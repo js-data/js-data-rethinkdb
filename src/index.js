@@ -53,7 +53,8 @@ var reserved = [
   'where'
 ];
 
-function filterQuery(r, resourceConfig, params) {
+function filterQuery(resourceConfig, params) {
+  var r = this.r;
   params = params || {};
   params.where = params.where || {};
   params.orderBy = params.orderBy || params.sort;
@@ -74,7 +75,7 @@ function filterQuery(r, resourceConfig, params) {
     }
   });
 
-  var query = r.table(resourceConfig.endpoint);
+  var query = r.db(this.defaults.db).table(resourceConfig.endpoint);
   var subQuery;
 
   DSUtils.forOwn(params.where, function (criteria, field) {
@@ -159,7 +160,7 @@ function DSRethinkDBAdapter(options) {
 var dsRethinkDBAdapterPrototype = DSRethinkDBAdapter.prototype;
 
 dsRethinkDBAdapterPrototype.find = function find(resourceConfig, id) {
-  return this.r.table(resourceConfig.endpoint).get(id).run().then(function (item) {
+  return this.r.db(this.defaults.db).table(resourceConfig.endpoint).get(id).run().then(function (item) {
     if (!item) {
       throw new Error('Not Found!');
     } else {
@@ -169,24 +170,24 @@ dsRethinkDBAdapterPrototype.find = function find(resourceConfig, id) {
 };
 
 dsRethinkDBAdapterPrototype.findAll = function (resourceConfig, params) {
-  return filterQuery(this.r, resourceConfig, params).run();
+  return filterQuery.call(this, resourceConfig, params).run();
 };
 
 dsRethinkDBAdapterPrototype.create = function (resourceConfig, attrs) {
-  return this.r.table(resourceConfig.endpoint).insert(attrs, { returnChanges: true }).run().then(function (cursor) {
+  return this.r.db(this.defaults.db).table(resourceConfig.endpoint).insert(attrs, { returnChanges: true }).run().then(function (cursor) {
     return cursor.changes[0].new_val;
   });
 };
 
 dsRethinkDBAdapterPrototype.update = function (resourceConfig, id, attrs) {
-  return this.r.table(resourceConfig.endpoint).get(id).update(attrs, { returnChanges: true }).run().then(function (cursor) {
+  return this.r.db(this.defaults.db).table(resourceConfig.endpoint).get(id).update(attrs, { returnChanges: true }).run().then(function (cursor) {
     return cursor.changes[0].new_val;
   });
 };
 
 dsRethinkDBAdapterPrototype.updateAll = function (resourceConfig, attrs, params) {
   params = params || {};
-  return filterQuery(this.r, resourceConfig, params).update(attrs, { returnChanges: true }).run().then(function (cursor) {
+  return filterQuery.call(this, resourceConfig, params).update(attrs, { returnChanges: true }).run().then(function (cursor) {
     var items = [];
     cursor.changes.forEach(function (change) {
       items.push(change.new_val);
@@ -196,14 +197,14 @@ dsRethinkDBAdapterPrototype.updateAll = function (resourceConfig, attrs, params)
 };
 
 dsRethinkDBAdapterPrototype.destroy = function (resourceConfig, id) {
-  return this.r.table(resourceConfig.endpoint).get(id).delete().run().then(function () {
+  return this.r.db(this.defaults.db).table(resourceConfig.endpoint).get(id).delete().run().then(function () {
     return undefined;
   });
 };
 
 dsRethinkDBAdapterPrototype.destroyAll = function (resourceConfig, params) {
   params = params || {};
-  return filterQuery(this.r, resourceConfig, params).delete().run().then(function () {
+  return filterQuery.call(this, resourceConfig, params).delete().run().then(function () {
     return undefined;
   });
 };
