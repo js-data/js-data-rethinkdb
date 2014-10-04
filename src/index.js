@@ -7,11 +7,7 @@ var contains = require('mout/array/contains');
 var isObject = require('mout/lang/isObject');
 var isString = require('mout/lang/isString');
 var upperCase = require('mout/string/upperCase');
-
-try {
-  rethinkdbdash = require('rethinkdbdash');
-} catch (e) {
-}
+var underscore = require('mout/string/underscore');
 
 function Defaults() {
 
@@ -55,7 +51,7 @@ function filterQuery(resourceConfig, params) {
     }
   });
 
-  var query = r.db(this.defaults.db).table(resourceConfig.endpoint);
+  var query = r.db(this.defaults.db).table(resourceConfig.table || underscore(resourceConfig.name));
   var subQuery;
 
   forOwn(params.where, function (criteria, field) {
@@ -140,7 +136,7 @@ function DSRethinkDBAdapter(options) {
 var dsRethinkDBAdapterPrototype = DSRethinkDBAdapter.prototype;
 
 dsRethinkDBAdapterPrototype.find = function find(resourceConfig, id) {
-  return this.r.db(this.defaults.db).table(resourceConfig.endpoint).get(id).run().then(function (item) {
+  return this.r.db(this.defaults.db).table(resourceConfig.table || underscore(resourceConfig.name)).get(id).run().then(function (item) {
     if (!item) {
       throw new Error('Not Found!');
     } else {
@@ -154,13 +150,13 @@ dsRethinkDBAdapterPrototype.findAll = function (resourceConfig, params) {
 };
 
 dsRethinkDBAdapterPrototype.create = function (resourceConfig, attrs) {
-  return this.r.db(this.defaults.db).table(resourceConfig.endpoint).insert(attrs, { returnChanges: true }).run().then(function (cursor) {
+  return this.r.db(this.defaults.db).table(resourceConfig.table || underscore(resourceConfig.name)).insert(attrs, { returnChanges: true }).run().then(function (cursor) {
     return cursor.changes[0].new_val;
   });
 };
 
 dsRethinkDBAdapterPrototype.update = function (resourceConfig, id, attrs) {
-  return this.r.db(this.defaults.db).table(resourceConfig.endpoint).get(id).update(attrs, { returnChanges: true }).run().then(function (cursor) {
+  return this.r.db(this.defaults.db).table(resourceConfig.table || underscore(resourceConfig.name)).get(id).update(attrs, { returnChanges: true }).run().then(function (cursor) {
     return cursor.changes[0].new_val;
   });
 };
@@ -177,7 +173,7 @@ dsRethinkDBAdapterPrototype.updateAll = function (resourceConfig, attrs, params)
 };
 
 dsRethinkDBAdapterPrototype.destroy = function (resourceConfig, id) {
-  return this.r.db(this.defaults.db).table(resourceConfig.endpoint).get(id).delete().run().then(function () {
+  return this.r.db(this.defaults.db).table(resourceConfig.table || underscore(resourceConfig.name)).get(id).delete().run().then(function () {
     return undefined;
   });
 };
