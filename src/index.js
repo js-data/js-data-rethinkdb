@@ -1,36 +1,17 @@
-var JSData, rethinkdbdash;
-
-try {
-  JSData = require('js-data');
-} catch (e) {
-}
+var rethinkdbdash = require('rethinkdbdash');
+var forOwn = require('mout/object/forOwn');
+var keys = require('mout/object/keys');
+var deepMixIn = require('mout/object/deepMixIn');
+var forEach = require('mout/array/forEach');
+var contains = require('mout/array/contains');
+var isObject = require('mout/lang/isObject');
+var isString = require('mout/lang/isString');
+var upperCase = require('mout/string/upperCase');
 
 try {
   rethinkdbdash = require('rethinkdbdash');
 } catch (e) {
 }
-
-if (!JSData) {
-  try {
-    JSData = window.JSData;
-  } catch (e) {
-  }
-}
-
-if (!rethinkdbdash) {
-  try {
-    rethinkdbdash = window.rethinkdbdash;
-  } catch (e) {
-  }
-}
-
-if (!JSData) {
-  throw new Error('js-data must be loaded!');
-} else if (!rethinkdbdash) {
-  throw new Error('rethinkdbdash must be loaded!');
-}
-
-var DSUtils = JSData.DSUtils;
 
 function Defaults() {
 
@@ -60,11 +41,10 @@ function filterQuery(resourceConfig, params) {
   params.orderBy = params.orderBy || params.sort;
   params.skip = params.skip || params.offset;
 
-  var keys = Object.keys(params);
-  keys.forEach(function (k) {
+  forEach(keys(params), function (k) {
     var v = params[k];
-    if (!DSUtils.contains(reserved, k)) {
-      if (DSUtils.isObject(v)) {
+    if (!contains(reserved, k)) {
+      if (isObject(v)) {
         params.where[k] = v;
       } else {
         params.where[k] = {
@@ -78,13 +58,13 @@ function filterQuery(resourceConfig, params) {
   var query = r.db(this.defaults.db).table(resourceConfig.endpoint);
   var subQuery;
 
-  DSUtils.forOwn(params.where, function (criteria, field) {
-    if (!DSUtils.isObject(criteria)) {
+  forOwn(params.where, function (criteria, field) {
+    if (!isObject(criteria)) {
       params.where[field] = {
         '==': criteria
       };
     }
-    DSUtils.forOwn(criteria, function (v, op) {
+    forOwn(criteria, function (v, op) {
       if (op === '==' || op === '===') {
         subQuery = subQuery ? subQuery.and(r.row(field).eq(v)) : r.row(field).eq(v);
       } else if (op === '!=' || op === '!==') {
@@ -126,16 +106,16 @@ function filterQuery(resourceConfig, params) {
   }
 
   if (params.orderBy) {
-    if (utils.isString(params.orderBy)) {
+    if (isString(params.orderBy)) {
       params.orderBy = [
         [params.orderBy, 'asc']
       ];
     }
     for (var i = 0; i < params.orderBy.length; i++) {
-      if (utils.isString(params.orderBy[i])) {
+      if (isString(params.orderBy[i])) {
         params.orderBy[i] = [params.orderBy[i], 'asc'];
       }
-      query = utils.upperCase(params.orderBy[i][1]) === 'DESC' ? query.orderBy(r.desc(params.orderBy[i][0])) : query.orderBy(params.orderBy[i][0]);
+      query = upperCase(params.orderBy[i][1]) === 'DESC' ? query.orderBy(r.desc(params.orderBy[i][0])) : query.orderBy(params.orderBy[i][0]);
     }
   }
 
@@ -153,7 +133,7 @@ function filterQuery(resourceConfig, params) {
 function DSRethinkDBAdapter(options) {
   options = options || {};
   this.defaults = new Defaults();
-  DSUtils.deepMixIn(this.defaults, options);
+  deepMixIn(this.defaults, options);
   this.r = rethinkdbdash(this.defaults);
 }
 
