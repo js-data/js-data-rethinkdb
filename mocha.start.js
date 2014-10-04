@@ -49,11 +49,7 @@ test.globals(testGlobals);
 
 beforeEach(function () {
   store = new JSData.DS();
-  adapter = new DSRethinkDBAdapter({
-    min: 10,
-    max: 50,
-    bufferSize: 10
-  });
+  adapter = new DSRethinkDBAdapter();
   DSUtils = JSData.DSUtils;
   DSErrors = JSData.DSErrors;
   globals.User = global.User = User = store.defineResource('user');
