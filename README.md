@@ -14,7 +14,6 @@ RethinkDB adapter for [js-data](http://www.js-data.io/js-data).
 
 | Branch | Master |
 | ------ | ------ |
-| Bower | [![Bower version](https://badge.fury.io/bo/js-data-rethinkdb.png)](http://badge.fury.io/bo/js-data-rethinkdb) |
 | NPM | [![NPM version](https://badge.fury.io/js/js-data-rethinkdb.png)](http://badge.fury.io/js/js-data-rethinkdb) |
 | Build Status | [![Build Status](https://travis-ci.org/js-data/js-data-rethinkdb.png?branch=master)](https://travis-ci.org/js-data/js-data-rethinkdb) |
 | Code Climate | [![Code Climate](https://codeclimate.com/github/js-data/js-data-rethinkdb.png)](https://codeclimate.com/github/js-data/js-data-rethinkdb) |
@@ -22,16 +21,17 @@ RethinkDB adapter for [js-data](http://www.js-data.io/js-data).
 | Coverage | [![Coverage Status](https://coveralls.io/repos/js-data/js-data-rethinkdb/badge.png?branch=master)](https://coveralls.io/r/js-data/js-data-rethinkdb?branch=master) |
 
 ## Quick Start
-`bower install --save rethinkdbdash js-data js-data-rethinkdb` or `npm install --save rethinkdbdash js-data js-data-rethinkdb`.
-
-Load Mozilla's `rethinkdbdash.js`.
-
-Load `js-data-rethinkdb.js` after `js-data.js`.
+`npm install --save js-data js-data-rethinkdb`.
 
 ```js
-var adapter = new DSRethinkDBAdapter();
+var JSData = require('js-data');
+var DSRethinkDBAdapter = require('js-data-rethinkdb');
 
 var store = new JSData.DS();
+
+// "r" will be available at adapter.r
+var adapter = new DSRethinkDBAdapter();
+
 store.registerAdapter('rethinkdb', adapter, { default: true });
 
 // "store" will now use the RethinkDB adapter for all async operations
