@@ -1,7 +1,7 @@
 {
   "name": "js-data-rethinkdb",
   "description": "RethinkDB adapter for js-data.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "homepage": "http://www.js-data.io/js-data-rethinkdb",
   "repository": {
     "type": "git",
