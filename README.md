@@ -7,9 +7,6 @@ RethinkDB adapter for [js-data](http://www.js-data.io/js-data).
 ## API Documentation
 [DSRethinkDBAdapter](https://github.com/js-data/js-data/wiki/DSRethinkDBAdapter)
 
-## Demo
-[https://js-data-rethinkdb.firebaseapp.com/](https://js-data-rethinkdb.firebaseapp.com/)
-
 ## Project Status
 
 | Branch | Master |
