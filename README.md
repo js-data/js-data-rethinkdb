@@ -2,10 +2,10 @@
 
 ## js-data-rethinkdb
 
-RethinkDB adapter for [js-data](http://www.js-data.io/js-data).
+RethinkDB adapter for [js-data](http://www.js-data.io/).
 
 ## API Documentation
-[DSRethinkDBAdapter](https://github.com/js-data/js-data/wiki/DSRethinkDBAdapter)
+[DSRethinkDBAdapter](http://www.js-data.io/docs/dsrethinkdbadapter)
 
 ## Project Status
 
