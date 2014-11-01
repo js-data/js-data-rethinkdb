@@ -30,9 +30,10 @@ var reserved = [
   'where'
 ];
 
-function filterQuery(resourceConfig, params) {
+function filterQuery(resourceConfig, params, options) {
   var r = this.r;
   params = params || {};
+  options = options || {};
   params.where = params.where || {};
   params.orderBy = params.orderBy || params.sort;
   params.skip = params.skip || params.offset;
@@ -51,7 +52,7 @@ function filterQuery(resourceConfig, params) {
     }
   });
 
-  var query = r.db(this.defaults.db).table(resourceConfig.table || underscore(resourceConfig.name));
+  var query = r.db(options.db || this.defaults.db).table(resourceConfig.table || underscore(resourceConfig.name));
   var subQuery;
 
   forOwn(params.where, function (criteria, field) {
@@ -131,12 +132,41 @@ function DSRethinkDBAdapter(options) {
   this.defaults = new Defaults();
   deepMixIn(this.defaults, options);
   this.r = rethinkdbdash(this.defaults);
+  this.databases = {};
+  this.tables = {};
 }
 
 var dsRethinkDBAdapterPrototype = DSRethinkDBAdapter.prototype;
 
-dsRethinkDBAdapterPrototype.find = function find(resourceConfig, id) {
-  return this.r.db(this.defaults.db).table(resourceConfig.table || underscore(resourceConfig.name)).get(id).run().then(function (item) {
+dsRethinkDBAdapterPrototype.waitForDb = function waitForDb(options) {
+  var _this = this;
+  options = options || {};
+  var db = options.db || _this.defaults.db;
+  if (!_this.databases[db]) {
+    _this.databases[db] = _this.r.branch(_this.r.dbList().contains(db), true, _this.r.dbCreate(db)).run();
+  }
+  return _this.databases[db];
+};
+
+dsRethinkDBAdapterPrototype.waitForTable = function waitForTable(table, options) {
+  var _this = this;
+  options = options || {};
+  var db = options.db || _this.defaults.db;
+  return _this.waitForDb(options).then(function () {
+    _this.tables[db] = _this.tables[db] || {};
+    if (!_this.tables[db][table]) {
+      _this.tables[db][table] = _this.r.branch(_this.r.db(db).tableList().contains(table), true, _this.r.db(db).tableCreate(table)).run();
+    }
+    return _this.tables[db][table];
+  });
+};
+
+dsRethinkDBAdapterPrototype.find = function find(resourceConfig, id, options) {
+  var _this = this;
+  options = options || {};
+  return _this.waitForTable(resourceConfig.table || underscore(resourceConfig.name), options).then(function () {
+    return _this.r.db(options.db || _this.defaults.db).table(resourceConfig.table || underscore(resourceConfig.name)).get(id).run();
+  }).then(function (item) {
     if (!item) {
       throw new Error('Not Found!');
     } else {
@@ -145,25 +175,41 @@ dsRethinkDBAdapterPrototype.find = function find(resourceConfig, id) {
   });
 };
 
-dsRethinkDBAdapterPrototype.findAll = function (resourceConfig, params) {
-  return filterQuery.call(this, resourceConfig, params).run();
+dsRethinkDBAdapterPrototype.findAll = function (resourceConfig, params, options) {
+  var _this = this;
+  options = options || {};
+  return _this.waitForTable(resourceConfig.table || underscore(resourceConfig.name), options).then(function () {
+    return filterQuery.call(_this, resourceConfig, params, options).run();
+  });
 };
 
-dsRethinkDBAdapterPrototype.create = function (resourceConfig, attrs) {
-  return this.r.db(this.defaults.db).table(resourceConfig.table || underscore(resourceConfig.name)).insert(attrs, { returnChanges: true }).run().then(function (cursor) {
+dsRethinkDBAdapterPrototype.create = function (resourceConfig, attrs, options) {
+  var _this = this;
+  options = options || {};
+  return _this.waitForTable(resourceConfig.table || underscore(resourceConfig.name), options).then(function () {
+    return _this.r.db(options.db || _this.defaults.db).table(resourceConfig.table || underscore(resourceConfig.name)).insert(attrs, { returnChanges: true }).run();
+  }).then(function (cursor) {
     return cursor.changes[0].new_val;
   });
 };
 
-dsRethinkDBAdapterPrototype.update = function (resourceConfig, id, attrs) {
-  return this.r.db(this.defaults.db).table(resourceConfig.table || underscore(resourceConfig.name)).get(id).update(attrs, { returnChanges: true }).run().then(function (cursor) {
+dsRethinkDBAdapterPrototype.update = function (resourceConfig, id, attrs, options) {
+  var _this = this;
+  options = options || {};
+  return _this.waitForTable(resourceConfig.table || underscore(resourceConfig.name), options).then(function () {
+    return _this.r.db(options.db || _this.defaults.db).table(resourceConfig.table || underscore(resourceConfig.name)).get(id).update(attrs, { returnChanges: true }).run();
+  }).then(function (cursor) {
     return cursor.changes[0].new_val;
   });
 };
 
-dsRethinkDBAdapterPrototype.updateAll = function (resourceConfig, attrs, params) {
+dsRethinkDBAdapterPrototype.updateAll = function (resourceConfig, attrs, params, options) {
+  var _this = this;
+  options = options || {};
   params = params || {};
-  return filterQuery.call(this, resourceConfig, params).update(attrs, { returnChanges: true }).run().then(function (cursor) {
+  return _this.waitForTable(resourceConfig.table || underscore(resourceConfig.name), options).then(function () {
+    return filterQuery.call(_this, resourceConfig, params, options).update(attrs, { returnChanges: true }).run();
+  }).then(function (cursor) {
     var items = [];
     cursor.changes.forEach(function (change) {
       items.push(change.new_val);
@@ -172,15 +218,23 @@ dsRethinkDBAdapterPrototype.updateAll = function (resourceConfig, attrs, params)
   });
 };
 
-dsRethinkDBAdapterPrototype.destroy = function (resourceConfig, id) {
-  return this.r.db(this.defaults.db).table(resourceConfig.table || underscore(resourceConfig.name)).get(id).delete().run().then(function () {
+dsRethinkDBAdapterPrototype.destroy = function (resourceConfig, id, options) {
+  var _this = this;
+  options = options || {};
+  return _this.waitForTable(resourceConfig.table || underscore(resourceConfig.name), options).then(function () {
+    return _this.r.db(options.db || _this.defaults.db).table(resourceConfig.table || underscore(resourceConfig.name)).get(id).delete().run();
+  }).then(function () {
     return undefined;
   });
 };
 
-dsRethinkDBAdapterPrototype.destroyAll = function (resourceConfig, params) {
+dsRethinkDBAdapterPrototype.destroyAll = function (resourceConfig, params, options) {
+  var _this = this;
+  options = options || {};
   params = params || {};
-  return filterQuery.call(this, resourceConfig, params).delete().run().then(function () {
+  return _this.waitForTable(resourceConfig.table || underscore(resourceConfig.name), options).then(function () {
+    return filterQuery.call(_this, resourceConfig, params, options).delete().run();
+  }).then(function () {
     return undefined;
   });
 };

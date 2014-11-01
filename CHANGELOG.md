@@ -1,3 +1,8 @@
+##### 1.0.0-alpha.1 - 01 November 2014
+
+###### Backwards compatible API changes
+- #1 - auto create db and tables if they don't exist
+
 ##### 0.2.0 - 03 October 2014
 
 ###### Breaking API changes
