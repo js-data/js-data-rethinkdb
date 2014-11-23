@@ -1,3 +1,8 @@
+##### 1.0.0-alpha.3 - 23 November 2014
+
+###### Backwards compatible bug fixes
+- Fixed the "in", "notIn", "|in", and "|notIn" operators
+
 ##### 1.0.0-alpha.2 - 23 November 2014
 
 Upgraded dependencies

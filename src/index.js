@@ -63,37 +63,37 @@ function filterQuery(resourceConfig, params, options) {
     }
     forOwn(criteria, function (v, op) {
       if (op === '==' || op === '===') {
-        subQuery = subQuery ? subQuery.and(r.row(field).eq(v)) : r.row(field).eq(v);
+        subQuery = subQuery ? subQuery.and(r.row(field).default(null).eq(v)) : r.row(field).default(null).eq(v);
       } else if (op === '!=' || op === '!==') {
-        subQuery = subQuery ? subQuery.and(r.row(field).ne(v)) : r.row(field).ne(v);
+        subQuery = subQuery ? subQuery.and(r.row(field).default(null).ne(v)) : r.row(field).default(null).ne(v);
       } else if (op === '>') {
-        subQuery = subQuery ? subQuery.and(r.row(field).gt(v)) : r.row(field).gt(v);
+        subQuery = subQuery ? subQuery.and(r.row(field).default(null).gt(v)) : r.row(field).default(null).gt(v);
       } else if (op === '>=') {
-        subQuery = subQuery ? subQuery.and(r.row(field).ge(v)) : r.row(field).ge(v);
+        subQuery = subQuery ? subQuery.and(r.row(field).default(null).ge(v)) : r.row(field).default(null).ge(v);
       } else if (op === '<') {
-        subQuery = subQuery ? subQuery.and(r.row(field).lt(v)) : r.row(field).lt(v);
+        subQuery = subQuery ? subQuery.and(r.row(field).default(null).lt(v)) : r.row(field).default(null).lt(v);
       } else if (op === '<=') {
-        subQuery = subQuery ? subQuery.and(r.row(field).le(v)) : r.row(field).le(v);
+        subQuery = subQuery ? subQuery.and(r.row(field).default(null).le(v)) : r.row(field).default(null).le(v);
       } else if (op === 'in') {
-        subQuery = subQuery ? subQuery.and(r.row(field).contains(v)) : r.row(field).contains(v);
+        subQuery = subQuery ? subQuery.and(r.expr(v).default(r.expr([])).contains(r.row(field).default(null))) : r.expr(v).default(r.expr([])).contains(r.row(field).default(null));
       } else if (op === 'notIn') {
-        subQuery = subQuery ? subQuery.and(r.row(field).contains(v).not()) : r.row(field).contains(v).not();
+        subQuery = subQuery ? subQuery.and(r.expr(v).default(r.expr([])).contains(r.row(field).default(null)).not()) : r.expr(v).default(r.expr([])).contains(r.row(field).default(null)).not();
       } else if (op === '|==' || op === '|===') {
-        subQuery = subQuery ? subQuery.or(r.row(field).eq(v)) : r.row(field).eq(v);
+        subQuery = subQuery ? subQuery.or(r.row(field).default(null).eq(v)) : r.row(field).default(null).eq(v);
       } else if (op === '|!=' || op === '|!==') {
-        subQuery = subQuery ? subQuery.or(r.row(field).ne(v)) : r.row(field).ne(v);
+        subQuery = subQuery ? subQuery.or(r.row(field).default(null).ne(v)) : r.row(field).default(null).ne(v);
       } else if (op === '|>') {
-        subQuery = subQuery ? subQuery.or(r.row(field).gt(v)) : r.row(field).gt(v);
+        subQuery = subQuery ? subQuery.or(r.row(field).default(null).gt(v)) : r.row(field).default(null).gt(v);
       } else if (op === '|>=') {
-        subQuery = subQuery ? subQuery.or(r.row(field).ge(v)) : r.row(field).ge(v);
+        subQuery = subQuery ? subQuery.or(r.row(field).default(null).ge(v)) : r.row(field).default(null).ge(v);
       } else if (op === '|<') {
-        subQuery = subQuery ? subQuery.or(r.row(field).lt(v)) : r.row(field).lt(v);
+        subQuery = subQuery ? subQuery.or(r.row(field).default(null).lt(v)) : r.row(field).default(null).lt(v);
       } else if (op === '|<=') {
-        subQuery = subQuery ? subQuery.or(r.row(field).le(v)) : r.row(field).le(v);
+        subQuery = subQuery ? subQuery.or(r.row(field).default(null).le(v)) : r.row(field).default(null).le(v);
       } else if (op === '|in') {
-        subQuery = subQuery ? subQuery.or(r.row(field).contains(v)) : r.row(field).contains(v);
+        subQuery = subQuery ? subQuery.or(r.expr(v).default(r.expr([])).contains(r.row(field).default(null))) : r.expr(v).default(r.expr([])).contains(r.row(field).default(null));
       } else if (op === '|notIn') {
-        subQuery = subQuery ? subQuery.or(r.row(field).contains(v).not()) : r.row(field).contains(v).not();
+        subQuery = subQuery ? subQuery.or(r.expr(v).default(r.expr([])).contains(r.row(field).default(null)).not()) : r.expr(v).default(r.expr([])).contains(r.row(field).default(null)).not();
       }
     });
   });
