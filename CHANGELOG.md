@@ -1,3 +1,7 @@
+##### 1.0.0-alpha.2 - 23 November 2014
+
+Upgraded dependencies
+
 ##### 1.0.0-alpha.1 - 01 November 2014
 
 ###### Backwards compatible API changes
