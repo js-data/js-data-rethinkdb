@@ -1,3 +1,8 @@
+##### 1.0.0-alpha.4 - 23 November 2014
+
+###### Backwards compatible bug fixes
+- Fixed improper use of r.row in nested queries
+
 ##### 1.0.0-alpha.3 - 23 November 2014
 
 ###### Backwards compatible bug fixes

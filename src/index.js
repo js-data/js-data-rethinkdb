@@ -5,6 +5,7 @@ var deepMixIn = require('mout/object/deepMixIn');
 var forEach = require('mout/array/forEach');
 var contains = require('mout/array/contains');
 var isObject = require('mout/lang/isObject');
+var isEmpty = require('mout/lang/isEmpty');
 var isString = require('mout/lang/isString');
 var upperCase = require('mout/string/upperCase');
 var underscore = require('mout/string/underscore');
@@ -53,53 +54,54 @@ function filterQuery(resourceConfig, params, options) {
   });
 
   var query = r.db(options.db || this.defaults.db).table(resourceConfig.table || underscore(resourceConfig.name));
-  var subQuery;
 
-  forOwn(params.where, function (criteria, field) {
-    if (!isObject(criteria)) {
-      params.where[field] = {
-        '==': criteria
-      };
-    }
-    forOwn(criteria, function (v, op) {
-      if (op === '==' || op === '===') {
-        subQuery = subQuery ? subQuery.and(r.row(field).default(null).eq(v)) : r.row(field).default(null).eq(v);
-      } else if (op === '!=' || op === '!==') {
-        subQuery = subQuery ? subQuery.and(r.row(field).default(null).ne(v)) : r.row(field).default(null).ne(v);
-      } else if (op === '>') {
-        subQuery = subQuery ? subQuery.and(r.row(field).default(null).gt(v)) : r.row(field).default(null).gt(v);
-      } else if (op === '>=') {
-        subQuery = subQuery ? subQuery.and(r.row(field).default(null).ge(v)) : r.row(field).default(null).ge(v);
-      } else if (op === '<') {
-        subQuery = subQuery ? subQuery.and(r.row(field).default(null).lt(v)) : r.row(field).default(null).lt(v);
-      } else if (op === '<=') {
-        subQuery = subQuery ? subQuery.and(r.row(field).default(null).le(v)) : r.row(field).default(null).le(v);
-      } else if (op === 'in') {
-        subQuery = subQuery ? subQuery.and(r.expr(v).default(r.expr([])).contains(r.row(field).default(null))) : r.expr(v).default(r.expr([])).contains(r.row(field).default(null));
-      } else if (op === 'notIn') {
-        subQuery = subQuery ? subQuery.and(r.expr(v).default(r.expr([])).contains(r.row(field).default(null)).not()) : r.expr(v).default(r.expr([])).contains(r.row(field).default(null)).not();
-      } else if (op === '|==' || op === '|===') {
-        subQuery = subQuery ? subQuery.or(r.row(field).default(null).eq(v)) : r.row(field).default(null).eq(v);
-      } else if (op === '|!=' || op === '|!==') {
-        subQuery = subQuery ? subQuery.or(r.row(field).default(null).ne(v)) : r.row(field).default(null).ne(v);
-      } else if (op === '|>') {
-        subQuery = subQuery ? subQuery.or(r.row(field).default(null).gt(v)) : r.row(field).default(null).gt(v);
-      } else if (op === '|>=') {
-        subQuery = subQuery ? subQuery.or(r.row(field).default(null).ge(v)) : r.row(field).default(null).ge(v);
-      } else if (op === '|<') {
-        subQuery = subQuery ? subQuery.or(r.row(field).default(null).lt(v)) : r.row(field).default(null).lt(v);
-      } else if (op === '|<=') {
-        subQuery = subQuery ? subQuery.or(r.row(field).default(null).le(v)) : r.row(field).default(null).le(v);
-      } else if (op === '|in') {
-        subQuery = subQuery ? subQuery.or(r.expr(v).default(r.expr([])).contains(r.row(field).default(null))) : r.expr(v).default(r.expr([])).contains(r.row(field).default(null));
-      } else if (op === '|notIn') {
-        subQuery = subQuery ? subQuery.or(r.expr(v).default(r.expr([])).contains(r.row(field).default(null)).not()) : r.expr(v).default(r.expr([])).contains(r.row(field).default(null)).not();
-      }
+  if (!isEmpty(params.where)) {
+    query = query.filter(function (row) {
+      var subQuery;
+      forOwn(params.where, function (criteria, field) {
+        if (!isObject(criteria)) {
+          params.where[field] = {
+            '==': criteria
+          };
+        }
+        forOwn(criteria, function (v, op) {
+          if (op === '==' || op === '===') {
+            subQuery = subQuery ? subQuery.and(row(field).default(null).eq(v)) : row(field).default(null).eq(v);
+          } else if (op === '!=' || op === '!==') {
+            subQuery = subQuery ? subQuery.and(row(field).default(null).ne(v)) : row(field).default(null).ne(v);
+          } else if (op === '>') {
+            subQuery = subQuery ? subQuery.and(row(field).default(null).gt(v)) : row(field).default(null).gt(v);
+          } else if (op === '>=') {
+            subQuery = subQuery ? subQuery.and(row(field).default(null).ge(v)) : row(field).default(null).ge(v);
+          } else if (op === '<') {
+            subQuery = subQuery ? subQuery.and(row(field).default(null).lt(v)) : row(field).default(null).lt(v);
+          } else if (op === '<=') {
+            subQuery = subQuery ? subQuery.and(row(field).default(null).le(v)) : row(field).default(null).le(v);
+          } else if (op === 'in') {
+            subQuery = subQuery ? subQuery.and(r.expr(v).default(r.expr([])).contains(row(field).default(null))) : r.expr(v).default(r.expr([])).contains(row(field).default(null));
+          } else if (op === 'notIn') {
+            subQuery = subQuery ? subQuery.and(r.expr(v).default(r.expr([])).contains(row(field).default(null)).not()) : r.expr(v).default(r.expr([])).contains(row(field).default(null)).not();
+          } else if (op === '|==' || op === '|===') {
+            subQuery = subQuery ? subQuery.or(row(field).default(null).eq(v)) : row(field).default(null).eq(v);
+          } else if (op === '|!=' || op === '|!==') {
+            subQuery = subQuery ? subQuery.or(row(field).default(null).ne(v)) : row(field).default(null).ne(v);
+          } else if (op === '|>') {
+            subQuery = subQuery ? subQuery.or(row(field).default(null).gt(v)) : row(field).default(null).gt(v);
+          } else if (op === '|>=') {
+            subQuery = subQuery ? subQuery.or(row(field).default(null).ge(v)) : row(field).default(null).ge(v);
+          } else if (op === '|<') {
+            subQuery = subQuery ? subQuery.or(row(field).default(null).lt(v)) : row(field).default(null).lt(v);
+          } else if (op === '|<=') {
+            subQuery = subQuery ? subQuery.or(row(field).default(null).le(v)) : row(field).default(null).le(v);
+          } else if (op === '|in') {
+            subQuery = subQuery ? subQuery.or(r.expr(v).default(r.expr([])).contains(row(field).default(null))) : r.expr(v).default(r.expr([])).contains(row(field).default(null));
+          } else if (op === '|notIn') {
+            subQuery = subQuery ? subQuery.or(r.expr(v).default(r.expr([])).contains(row(field).default(null)).not()) : r.expr(v).default(r.expr([])).contains(row(field).default(null)).not();
+          }
+        });
+      });
+      return subQuery;
     });
-  });
-
-  if (subQuery) {
-    query = query.filter(subQuery);
   }
 
   if (params.orderBy) {
