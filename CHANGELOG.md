@@ -1,3 +1,8 @@
+##### 1.0.0-alpha.5 - 28 November 2014
+
+###### Backwards compatible API changes
+- Added isectEmpty, isectNotEmpty, |isectEmpty, and |isectNotEmpty filter operators.
+
 ##### 1.0.0-alpha.4 - 23 November 2014
 
 ###### Backwards compatible bug fixes
