@@ -1,3 +1,7 @@
+##### 1.0.0-beta.1 - 12 January 2015
+
+Now in beta.
+
 ##### 1.0.0-alpha.5 - 28 November 2014
 
 ###### Backwards compatible API changes
