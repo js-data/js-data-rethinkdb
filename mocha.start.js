@@ -6,7 +6,6 @@ var mocha = require('mocha');
 var sinon = require('sinon');
 var DSRethinkDBAdapter = require('./');
 var JSData = require('js-data');
-var Promise = require('bluebird');
 
 var adapter, store, DSUtils, DSErrors, User, Post, Comment;
 
