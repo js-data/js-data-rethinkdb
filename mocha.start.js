@@ -6,8 +6,9 @@ var mocha = require('mocha');
 var sinon = require('sinon');
 var DSRethinkDBAdapter = require('./');
 var JSData = require('js-data');
+var Promise = require('bluebird');
 
-var adapter, store, DSUtils, DSErrors, User;
+var adapter, store, DSUtils, DSErrors, User, Post, Comment;
 
 var globals = module.exports = {
   fail: function (msg) {
@@ -52,7 +53,49 @@ beforeEach(function () {
   adapter = new DSRethinkDBAdapter();
   DSUtils = JSData.DSUtils;
   DSErrors = JSData.DSErrors;
-  globals.User = global.User = User = store.defineResource('user');
+  globals.User = global.User = User = store.defineResource({
+    name: 'user',
+    relations: {
+      hasMany: {
+        post: {
+          localField: 'posts',
+          foreignKey: 'post'
+        }
+      }
+    }
+  });
+  globals.Post = global.Post = Post = store.defineResource({
+    name: 'post',
+    relations: {
+      belongsTo: {
+        user: {
+          localField: 'user',
+          localKey: 'userId'
+        }
+      },
+      hasMany: {
+        comment: {
+          localField: 'comments',
+          foreignKey: 'postId'
+        }
+      }
+    }
+  });
+  globals.Comment = global.Comment = Comment = store.defineResource({
+    name: 'comment',
+    relations: {
+      belongsTo: {
+        post: {
+          localField: 'post',
+          localKey: 'postId'
+        },
+        user: {
+          localField: 'user',
+          localKey: 'userId'
+        }
+      }
+    }
+  });
 
   globals.adapter = adapter;
   global.adapter = globals.adapter;

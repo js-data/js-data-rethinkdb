@@ -1,14 +1,17 @@
 var rethinkdbdash = require('rethinkdbdash');
+var contains = require('mout/array/contains');
+var map = require('mout/array/map');
 var forOwn = require('mout/object/forOwn');
 var keys = require('mout/object/keys');
 var deepMixIn = require('mout/object/deepMixIn');
 var forEach = require('mout/array/forEach');
-var contains = require('mout/array/contains');
 var isObject = require('mout/lang/isObject');
+var isArray = require('mout/lang/isArray');
 var isEmpty = require('mout/lang/isEmpty');
 var isString = require('mout/lang/isString');
 var upperCase = require('mout/string/upperCase');
 var underscore = require('mout/string/underscore');
+var JSData = require('js-data');
 
 function Defaults() {
 
@@ -144,6 +147,7 @@ function DSRethinkDBAdapter(options) {
   this.r = rethinkdbdash(this.defaults);
   this.databases = {};
   this.tables = {};
+  this.indices = {};
 }
 
 var dsRethinkDBAdapterPrototype = DSRethinkDBAdapter.prototype;
@@ -171,15 +175,109 @@ dsRethinkDBAdapterPrototype.waitForTable = function waitForTable(table, options)
   });
 };
 
-dsRethinkDBAdapterPrototype.find = function find(resourceConfig, id, options) {
+dsRethinkDBAdapterPrototype.waitForIndex = function waitForIndex(table, index, options) {
   var _this = this;
   options = options || {};
-  return _this.waitForTable(resourceConfig.table || underscore(resourceConfig.name), options).then(function () {
-    return _this.r.db(options.db || _this.defaults.db).table(resourceConfig.table || underscore(resourceConfig.name)).get(id).run();
+  var db = options.db || _this.defaults.db;
+  return _this.waitForDb(options).then(function () {
+    return _this.waitForTable(table, options);
+  }).then(function () {
+    _this.indices[db] = _this.indices[db] || {};
+    _this.indices[db][table] = _this.indices[db][table] || {};
+    if (!_this.tables[db][table][index]) {
+      _this.tables[db][table][index] = _this.r.branch(_this.r.db(db).table(table).indexList().contains(index), true, _this.r.db(db).table(table).indexCreate(index)).run().then(function () {
+        return _this.r.db(db).table(table).indexWait(index).run();
+      });
+    }
+    return _this.tables[db][table][index];
+  });
+};
+
+dsRethinkDBAdapterPrototype.find = function find(resourceConfig, id, options) {
+  var _this = this;
+  var newModels = {};
+  var models = {};
+  var merge = {};
+  options = options || {};
+  var table = resourceConfig.table || underscore(resourceConfig.name);
+  var tasks = [_this.waitForTable(table, options)];
+  forEach(resourceConfig.relationList, function (def) {
+    var relationName = def.relation;
+    var relationDef = resourceConfig.getResource(relationName);
+    if (!relationDef) {
+      throw new JSData.DSErrors.NER(relationName);
+    }
+    if (def.foreignKey) {
+      tasks.push(_this.waitForIndex(relationDef.table || underscore(relationDef.name), def.foreignKey, options));
+    } else if (def.localKey) {
+      tasks.push(_this.waitForIndex(resourceConfig.table || underscore(resourceConfig.name), def.localKey, options));
+    }
+  });
+  return JSData.DSUtils.Promise.all(tasks).then(function () {
+    return _this.r.do(_this.r.table(table).get(id), function (doc) {
+      forEach(resourceConfig.relationList, function (def) {
+        var relationName = def.relation;
+        models[relationName] = resourceConfig.getResource(relationName);
+        if (!options.with || !options.with.length || !contains(options.with, relationName)) {
+          return;
+        }
+        if (!models[relationName]) {
+          throw new JSData.DSErrors.NER(relationName);
+        }
+        var localKey = def.localKey;
+        var localField = def.localField;
+        var foreignKey = def.foreignKey;
+        if (def.type === 'belongsTo') {
+          merge[localField] = _this.r.table(models[relationName].table || underscore(models[relationName].name)).get(doc(localKey).default(''));
+          newModels[localField] = {
+            modelName: relationName,
+            relation: 'belongsTo'
+          };
+        } else if (def.type === 'hasMany') {
+          merge[localField] = _this.r.table(models[relationName].table || underscore(models[relationName].name)).getAll(id, { index: foreignKey }).coerceTo('ARRAY');
+
+          newModels[localField] = {
+            modelName: relationName,
+            relation: 'hasMany'
+          };
+        } else if (def.type === 'hasOne') {
+          merge[localField] = _this.r.table(models[relationName].table || underscore(models[relationName].name));
+
+          if (localKey) {
+            merge[localField] = merge[localField].get(localKey);
+          } else {
+            merge[localField] = merge[localField].getAll(id, { index: foreignKey }).coerceTo('ARRAY');
+          }
+
+          newModels[localField] = {
+            modelName: relationName,
+            relation: 'hasOne'
+          };
+        }
+      });
+
+      if (!isEmpty(merge)) {
+        return doc.merge(merge);
+      }
+      return doc;
+    }).run();
   }).then(function (item) {
     if (!item) {
       throw new Error('Not Found!');
     } else {
+      forOwn(item, function (localValue, localKey) {
+        if (localKey in newModels) {
+          if (isObject(localValue)) {
+            item[localKey] = item[localKey];
+          } else if (isArray(localValue)) {
+            if (newModels[localKey].relation === 'hasOne' && localValue.length) {
+              item[localKey] = localValue[0];
+            } else {
+              item[localKey] = localValue;
+            }
+          }
+        }
+      });
       return item;
     }
   });
