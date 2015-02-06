@@ -1,6 +1,5 @@
 var rethinkdbdash = require('rethinkdbdash');
 var contains = require('mout/array/contains');
-var map = require('mout/array/map');
 var forOwn = require('mout/object/forOwn');
 var keys = require('mout/object/keys');
 var deepMixIn = require('mout/object/deepMixIn');
