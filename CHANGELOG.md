@@ -1,3 +1,7 @@
+##### 1.1.1 - 25 February 2015
+
+- Updated dependencies
+
 ##### 1.1.0 - 05 February 2015
 
 - #3, #4 - Added the `with` option to `DSRethinkDBAdapter#find` which allows for loading relations.

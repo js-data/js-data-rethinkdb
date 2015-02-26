@@ -7,11 +7,14 @@ RethinkDB adapter for [js-data](http://www.js-data.io/).
 ## API Documentation
 [DSRethinkDBAdapter](http://www.js-data.io/docs/dsrethinkdbadapter)
 
+## Example App
+[js-data-examples/server/rethinkdb](https://github.com/js-data/js-data-examples/tree/master/server/rethinkdb)
+
 ## Project Status
 
 | Branch | Master |
 | ------ | ------ |
-| NPM | [![NPM version](https://badge.fury.io/js/js-data-rethinkdb.png)](http://badge.fury.io/js/js-data-rethinkdb) |
+| NPM | [![NPM](https://nodei.co/npm/js-data-rethinkdb.png?downloads=true&stars=true)](https://nodei.co/npm/js-data-rethinkdb/) |
 | Build Status | [![Build Status](https://travis-ci.org/js-data/js-data-rethinkdb.png?branch=master)](https://travis-ci.org/js-data/js-data-rethinkdb) |
 | Code Climate | [![Code Climate](https://codeclimate.com/github/js-data/js-data-rethinkdb.png)](https://codeclimate.com/github/js-data/js-data-rethinkdb) |
 | Dependency Status | [![Dependency Status](https://gemnasium.com/js-data/js-data-rethinkdb.png)](https://gemnasium.com/js-data/js-data-rethinkdb) |

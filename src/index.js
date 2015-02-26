@@ -11,6 +11,7 @@ var isString = require('mout/lang/isString');
 var upperCase = require('mout/string/upperCase');
 var underscore = require('mout/string/underscore');
 var JSData = require('js-data');
+var P = JSData.DSUtils.Promise;
 
 function Defaults() {
 
@@ -212,7 +213,7 @@ dsRethinkDBAdapterPrototype.find = function find(resourceConfig, id, options) {
       tasks.push(_this.waitForIndex(resourceConfig.table || underscore(resourceConfig.name), def.localKey, options));
     }
   });
-  return JSData.DSUtils.Promise.all(tasks).then(function () {
+  return P.all(tasks).then(function () {
     return _this.r.do(_this.r.table(table).get(id), function (doc) {
       forEach(resourceConfig.relationList, function (def) {
         var relationName = def.relation;
@@ -262,7 +263,7 @@ dsRethinkDBAdapterPrototype.find = function find(resourceConfig, id, options) {
     }).run();
   }).then(function (item) {
     if (!item) {
-      throw new Error('Not Found!');
+      return P.reject(new Error('Not Found!'));
     } else {
       forOwn(item, function (localValue, localKey) {
         if (localKey in newModels) {
