@@ -1,7 +1,7 @@
 {
   "name": "js-data-rethinkdb",
   "description": "RethinkDB adapter for js-data.",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "homepage": "http://www.js-data.io/docs/dsrethinkdbadapter",
   "repository": {
     "type": "git",
@@ -17,7 +17,7 @@
       "url": "https://github.com/js-data/js-data-rethinkdb/blob/master/LICENSE"
     }
   ],
-  "main": "./src/index.js",
+  "main": "./dist/js-data-rethinkdb.js",
   "keywords": [
     "data",
     "datastore",
@@ -28,15 +28,21 @@
     "reql"
   ],
   "devDependencies": {
-    "chai": "2.1.0",
+    "babel-core": "^4.7.3",
+    "babel-loader": "^4.1.0",
+    "chai": "2.1.1",
     "grunt": "0.4.5",
-    "grunt-contrib-jshint": "0.11.0",
     "grunt-contrib-watch": "0.6.1",
     "grunt-karma-coveralls": "2.5.3",
     "grunt-mocha-test": "0.12.7",
+    "grunt-webpack": "^1.0.8",
     "jit-grunt": "0.9.1",
-    "sinon": "1.12.2",
-    "time-grunt": "1.1.0"
+    "jshint": "^2.6.3",
+    "jshint-loader": "^0.8.3",
+    "sinon": "1.13.0",
+    "time-grunt": "1.1.0",
+    "webpack": "^1.7.2",
+    "webpack-dev-server": "^1.7.0"
   },
   "scripts": {
     "test": "grunt test"

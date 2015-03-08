@@ -48,7 +48,9 @@ for (var key in globals) {
 test.globals(testGlobals);
 
 beforeEach(function () {
-  store = new JSData.DS();
+  store = new JSData.DS({
+    log: false
+  });
   adapter = new DSRethinkDBAdapter();
   DSUtils = JSData.DSUtils;
   DSErrors = JSData.DSErrors;

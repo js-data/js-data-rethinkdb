@@ -1,3 +1,8 @@
+##### 1.1.2 - 07 March 2015
+
+###### Other
+- Converted to ES6, using Babel.js to transpile to ES5.
+
 ##### 1.1.1 - 25 February 2015
 
 - Updated dependencies
