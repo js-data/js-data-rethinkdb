@@ -1,26 +1,28 @@
 <img src="https://raw.githubusercontent.com/js-data/js-data/master/js-data.png" alt="js-data logo" title="js-data" align="right" width="64" height="64" />
 
-## js-data-rethinkdb [![NPM version](https://badge.fury.io/js/js-data-rethinkdb.png)](http://badge.fury.io/js/js-data-rethinkdb)
+## js-data-rethinkdb [![npm version](https://img.shields.io/npm/v/js-data-rethinkdb.svg?style=flat-square)](https://www.npmjs.org/package/js-data-rethinkdb) [![Travis CI](https://img.shields.io/travis/js-data/js-data-rethinkdb.svg?style=flat-square)](https://travis-ci.org/js-data/js-data-rethinkdb) [![npm downloads](https://img.shields.io/npm/dm/js-data-rethinkdb.svg?style=flat-square)](https://www.npmjs.org/package/js-data-rethinkdb) [![License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](https://github.com/js-data/js-data-rethinkdb/blob/master/LICENSE)
 
 RethinkDB adapter for [js-data](http://www.js-data.io/).
 
-## API Documentation
+### API Documentation
 [DSRethinkDBAdapter](http://www.js-data.io/docs/dsrethinkdbadapter)
 
-## Example App
+### Example App
 [js-data-examples/server/rethinkdb](https://github.com/js-data/js-data-examples/tree/master/server/rethinkdb)
 
-## Project Status
+### Project Status
 
-| Branch | Master |
-| ------ | ------ |
-| NPM | [![NPM](https://nodei.co/npm/js-data-rethinkdb.png?downloads=true&stars=true)](https://nodei.co/npm/js-data-rethinkdb/) |
-| Build Status | [![Build Status](https://travis-ci.org/js-data/js-data-rethinkdb.png?branch=master)](https://travis-ci.org/js-data/js-data-rethinkdb) |
-| Code Climate | [![Code Climate](https://codeclimate.com/github/js-data/js-data-rethinkdb.png)](https://codeclimate.com/github/js-data/js-data-rethinkdb) |
-| Dependency Status | [![Dependency Status](https://gemnasium.com/js-data/js-data-rethinkdb.png)](https://gemnasium.com/js-data/js-data-rethinkdb) |
-| Coverage | [![Coverage Status](https://coveralls.io/repos/js-data/js-data-rethinkdb/badge.png?branch=master)](https://coveralls.io/r/js-data/js-data-rethinkdb?branch=master) |
+__Latest Release:__ [![Latest Release](https://img.shields.io/github/release/js-data/js-data-rethinkdb.svg?style=flat-square)](https://github.com/js-data/js-data-rethinkdb/releases)
 
-## Quick Start
+__Status:__
+
+[![Dependency Status](https://img.shields.io/gemnasium/js-data/js-data-rethinkdb.svg?style=flat-square)](https://gemnasium.com/js-data/js-data-rethinkdb) [![Codacity](https://img.shields.io/codacy/69206fcb0df6462ca559610af32fd1fb.svg?style=flat-square)](https://www.codacy.com/public/jasondobry/js-data-rethinkdb/dashboard)
+
+__Supported Platforms:__
+
+[![node version](https://img.shields.io/badge/Node-0.10%2B-green.svg?style=flat-square)](https://github.com/js-data/js-data)
+
+### Quick Start
 `npm install --save js-data js-data-rethinkdb`.
 
 ```js
@@ -37,16 +39,16 @@ store.registerAdapter('rethinkdb', adapter, { default: true });
 // "store" will now use the RethinkDB adapter for all async operations
 ```
 
-## Changelog
+### Changelog
 [CHANGELOG.md](https://github.com/js-data/js-data-rethinkdb/blob/master/CHANGELOG.md)
 
-## Community
+### Community
 - [Mailing List](https://groups.io/org/groupsio/jsdata) - Ask your questions!
 - [Issues](https://github.com/js-data/js-data-rethinkdb/issues) - Found a bug? Feature request? Submit an issue!
 - [GitHub](https://github.com/js-data/js-data-rethinkdb) - View the source code for js-data.
 - [Contributing Guide](https://github.com/js-data/js-data-rethinkdb/blob/master/CONTRIBUTING.md)
 
-## Contributing
+### Contributing
 
 First, feel free to contact me with questions. [Mailing List](https://groups.io/org/groupsio/jsdata). [Issues](https://github.com/js-data/js-data-rethinkdb/issues).
 
@@ -59,7 +61,7 @@ First, feel free to contact me with questions. [Mailing List](https://groups.io/
 1. Write your code, including relevant documentation and tests
 1. Submit a PR and we'll review
 
-## License
+### License
 
 The MIT License (MIT)
 
