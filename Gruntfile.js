@@ -1,8 +1,8 @@
 /*
  * js-data-rethinkdb
- * http://github.com/js-data/js-data-rethinkdb
+ * https://github.com/js-data/js-data-rethinkdb
  *
- * Copyright (c) 2014-2015 Jason Dobry <http://www.js-data.io/js-data-rethinkdb>
+ * Copyright (c) 2014-2015 Jason Dobry <http://www.js-data.io/docs/dsrethinkdbadapter>
  * Licensed under the MIT license. <https://github.com/js-data/js-data-rethinkdb/blob/master/LICENSE>
  */
 module.exports = function (grunt) {
@@ -18,10 +18,6 @@ module.exports = function (grunt) {
   // Project configuration.
   grunt.initConfig({
     pkg: pkg,
-    jshint: {
-      all: ['Gruntfile.js', 'src/**/*.js', 'test/*.js'],
-      jshintrc: '.jshintrc'
-    },
     watch: {
       dist: {
         files: ['src/**/*.js'],
@@ -52,15 +48,9 @@ module.exports = function (grunt) {
           library: 'js-data-rethinkdb'
         },
         externals: [
-          'mout/array/contains',
-          'mout/object/forOwn',
           'mout/object/keys',
-          'mout/object/deepMixIn',
-          'mout/array/forEach',
-          'mout/lang/isObject',
-          'mout/lang/isArray',
+          'mout/object/omit',
           'mout/lang/isEmpty',
-          'mout/lang/isString',
           'mout/string/upperCase',
           'mout/string/underscore',
           'bluebird',

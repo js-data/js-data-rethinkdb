@@ -1,7 +1,7 @@
 describe('DSRethinkDBAdapter#updateAll', function () {
-  it('should update all items', function (done) {
+  it('should update all items', function () {
     var id, id2;
-    adapter.create(User, { name: 'John', age: 20 })
+    return adapter.create(User, { name: 'John', age: 20 })
       .then(function (user) {
         id = user.id;
         return adapter.create(User, { name: 'John', age: 30 });
@@ -42,7 +42,6 @@ describe('DSRethinkDBAdapter#updateAll', function () {
         return adapter.destroyAll(User);
       }).then(function (destroyedUser) {
         assert.isFalse(!!destroyedUser);
-        done();
-      }).catch(done);
+      });
   });
 });

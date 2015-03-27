@@ -60,7 +60,11 @@ beforeEach(function () {
       hasMany: {
         post: {
           localField: 'posts',
-          foreignKey: 'post'
+          foreignKey: 'userId'
+        },
+        comment: {
+          localField: 'comments',
+          foreignKey: 'userId'
         }
       }
     }

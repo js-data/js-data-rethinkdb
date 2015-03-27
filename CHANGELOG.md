@@ -1,3 +1,13 @@
+##### 1.2.0 - 26 March 2015
+
+###### Backwards compatible API changes
+- #3 - Add support for loading relations
+- #4 - Add support for auto-creating secondary indexes based on the relation definitions
+
+###### Backwards compatible bug fixes
+- #5 - Should not be saving relations (duplicating data)
+- #6 - Need to use removeCircular
+
 ##### 1.1.2 - 07 March 2015
 
 ###### Other

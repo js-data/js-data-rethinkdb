@@ -1,30 +1,33 @@
 describe('DSRethinkDBAdapter#findAll', function () {
-  it('should filter users', function (done) {
-    var id;
+  it('should filter users', function () {
+    var id, postId;
 
-    adapter.findAll(User, {
+    return adapter.findAll(User, {
       age: 30
     }).then(function (users) {
       assert.equal(users.length, 0);
       return adapter.create(User, { name: 'John' });
     }).then(function (user) {
       id = user.id;
+      return adapter.create(Post, { title: 'foo', userId: user.id });
+    }).then(function (post) {
+      postId = post.id;
+      assert.equal(post.userId, id);
       return adapter.findAll(User, {
         name: 'John'
-      });
+      }, { with: ['post', 'comment']});
     }).then(function (users) {
       assert.equal(users.length, 1);
-      assert.deepEqual(users[0], { id: id, name: 'John' });
+      assert.deepEqual(users[0], { id: id, name: 'John', comments: [], posts: [ { id: postId, userId:id, title: 'foo' } ] });
       return adapter.destroy(User, id);
     }).then(function (destroyedUser) {
       assert.isFalse(!!destroyedUser);
-      done();
-    }).catch(done);
+    });
   });
-  it('should filter users using the "in" operator', function (done) {
+  it('should filter users using the "in" operator', function () {
     var id;
 
-    adapter.findAll(User, {
+    return adapter.findAll(User, {
       where: {
         age: {
           'in': [30]
@@ -44,7 +47,6 @@ describe('DSRethinkDBAdapter#findAll', function () {
       return adapter.destroy(User, id);
     }).then(function (destroyedUser) {
       assert.isFalse(!!destroyedUser);
-      done();
-    }).catch(done);
+    });
   });
 });

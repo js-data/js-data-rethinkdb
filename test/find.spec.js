@@ -1,7 +1,7 @@
 describe('DSRethinkDBAdapter#find', function () {
-  it('should find a user in RethinkDB', function (done) {
+  it('should find a user in RethinkDB', function () {
     var id, id2, _user, _post, _comments;
-    adapter.create(User, { name: 'John' })
+    return adapter.create(User, { name: 'John' })
       .then(function (user) {
         _user = user;
         id = user.id;
@@ -60,11 +60,11 @@ describe('DSRethinkDBAdapter#find', function () {
         return adapter.destroy(Post, id2);
       })
       .then(function () {
-        done('Should not have reached here!');
+        throw new Error('Should not have reached here!');
       })
       .catch(function (err) {
         assert.equal(err.message, 'Not Found!');
-        done();
+        return true;
       });
   });
 });
