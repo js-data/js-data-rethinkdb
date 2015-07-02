@@ -1,3 +1,4 @@
+var Promise = require('bluebird');
 describe('DSRethinkDBAdapter#find', function () {
   it('should find a user in RethinkDB', function () {
     var id, id2, _user, _post, _comments;

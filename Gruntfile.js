@@ -48,14 +48,9 @@ module.exports = function (grunt) {
           library: 'js-data-rethinkdb'
         },
         externals: [
-          'mout/object/keys',
-          'mout/object/omit',
-          'mout/lang/isEmpty',
-          'mout/string/upperCase',
           'mout/string/underscore',
           'bluebird',
           'js-data',
-          'js-data-schema',
           'rethinkdbdash'
         ],
         module: {

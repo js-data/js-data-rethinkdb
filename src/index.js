@@ -1,13 +1,9 @@
-import rethinkdbdash from 'rethinkdbdash';
-import JSData from 'js-data';
+let rethinkdbdash = require('rethinkdbdash');
+let JSData = require('js-data');
 let { DSUtils } = JSData;
-let { Promise: P, contains, forOwn, deepMixIn, forEach, isObject, isArray, isString, removeCircular } = DSUtils;
+let { upperCase, contains, forOwn, isEmpty, keys, deepMixIn, forEach, isObject, isArray, isString, removeCircular, omit } = DSUtils;
 
-import keys from 'mout/object/keys';
-import isEmpty from 'mout/lang/isEmpty';
-import upperCase from 'mout/string/upperCase';
-import underscore from 'mout/string/underscore';
-import omit from 'mout/object/omit';
+let underscore = require('mout/string/underscore');
 
 class Defaults {
 
@@ -207,7 +203,7 @@ class DSRethinkDBAdapter {
         tasks.push(this.waitForIndex(resourceConfig.table || underscore(resourceConfig.name), def.localKey, options));
       }
     });
-    return P.all(tasks).then(() => {
+    return DSUtils.Promise.all(tasks).then(() => {
       return this.r.do(this.r.table(table).get(id), doc => {
         forEach(resourceConfig.relationList, def => {
           let relationName = def.relation;
@@ -257,7 +253,7 @@ class DSRethinkDBAdapter {
       }).run();
     }).then(item => {
       if (!item) {
-        return P.reject(new Error('Not Found!'));
+        return DSUtils.Promise.reject(new Error('Not Found!'));
       } else {
         forOwn(item, (localValue, localKey) => {
           if (localKey in newModels) {
@@ -298,7 +294,7 @@ class DSRethinkDBAdapter {
         tasks.push(this.waitForIndex(resourceConfig.table || underscore(resourceConfig.name), def.localKey, options));
       }
     });
-    return P.all(tasks).then(() => {
+    return DSUtils.Promise.all(tasks).then(() => {
       let query = this.filterSequence(this.selectTable(resourceConfig, options), params);
       if (options.with && options.with.length) {
         query = query.map(doc => {

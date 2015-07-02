@@ -51,48 +51,25 @@ module.exports =
 
 	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
-	var _rethinkdbdash = __webpack_require__(1);
-
-	var _rethinkdbdash2 = _interopRequireDefault(_rethinkdbdash);
-
-	var _jsData = __webpack_require__(2);
-
-	var _jsData2 = _interopRequireDefault(_jsData);
-
-	var _moutObjectKeys = __webpack_require__(3);
-
-	var _moutObjectKeys2 = _interopRequireDefault(_moutObjectKeys);
-
-	var _moutLangIsEmpty = __webpack_require__(4);
-
-	var _moutLangIsEmpty2 = _interopRequireDefault(_moutLangIsEmpty);
-
-	var _moutStringUpperCase = __webpack_require__(5);
-
-	var _moutStringUpperCase2 = _interopRequireDefault(_moutStringUpperCase);
-
-	var _moutStringUnderscore = __webpack_require__(6);
-
-	var _moutStringUnderscore2 = _interopRequireDefault(_moutStringUnderscore);
-
-	var _moutObjectOmit = __webpack_require__(7);
-
-	var _moutObjectOmit2 = _interopRequireDefault(_moutObjectOmit);
-
-	var DSUtils = _jsData2['default'].DSUtils;
-	var P = DSUtils.Promise;
+	var rethinkdbdash = __webpack_require__(1);
+	var JSData = __webpack_require__(2);
+	var DSUtils = JSData.DSUtils;
+	var upperCase = DSUtils.upperCase;
 	var contains = DSUtils.contains;
 	var forOwn = DSUtils.forOwn;
+	var isEmpty = DSUtils.isEmpty;
+	var keys = DSUtils.keys;
 	var deepMixIn = DSUtils.deepMixIn;
 	var forEach = DSUtils.forEach;
 	var isObject = DSUtils.isObject;
 	var isArray = DSUtils.isArray;
 	var isString = DSUtils.isString;
 	var removeCircular = DSUtils.removeCircular;
+	var omit = DSUtils.omit;
+
+	var underscore = __webpack_require__(3);
 
 	var Defaults = function Defaults() {
 	  _classCallCheck(this, Defaults);
@@ -115,7 +92,7 @@ module.exports =
 	    options = options || {};
 	    this.defaults = new Defaults();
 	    deepMixIn(this.defaults, options);
-	    this.r = (0, _rethinkdbdash2['default'])(this.defaults);
+	    this.r = rethinkdbdash(this.defaults);
 	    this.databases = {};
 	    this.tables = {};
 	    this.indices = {};
@@ -124,7 +101,7 @@ module.exports =
 	  _createClass(DSRethinkDBAdapter, [{
 	    key: 'selectTable',
 	    value: function selectTable(resourceConfig, options) {
-	      return this.r.db(options.db || this.defaults.db).table(resourceConfig.table || (0, _moutStringUnderscore2['default'])(resourceConfig.name));
+	      return this.r.db(options.db || this.defaults.db).table(resourceConfig.table || underscore(resourceConfig.name));
 	    }
 	  }, {
 	    key: 'filterSequence',
@@ -135,7 +112,7 @@ module.exports =
 	      params.orderBy = params.orderBy || params.sort;
 	      params.skip = params.skip || params.offset;
 
-	      forEach((0, _moutObjectKeys2['default'])(params), function (k) {
+	      forEach(keys(params), function (k) {
 	        var v = params[k];
 	        if (!contains(reserved, k)) {
 	          if (isObject(v)) {
@@ -151,7 +128,7 @@ module.exports =
 
 	      var query = sequence;
 
-	      if (!(0, _moutLangIsEmpty2['default'])(params.where)) {
+	      if (!isEmpty(params.where)) {
 	        query = query.filter(function (row) {
 	          var subQuery = undefined;
 	          forOwn(params.where, function (criteria, field) {
@@ -216,7 +193,7 @@ module.exports =
 	          if (isString(params.orderBy[i])) {
 	            params.orderBy[i] = [params.orderBy[i], 'asc'];
 	          }
-	          query = (0, _moutStringUpperCase2['default'])(params.orderBy[i][1]) === 'DESC' ? query.orderBy(r.desc(params.orderBy[i][0])) : query.orderBy(params.orderBy[i][0]);
+	          query = upperCase(params.orderBy[i][1]) === 'DESC' ? query.orderBy(r.desc(params.orderBy[i][0])) : query.orderBy(params.orderBy[i][0]);
 	        }
 	      }
 
@@ -284,23 +261,23 @@ module.exports =
 	      var models = {};
 	      var merge = {};
 	      options = options || {};
-	      var table = resourceConfig.table || (0, _moutStringUnderscore2['default'])(resourceConfig.name);
+	      var table = resourceConfig.table || underscore(resourceConfig.name);
 	      var tasks = [this.waitForTable(table, options)];
 	      forEach(resourceConfig.relationList, function (def) {
 	        var relationName = def.relation;
 	        var relationDef = resourceConfig.getResource(relationName);
 	        if (!relationDef) {
-	          throw new _jsData2['default'].DSErrors.NER(relationName);
+	          throw new JSData.DSErrors.NER(relationName);
 	        } else if (!options['with'] || !contains(options['with'], relationName)) {
 	          return;
 	        }
 	        if (def.foreignKey) {
-	          tasks.push(_this3.waitForIndex(relationDef.table || (0, _moutStringUnderscore2['default'])(relationDef.name), def.foreignKey, options));
+	          tasks.push(_this3.waitForIndex(relationDef.table || underscore(relationDef.name), def.foreignKey, options));
 	        } else if (def.localKey) {
-	          tasks.push(_this3.waitForIndex(resourceConfig.table || (0, _moutStringUnderscore2['default'])(resourceConfig.name), def.localKey, options));
+	          tasks.push(_this3.waitForIndex(resourceConfig.table || underscore(resourceConfig.name), def.localKey, options));
 	        }
 	      });
-	      return P.all(tasks).then(function () {
+	      return DSUtils.Promise.all(tasks).then(function () {
 	        return _this3.r['do'](_this3.r.table(table).get(id), function (doc) {
 	          forEach(resourceConfig.relationList, function (def) {
 	            var relationName = def.relation;
@@ -309,26 +286,26 @@ module.exports =
 	              return;
 	            }
 	            if (!models[relationName]) {
-	              throw new _jsData2['default'].DSErrors.NER(relationName);
+	              throw new JSData.DSErrors.NER(relationName);
 	            }
 	            var localKey = def.localKey;
 	            var localField = def.localField;
 	            var foreignKey = def.foreignKey;
 	            if (def.type === 'belongsTo') {
-	              merge[localField] = _this3.r.table(models[relationName].table || (0, _moutStringUnderscore2['default'])(models[relationName].name)).get(doc(localKey)['default'](''));
+	              merge[localField] = _this3.r.table(models[relationName].table || underscore(models[relationName].name)).get(doc(localKey)['default'](''));
 	              newModels[localField] = {
 	                modelName: relationName,
 	                relation: 'belongsTo'
 	              };
 	            } else if (def.type === 'hasMany') {
-	              merge[localField] = _this3.r.table(models[relationName].table || (0, _moutStringUnderscore2['default'])(models[relationName].name)).getAll(id, { index: foreignKey }).coerceTo('ARRAY');
+	              merge[localField] = _this3.r.table(models[relationName].table || underscore(models[relationName].name)).getAll(id, { index: foreignKey }).coerceTo('ARRAY');
 
 	              newModels[localField] = {
 	                modelName: relationName,
 	                relation: 'hasMany'
 	              };
 	            } else if (def.type === 'hasOne') {
-	              merge[localField] = _this3.r.table(models[relationName].table || (0, _moutStringUnderscore2['default'])(models[relationName].name));
+	              merge[localField] = _this3.r.table(models[relationName].table || underscore(models[relationName].name));
 
 	              if (localKey) {
 	                merge[localField] = merge[localField].get(localKey);
@@ -343,14 +320,14 @@ module.exports =
 	            }
 	          });
 
-	          if (!(0, _moutLangIsEmpty2['default'])(merge)) {
+	          if (!isEmpty(merge)) {
 	            return doc.merge(merge);
 	          }
 	          return doc;
 	        }).run();
 	      }).then(function (item) {
 	        if (!item) {
-	          return P.reject(new Error('Not Found!'));
+	          return DSUtils.Promise.reject(new Error('Not Found!'));
 	        } else {
 	          forOwn(item, function (localValue, localKey) {
 	            if (localKey in newModels) {
@@ -375,7 +352,7 @@ module.exports =
 	      var _this4 = this;
 
 	      options = options || {};
-	      var table = resourceConfig.table || (0, _moutStringUnderscore2['default'])(resourceConfig.name);
+	      var table = resourceConfig.table || underscore(resourceConfig.name);
 	      var tasks = [this.waitForTable(table, options)];
 	      var models = {};
 	      var merge = {};
@@ -384,17 +361,17 @@ module.exports =
 	        var relationName = def.relation;
 	        var relationDef = resourceConfig.getResource(relationName);
 	        if (!relationDef) {
-	          throw new _jsData2['default'].DSErrors.NER(relationName);
+	          throw new JSData.DSErrors.NER(relationName);
 	        } else if (!options['with'] || !contains(options['with'], relationName)) {
 	          return;
 	        }
 	        if (def.foreignKey) {
-	          tasks.push(_this4.waitForIndex(relationDef.table || (0, _moutStringUnderscore2['default'])(relationDef.name), def.foreignKey, options));
+	          tasks.push(_this4.waitForIndex(relationDef.table || underscore(relationDef.name), def.foreignKey, options));
 	        } else if (def.localKey) {
-	          tasks.push(_this4.waitForIndex(resourceConfig.table || (0, _moutStringUnderscore2['default'])(resourceConfig.name), def.localKey, options));
+	          tasks.push(_this4.waitForIndex(resourceConfig.table || underscore(resourceConfig.name), def.localKey, options));
 	        }
 	      });
-	      return P.all(tasks).then(function () {
+	      return DSUtils.Promise.all(tasks).then(function () {
 	        var query = _this4.filterSequence(_this4.selectTable(resourceConfig, options), params);
 	        if (options['with'] && options['with'].length) {
 	          query = query.map(function (doc) {
@@ -406,26 +383,26 @@ module.exports =
 	                return;
 	              }
 	              if (!models[relationName]) {
-	                throw new _jsData2['default'].DSErrors.NER(relationName);
+	                throw new JSData.DSErrors.NER(relationName);
 	              }
 	              var localKey = def.localKey;
 	              var localField = def.localField;
 	              var foreignKey = def.foreignKey;
 	              if (def.type === 'belongsTo') {
-	                merge[localField] = _this4.r.table(models[relationName].table || (0, _moutStringUnderscore2['default'])(models[relationName].name)).get(doc(localKey)['default'](''));
+	                merge[localField] = _this4.r.table(models[relationName].table || underscore(models[relationName].name)).get(doc(localKey)['default'](''));
 	                newModels[localField] = {
 	                  modelName: relationName,
 	                  relation: 'belongsTo'
 	                };
 	              } else if (def.type === 'hasMany') {
-	                merge[localField] = _this4.r.table(models[relationName].table || (0, _moutStringUnderscore2['default'])(models[relationName].name)).getAll(id, { index: foreignKey }).coerceTo('ARRAY');
+	                merge[localField] = _this4.r.table(models[relationName].table || underscore(models[relationName].name)).getAll(id, { index: foreignKey }).coerceTo('ARRAY');
 
 	                newModels[localField] = {
 	                  modelName: relationName,
 	                  relation: 'hasMany'
 	                };
 	              } else if (def.type === 'hasOne') {
-	                merge[localField] = _this4.r.table(models[relationName].table || (0, _moutStringUnderscore2['default'])(models[relationName].name));
+	                merge[localField] = _this4.r.table(models[relationName].table || underscore(models[relationName].name));
 
 	                if (localKey) {
 	                  merge[localField] = merge[localField].get(localKey);
@@ -440,7 +417,7 @@ module.exports =
 	              }
 	            });
 
-	            if (!(0, _moutLangIsEmpty2['default'])(merge)) {
+	            if (!isEmpty(merge)) {
 	              return doc.merge(merge);
 	            }
 	            return doc;
@@ -454,10 +431,10 @@ module.exports =
 	    value: function create(resourceConfig, attrs, options) {
 	      var _this5 = this;
 
-	      attrs = removeCircular((0, _moutObjectOmit2['default'])(attrs, resourceConfig.relationFields || []));
+	      attrs = removeCircular(omit(attrs, resourceConfig.relationFields || []));
 	      options = options || {};
-	      return this.waitForTable(resourceConfig.table || (0, _moutStringUnderscore2['default'])(resourceConfig.name), options).then(function () {
-	        return _this5.r.db(options.db || _this5.defaults.db).table(resourceConfig.table || (0, _moutStringUnderscore2['default'])(resourceConfig.name)).insert(attrs, { returnChanges: true }).run();
+	      return this.waitForTable(resourceConfig.table || underscore(resourceConfig.name), options).then(function () {
+	        return _this5.r.db(options.db || _this5.defaults.db).table(resourceConfig.table || underscore(resourceConfig.name)).insert(attrs, { returnChanges: true }).run();
 	      }).then(function (cursor) {
 	        return cursor.changes[0].new_val;
 	      });
@@ -467,10 +444,10 @@ module.exports =
 	    value: function update(resourceConfig, id, attrs, options) {
 	      var _this6 = this;
 
-	      attrs = removeCircular((0, _moutObjectOmit2['default'])(attrs, resourceConfig.relationFields || []));
+	      attrs = removeCircular(omit(attrs, resourceConfig.relationFields || []));
 	      options = options || {};
-	      return this.waitForTable(resourceConfig.table || (0, _moutStringUnderscore2['default'])(resourceConfig.name), options).then(function () {
-	        return _this6.r.db(options.db || _this6.defaults.db).table(resourceConfig.table || (0, _moutStringUnderscore2['default'])(resourceConfig.name)).get(id).update(attrs, { returnChanges: true }).run();
+	      return this.waitForTable(resourceConfig.table || underscore(resourceConfig.name), options).then(function () {
+	        return _this6.r.db(options.db || _this6.defaults.db).table(resourceConfig.table || underscore(resourceConfig.name)).get(id).update(attrs, { returnChanges: true }).run();
 	      }).then(function (cursor) {
 	        return cursor.changes[0].new_val;
 	      });
@@ -480,10 +457,10 @@ module.exports =
 	    value: function updateAll(resourceConfig, attrs, params, options) {
 	      var _this7 = this;
 
-	      attrs = removeCircular((0, _moutObjectOmit2['default'])(attrs, resourceConfig.relationFields || []));
+	      attrs = removeCircular(omit(attrs, resourceConfig.relationFields || []));
 	      options = options || {};
 	      params = params || {};
-	      return this.waitForTable(resourceConfig.table || (0, _moutStringUnderscore2['default'])(resourceConfig.name), options).then(function () {
+	      return this.waitForTable(resourceConfig.table || underscore(resourceConfig.name), options).then(function () {
 	        return _this7.filterSequence(_this7.selectTable(resourceConfig, options), params).update(attrs, { returnChanges: true }).run();
 	      }).then(function (cursor) {
 	        var items = [];
@@ -499,8 +476,8 @@ module.exports =
 	      var _this8 = this;
 
 	      options = options || {};
-	      return this.waitForTable(resourceConfig.table || (0, _moutStringUnderscore2['default'])(resourceConfig.name), options).then(function () {
-	        return _this8.r.db(options.db || _this8.defaults.db).table(resourceConfig.table || (0, _moutStringUnderscore2['default'])(resourceConfig.name)).get(id)['delete']().run();
+	      return this.waitForTable(resourceConfig.table || underscore(resourceConfig.name), options).then(function () {
+	        return _this8.r.db(options.db || _this8.defaults.db).table(resourceConfig.table || underscore(resourceConfig.name)).get(id)['delete']().run();
 	      }).then(function () {
 	        return undefined;
 	      });
@@ -512,7 +489,7 @@ module.exports =
 
 	      options = options || {};
 	      params = params || {};
-	      return this.waitForTable(resourceConfig.table || (0, _moutStringUnderscore2['default'])(resourceConfig.name), options).then(function () {
+	      return this.waitForTable(resourceConfig.table || underscore(resourceConfig.name), options).then(function () {
 	        return _this9.filterSequence(_this9.selectTable(resourceConfig, options), params)['delete']().run();
 	      }).then(function () {
 	        return undefined;
@@ -542,31 +519,7 @@ module.exports =
 /* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = require("mout/object/keys");
-
-/***/ },
-/* 4 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = require("mout/lang/isEmpty");
-
-/***/ },
-/* 5 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = require("mout/string/upperCase");
-
-/***/ },
-/* 6 */
-/***/ function(module, exports, __webpack_require__) {
-
 	module.exports = require("mout/string/underscore");
-
-/***/ },
-/* 7 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = require("mout/object/omit");
 
 /***/ }
 /******/ ]);
