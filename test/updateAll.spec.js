@@ -44,4 +44,43 @@ describe('DSRethinkDBAdapter#updateAll', function () {
         assert.isFalse(!!destroyedUser);
       });
   });
+  it('should still work if there are no changes', function () {
+    var id, id2;
+    return adapter.create(User, { name: 'John', age: 20 })
+      .then(function (user) {
+        id = user.id;
+        return adapter.create(User, { name: 'John', age: 30 });
+      }).then(function (user) {
+        id2 = user.id;
+        return adapter.findAll(User, {
+          name: 'John'
+        });
+      }).then(function (users) {
+        users.sort(function (a, b) {
+          return a.age - b.age;
+        });
+        assert.deepEqual(users, [{ id: id, name: 'John', age: 20 }, { id: id2, name: 'John', age: 30 }]);
+        return adapter.updateAll(User, {
+          name: 'John'
+        }, {
+          name: 'John'
+        });
+      }).then(function (users) {
+        users.sort(function (a, b) {
+          return a.age - b.age;
+        });
+        assert.deepEqual(users, [{ id: id, name: 'John', age: 20 }, { id: id2, name: 'John', age: 30 }]);
+        return adapter.findAll(User, {
+          name: 'John'
+        });
+      }).then(function (users) {
+        users.sort(function (a, b) {
+          return a.age - b.age;
+        });
+        assert.deepEqual(users, [{ id: id, name: 'John', age: 20 }, { id: id2, name: 'John', age: 30 }]);
+        return adapter.destroyAll(User);
+      }).then(function (destroyedUser) {
+        assert.isFalse(!!destroyedUser);
+      });
+  });
 });

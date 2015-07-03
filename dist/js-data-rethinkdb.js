@@ -45,10 +45,6 @@ module.exports =
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	Object.defineProperty(exports, '__esModule', {
-	  value: true
-	});
-
 	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
@@ -449,7 +445,11 @@ module.exports =
 	      return this.waitForTable(resourceConfig.table || underscore(resourceConfig.name), options).then(function () {
 	        return _this6.r.db(options.db || _this6.defaults.db).table(resourceConfig.table || underscore(resourceConfig.name)).get(id).update(attrs, { returnChanges: true }).run();
 	      }).then(function (cursor) {
-	        return cursor.changes[0].new_val;
+	        if (cursor.changes && cursor.changes.length && cursor.changes[0].new_val) {
+	          return cursor.changes[0].new_val;
+	        } else {
+	          return _this6.selectTable(resourceConfig, options).get(id).run();
+	        }
 	      });
 	    }
 	  }, {
@@ -463,11 +463,21 @@ module.exports =
 	      return this.waitForTable(resourceConfig.table || underscore(resourceConfig.name), options).then(function () {
 	        return _this7.filterSequence(_this7.selectTable(resourceConfig, options), params).update(attrs, { returnChanges: true }).run();
 	      }).then(function (cursor) {
-	        var items = [];
-	        cursor.changes.forEach(function (change) {
-	          return items.push(change.new_val);
-	        });
-	        return items;
+	        if (cursor && cursor.changes && cursor.changes.length) {
+	          var _ret = (function () {
+	            var items = [];
+	            cursor.changes.forEach(function (change) {
+	              return items.push(change.new_val);
+	            });
+	            return {
+	              v: items
+	            };
+	          })();
+
+	          if (typeof _ret === 'object') return _ret.v;
+	        } else {
+	          return _this7.filterSequence(_this7.selectTable(resourceConfig, options), params).run();
+	        }
 	      });
 	    }
 	  }, {
@@ -500,8 +510,7 @@ module.exports =
 	  return DSRethinkDBAdapter;
 	})();
 
-	exports['default'] = DSRethinkDBAdapter;
-	module.exports = exports['default'];
+	module.exports = DSRethinkDBAdapter;
 
 /***/ },
 /* 1 */

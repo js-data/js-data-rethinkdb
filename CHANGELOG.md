@@ -1,3 +1,8 @@
+##### 2.0.1 - 03 July 2015
+
+###### Backwards compatible bug fixes
+- #8 - update/updateAll fail if there are no changes
+
 ##### 2.0.0 - 02 July 2015
 
 Stable Version 2.0.0

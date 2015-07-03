@@ -224,7 +224,7 @@ class DSRethinkDBAdapter {
               relation: 'belongsTo'
             };
           } else if (def.type === 'hasMany') {
-            merge[localField] = this.r.table(models[relationName].table || underscore(models[relationName].name)).getAll(id, { index: foreignKey }).coerceTo('ARRAY');
+            merge[localField] = this.r.table(models[relationName].table || underscore(models[relationName].name)).getAll(id, {index: foreignKey}).coerceTo('ARRAY');
 
             newModels[localField] = {
               modelName: relationName,
@@ -236,7 +236,7 @@ class DSRethinkDBAdapter {
             if (localKey) {
               merge[localField] = merge[localField].get(localKey);
             } else {
-              merge[localField] = merge[localField].getAll(id, { index: foreignKey }).coerceTo('ARRAY');
+              merge[localField] = merge[localField].getAll(id, {index: foreignKey}).coerceTo('ARRAY');
             }
 
             newModels[localField] = {
@@ -318,7 +318,7 @@ class DSRethinkDBAdapter {
                 relation: 'belongsTo'
               };
             } else if (def.type === 'hasMany') {
-              merge[localField] = this.r.table(models[relationName].table || underscore(models[relationName].name)).getAll(id, { index: foreignKey }).coerceTo('ARRAY');
+              merge[localField] = this.r.table(models[relationName].table || underscore(models[relationName].name)).getAll(id, {index: foreignKey}).coerceTo('ARRAY');
 
               newModels[localField] = {
                 modelName: relationName,
@@ -330,7 +330,7 @@ class DSRethinkDBAdapter {
               if (localKey) {
                 merge[localField] = merge[localField].get(localKey);
               } else {
-                merge[localField] = merge[localField].getAll(id, { index: foreignKey }).coerceTo('ARRAY');
+                merge[localField] = merge[localField].getAll(id, {index: foreignKey}).coerceTo('ARRAY');
               }
 
               newModels[localField] = {
@@ -354,7 +354,7 @@ class DSRethinkDBAdapter {
     attrs = removeCircular(omit(attrs, resourceConfig.relationFields || []));
     options = options || {};
     return this.waitForTable(resourceConfig.table || underscore(resourceConfig.name), options).then(() => {
-      return this.r.db(options.db || this.defaults.db).table(resourceConfig.table || underscore(resourceConfig.name)).insert(attrs, { returnChanges: true }).run();
+      return this.r.db(options.db || this.defaults.db).table(resourceConfig.table || underscore(resourceConfig.name)).insert(attrs, {returnChanges: true}).run();
     }).then(cursor => cursor.changes[0].new_val);
   }
 
@@ -362,9 +362,13 @@ class DSRethinkDBAdapter {
     attrs = removeCircular(omit(attrs, resourceConfig.relationFields || []));
     options = options || {};
     return this.waitForTable(resourceConfig.table || underscore(resourceConfig.name), options).then(() => {
-      return this.r.db(options.db || this.defaults.db).table(resourceConfig.table || underscore(resourceConfig.name)).get(id).update(attrs, { returnChanges: true }).run();
+      return this.r.db(options.db || this.defaults.db).table(resourceConfig.table || underscore(resourceConfig.name)).get(id).update(attrs, {returnChanges: true}).run();
     }).then(cursor => {
-      return cursor.changes[0].new_val;
+      if (cursor.changes && cursor.changes.length && cursor.changes[0].new_val) {
+        return cursor.changes[0].new_val;
+      } else {
+        return this.selectTable(resourceConfig, options).get(id).run();
+      }
     });
   }
 
@@ -373,11 +377,15 @@ class DSRethinkDBAdapter {
     options = options || {};
     params = params || {};
     return this.waitForTable(resourceConfig.table || underscore(resourceConfig.name), options).then(() => {
-      return this.filterSequence(this.selectTable(resourceConfig, options), params).update(attrs, { returnChanges: true }).run();
+      return this.filterSequence(this.selectTable(resourceConfig, options), params).update(attrs, {returnChanges: true}).run();
     }).then(cursor => {
-      let items = [];
-      cursor.changes.forEach(change => items.push(change.new_val));
-      return items;
+      if (cursor && cursor.changes && cursor.changes.length) {
+        let items = [];
+        cursor.changes.forEach(change => items.push(change.new_val));
+        return items;
+      } else {
+        return this.filterSequence(this.selectTable(resourceConfig, options), params).run();
+      }
     });
   }
 
@@ -397,4 +405,4 @@ class DSRethinkDBAdapter {
   }
 }
 
-export default DSRethinkDBAdapter;
+module.exports = DSRethinkDBAdapter;
