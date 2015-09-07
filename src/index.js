@@ -109,6 +109,9 @@ class DSRethinkDBAdapter {
               subQuery = subQuery ? subQuery.or(row(field).default(null).lt(v)) : row(field).default(null).lt(v);
             } else if (op === '|<=') {
               subQuery = subQuery ? subQuery.or(row(field).default(null).le(v)) : row(field).default(null).le(v);
+            } else if (op === '!contains') {
+              v = '(i?)' + v; // Case-insensitive
+              subQuery = subQuery ? subQuery.or(row(field).default(null).match(v)) : row(field).default(null).match(v);
             } else if (op === '|isectEmpty') {
               subQuery = subQuery ? subQuery.or(row(field).default([]).setIntersection(r.expr(v).default([])).count().eq(0)) : row(field).default([]).setIntersection(r.expr(v).default([])).count().eq(0);
             } else if (op === '|isectNotEmpty') {
