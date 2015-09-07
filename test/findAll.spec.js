@@ -49,4 +49,33 @@ describe('DSRethinkDBAdapter#findAll', function () {
       assert.isFalse(!!destroyedUser);
     });
   });
+  it('should filter users using the "contains" operator', function () {
+    var id;
+
+    return adapter.findAll(User, {
+      where: {
+        name: {
+          'contains': 'J'
+        }
+      }
+    }).then(function (users) {
+      assert.equal(users.length, 0);
+      return adapter.create(User, { name: 'John' });
+    }).then(function (user) {
+      id = user.id;
+      return adapter.findAll(User, {
+        where: {
+          name: {
+            'contains': 'J'
+          }
+        }
+      });
+    }).then(function (users) {
+      assert.equal(users.length, 1);
+      assert.deepEqual(users[0], { id: id, name: 'John' });
+      return adapter.destroy(User, id);
+    }).then(function (destroyedUser) {
+      assert.isFalse(!!destroyedUser);
+    });
+  });
 });
