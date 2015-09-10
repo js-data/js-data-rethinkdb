@@ -2,6 +2,7 @@
   "node": false,
   "browser": true,
   "esnext": true,
+  "asi": true,
   "bitwise": true,
   "camelcase": false,
   "curly": true,

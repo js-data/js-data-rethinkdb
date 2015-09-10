@@ -1,3 +1,8 @@
+##### 2.0.2 - 09 September 2015
+
+###### Backwards compatible bug fixes
+- #9 - CI tests failing because of outdated npm
+
 ##### 2.0.1 - 03 July 2015
 
 ###### Backwards compatible bug fixes

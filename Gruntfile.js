@@ -69,10 +69,27 @@ module.exports = function (grunt) {
     }
   });
 
+  grunt.registerTask('standard', function () {
+    var child_process = require('child_process');
+    var done = this.async();
+    grunt.log.writeln('Linting for correcting formatting...');
+    child_process.exec('node node_modules/standard/bin/cmd.js --parser babel-eslint src/index.js', function (err, stdout) {
+      console.log(stdout);
+      if (err) {
+        grunt.log.writeln('Failed due to ' + (stdout.split('\n').length - 2) + ' lint errors!');
+        done(err);
+      } else {
+        grunt.log.writeln('Done linting.');
+        done();
+      }
+    });
+  });
+
   grunt.registerTask('n', ['mochaTest']);
 
   grunt.registerTask('test', ['build', 'n']);
   grunt.registerTask('build', [
+    'standard',
     'webpack'
   ]);
   grunt.registerTask('go', ['build', 'watch:dist']);
