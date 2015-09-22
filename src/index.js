@@ -90,6 +90,16 @@ class DSRethinkDBAdapter {
               subQuery = subQuery ? subQuery.and(row(field).default([]).setIntersection(r.expr(v).default([])).count().eq(0)) : row(field).default([]).setIntersection(r.expr(v).default([])).count().eq(0)
             } else if (op === 'isectNotEmpty') {
               subQuery = subQuery ? subQuery.and(row(field).default([]).setIntersection(r.expr(v).default([])).count().ne(0)) : row(field).default([]).setIntersection(r.expr(v).default([])).count().ne(0)
+            } else if (op === 'like') {
+              v = '(i?)' + v // Case-insensitive
+              subQuery = subQuery ? subQuery.and(row(field).default(null).match(v)) : row(field).default(null).match(v)
+            } else if (op === 'notLike') {
+              v = '(i?)' + v // Case-insensitive
+              subQuery = subQuery ? subQuery.and(row(field).default(null).match(v).not()) : row(field).default(null).match(v).not()
+            } else if (op === 'contains') {
+              subQuery = subQuery ? subQuery.and(row(field).default([]).contains(r.expr(v).default(null))) : row(field).default([]).contains(r.expr(v).default(null))
+            } else if (op === 'notContains') {
+              subQuery = subQuery ? subQuery.and(row(field).default([]).contains(r.expr(v).default(null)).not()) : row(field).default([]).contains(r.expr(v).default(null)).not()
             } else if (op === 'in') {
               subQuery = subQuery ? subQuery.and(r.expr(v).default(r.expr([])).contains(row(field).default(null))) : r.expr(v).default(r.expr([])).contains(row(field).default(null))
             } else if (op === 'notIn') {
@@ -110,6 +120,16 @@ class DSRethinkDBAdapter {
               subQuery = subQuery ? subQuery.or(row(field).default([]).setIntersection(r.expr(v).default([])).count().eq(0)) : row(field).default([]).setIntersection(r.expr(v).default([])).count().eq(0)
             } else if (op === '|isectNotEmpty') {
               subQuery = subQuery ? subQuery.or(row(field).default([]).setIntersection(r.expr(v).default([])).count().ne(0)) : row(field).default([]).setIntersection(r.expr(v).default([])).count().ne(0)
+            } else if (op === '|like') {
+              v = '(i?)' + v // Case-insensitive
+              subQuery = subQuery ? subQuery.or(row(field).default(null).match(v)) : row(field).default(null).match(v)
+            } else if (op === '|notLike') {
+              v = '(i?)' + v // Case-insensitive
+              subQuery = subQuery ? subQuery.or(row(field).default(null).match(v).not()) : row(field).default(null).match(v).not()
+            } else if (op === '|contains') {
+              subQuery = subQuery ? subQuery.or(row(field).default([]).contains(r.expr(v).default(null))) : row(field).default([]).contains(r.expr(v).default(null))
+            } else if (op === '|notContains') {
+              subQuery = subQuery ? subQuery.or(row(field).default([]).contains(r.expr(v).default(null)).not()) : row(field).default([]).contains(r.expr(v).default(null)).not()
             } else if (op === '|in') {
               subQuery = subQuery ? subQuery.or(r.expr(v).default(r.expr([])).contains(row(field).default(null))) : r.expr(v).default(r.expr([])).contains(row(field).default(null))
             } else if (op === '|notIn') {

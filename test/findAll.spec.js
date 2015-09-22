@@ -49,4 +49,119 @@ describe('DSRethinkDBAdapter#findAll', function () {
       assert.isFalse(!!destroyedUser);
     });
   });
+  it('should filter users using the "notContains" operator', function () {
+    var id;
+
+    return adapter.findAll(User, {
+      where: {
+        roles: {
+          'notContains': 'user'
+        }
+      }
+    }).then(function (users) {
+      assert.equal(users.length, 0);
+      return adapter.create(User, { name: 'John', roles: [ 'admin' ] });
+    }).then(function (user) {
+      id = user.id;
+      return adapter.findAll(User, {
+        where: {
+          roles: {
+            'notContains': 'user'
+          }
+        }
+      });
+    }).then(function (users) {
+      assert.equal(users.length, 1);
+      assert.deepEqual(users[0], { id: id, name: 'John', roles: [ 'admin' ] });
+      return adapter.destroy(User, id);
+    }).then(function (destroyedUser) {
+      assert.isFalse(!!destroyedUser);
+    });
+  });  it('should filter users using the "contains" operator', function () {
+    var id;
+
+    return adapter.findAll(User, {
+      where: {
+        roles: {
+          'contains': 'admin'
+        }
+      }
+    }).then(function (users) {
+      assert.equal(users.length, 0);
+      return adapter.create(User, { name: 'John', roles: [ 'admin' ] });
+    }).then(function (user) {
+      id = user.id;
+      return adapter.findAll(User, {
+        where: {
+          roles: {
+            'contains': 'admin'
+          }
+        }
+      });
+    }).then(function (users) {
+      assert.equal(users.length, 1);
+      assert.deepEqual(users[0], { id: id, name: 'John', roles: [ 'admin' ] });
+      return adapter.destroy(User, id);
+    }).then(function (destroyedUser) {
+      assert.isFalse(!!destroyedUser);
+    });
+  });
+  it('should filter users using the "like" operator', function () {
+    var id;
+
+    return adapter.findAll(User, {
+      where: {
+        name: {
+          'like': 'J'
+        }
+      }
+    }).then(function (users) {
+      assert.equal(users.length, 0);
+      return adapter.create(User, { name: 'John' });
+    }).then(function (user) {
+      id = user.id;
+      return adapter.findAll(User, {
+        where: {
+          name: {
+            'like': 'J'
+          }
+        }
+      });
+    }).then(function (users) {
+      assert.equal(users.length, 1);
+      assert.deepEqual(users[0], { id: id, name: 'John' });
+      return adapter.destroy(User, id);
+    }).then(function (destroyedUser) {
+      assert.isFalse(!!destroyedUser);
+    });
+  });
+  it('should filter users using the "notLike" operator', function () {
+    var id;
+
+    return adapter.findAll(User, {
+      where: {
+        name: {
+          'notLike': 'x'
+        }
+      }
+    }).then(function (users) {
+      assert.equal(users.length, 0);
+      return adapter.create(User, { name: 'John' });
+    }).then(function (user) {
+      id = user.id;
+      return adapter.findAll(User, {
+        where: {
+          name: {
+            'notLike': 'x'
+          }
+        }
+      });
+    }).then(function (users) {
+      assert.equal(users.length, 1);
+      assert.deepEqual(users[0], { id: id, name: 'John' });
+      return adapter.destroy(User, id);
+    }).then(function (destroyedUser) {
+      assert.isFalse(!!destroyedUser);
+    });
+  });
 });
