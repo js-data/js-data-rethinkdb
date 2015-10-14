@@ -14,14 +14,6 @@ RethinkDB adapter for [js-data](http://www.js-data.io/).
 
 __Latest Release:__ [![Latest Release](https://img.shields.io/github/release/js-data/js-data-rethinkdb.svg?style=flat-square)](https://github.com/js-data/js-data-rethinkdb/releases)
 
-__Status:__
-
-[![Dependency Status](https://img.shields.io/gemnasium/js-data/js-data-rethinkdb.svg?style=flat-square)](https://gemnasium.com/js-data/js-data-rethinkdb) [![Codacity](https://img.shields.io/codacy/69206fcb0df6462ca559610af32fd1fb.svg?style=flat-square)](https://www.codacy.com/public/jasondobry/js-data-rethinkdb/dashboard)
-
-__Supported Platforms:__
-
-[![node version](https://img.shields.io/badge/Node-0.10%2B-green.svg?style=flat-square)](https://github.com/js-data/js-data)
-
 ### Quick Start
 `npm install --save js-data js-data-rethinkdb`.
 
