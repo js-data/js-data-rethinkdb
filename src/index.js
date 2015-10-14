@@ -69,9 +69,7 @@ class DSRethinkDBAdapter {
         let subQuery
         forOwn(params.where, function (criteria, field) {
           if (!isObject(criteria)) {
-            params.where[field] = {
-              '==': criteria
-            }
+            criteria = {'==': criteria}
           }
           forOwn(criteria, function (v, op) {
             if (op === '==' || op === '===') {
