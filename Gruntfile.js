@@ -18,12 +18,6 @@ module.exports = function (grunt) {
   // Project configuration.
   grunt.initConfig({
     pkg: pkg,
-    watch: {
-      dist: {
-        files: ['src/**/*.js'],
-        tasks: ['build']
-      }
-    },
     coveralls: {
       options: {
         coverage_dir: 'coverage'
@@ -85,13 +79,10 @@ module.exports = function (grunt) {
     });
   });
 
-  grunt.registerTask('n', ['mochaTest']);
-
-  grunt.registerTask('test', ['build', 'n']);
   grunt.registerTask('build', [
     'standard',
     'webpack'
   ]);
-  grunt.registerTask('go', ['build', 'watch:dist']);
+  grunt.registerTask('test', ['build', 'mochaTest']);
   grunt.registerTask('default', ['build']);
 };

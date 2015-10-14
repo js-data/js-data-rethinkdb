@@ -3,7 +3,6 @@
 
 var assert = require('chai').assert;
 var mocha = require('mocha');
-var sinon = require('sinon');
 var DSRethinkDBAdapter = require('./');
 var JSData = require('js-data');
 JSData.DSUtils.Promise = require('bluebird');
@@ -34,7 +33,6 @@ var globals = module.exports = {
   }],
   TYPES_EXCEPT_FUNCTION: ['string', 123, 123.123, null, undefined, {}, [], true, false],
   assert: assert,
-  sinon: sinon,
   adapter: undefined
 };
 

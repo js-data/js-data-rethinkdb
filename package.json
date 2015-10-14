@@ -34,17 +34,13 @@
     "bluebird": "2.10.2",
     "chai": "3.3.0",
     "grunt": "0.4.5",
-    "grunt-contrib-watch": "0.6.1",
-    "grunt-karma-coveralls": "2.5.4",
     "grunt-mocha-test": "0.12.7",
     "grunt-webpack": "1.0.11",
     "jit-grunt": "0.9.1",
     "jshint": "2.8.0",
     "jshint-loader": "0.8.3",
-    "sinon": "1.17.1",
     "standard": "5.3.1",
-    "time-grunt": "1.2.1",
-    "webpack-dev-server": "1.12.0"
+    "time-grunt": "1.2.1"
   },
   "standard": {
     "parser": "babel-eslint"
