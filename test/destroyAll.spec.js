@@ -1,24 +1,22 @@
-describe('DSRethinkDBAdapter#destroyAll', function () {
-  it('should destroy all items', function () {
-    var id;
-    return adapter.create(User, { name: 'John' })
-      .then(function (user) {
-        id = user.id;
-        return adapter.findAll(User, {
-          name: 'John'
-        });
-      }).then(function (users) {
-        assert.equal(users.length, 1);
-        assert.deepEqual(users[0], { id: id, name: 'John' });
-        return adapter.destroyAll(User, {
-          name: 'John'
-        });
-      }).then(function () {
-        return adapter.findAll(User, {
-          name: 'John'
-        });
-      }).then(function (users) {
-        assert.equal(users.length, 0);
-      });
-  });
-});
+describe('DSRethinkDBAdapter#destroyAll', function() {
+  it('should destroy all items', function*() {
+    var user = yield adapter.create(User, {
+      name: 'John'
+    })
+    var users = yield adapter.findAll(User, {
+      name: 'John'
+    })
+    assert.equal(users.length, 1)
+    assert.deepEqual(users[0], {
+      id: user.id,
+      name: 'John'
+    })
+    yield adapter.destroyAll(User, {
+      name: 'John'
+    })
+    users = yield adapter.findAll(User, {
+      name: 'John'
+    })
+    assert.equal(users.length, 0)
+  })
+})

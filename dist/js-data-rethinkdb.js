@@ -430,6 +430,7 @@ module.exports =
 	      return this.waitForTable(resourceConfig.table || underscore(resourceConfig.name), options).then(function () {
 	        return _this5.r.db(options.db || _this5.defaults.db).table(resourceConfig.table || underscore(resourceConfig.name)).insert(attrs, { returnChanges: true }).run();
 	      }).then(function (cursor) {
+	        _this5._handleErrors(cursor);
 	        return cursor.changes[0].new_val;
 	      });
 	    }
@@ -443,6 +444,7 @@ module.exports =
 	      return this.waitForTable(resourceConfig.table || underscore(resourceConfig.name), options).then(function () {
 	        return _this6.r.db(options.db || _this6.defaults.db).table(resourceConfig.table || underscore(resourceConfig.name)).get(id).update(attrs, { returnChanges: true }).run();
 	      }).then(function (cursor) {
+	        _this6._handleErrors(cursor);
 	        if (cursor.changes && cursor.changes.length && cursor.changes[0].new_val) {
 	          return cursor.changes[0].new_val;
 	        } else {
@@ -461,6 +463,7 @@ module.exports =
 	      return this.waitForTable(resourceConfig.table || underscore(resourceConfig.name), options).then(function () {
 	        return _this7.filterSequence(_this7.selectTable(resourceConfig, options), params).update(attrs, { returnChanges: true }).run();
 	      }).then(function (cursor) {
+	        _this7._handleErrors(cursor);
 	        if (cursor && cursor.changes && cursor.changes.length) {
 	          var _ret = (function () {
 	            var items = [];
@@ -502,6 +505,16 @@ module.exports =
 	      }).then(function () {
 	        return undefined;
 	      });
+	    }
+	  }, {
+	    key: '_handleErrors',
+	    value: function _handleErrors(cursor) {
+	      if (cursor && cursor.errors > 0) {
+	        if (cursor.first_error) {
+	          throw new Error(cursor.first_error);
+	        }
+	        throw new Error('Unknown RethinkDB Error');
+	      }
 	    }
 	  }]);
 

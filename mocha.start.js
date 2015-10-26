@@ -2,7 +2,12 @@
 'use strict';
 
 var assert = require('chai').assert;
+assert.equalObjects = function (a, b, m) {
+  assert.deepEqual(JSON.parse(JSON.stringify(a)), JSON.parse(JSON.stringify(b)), m || 'Objects should be equal!');
+};
 var mocha = require('mocha');
+var coMocha = require('co-mocha');
+coMocha(mocha);
 var DSRethinkDBAdapter = require('./');
 var JSData = require('js-data');
 JSData.DSUtils.Promise = require('bluebird');
@@ -111,11 +116,11 @@ beforeEach(function () {
   global.DSErrors = globals.DSErrors;
 });
 
-afterEach(function (done) {
+afterEach(function* () {
   globals.adapter = null;
   global.adapter = null;
 
-  adapter.destroyAll(User, {}).then(function () {
-    done();
-  }, done);
+  yield adapter.destroyAll(Comment);
+  yield adapter.destroyAll(Post);
+  yield adapter.destroyAll(User);
 });
