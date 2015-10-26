@@ -353,7 +353,10 @@ class DSRethinkDBAdapter {
     options = options || {}
     return this.waitForTable(resourceConfig.table || underscore(resourceConfig.name), options).then(() => {
       return this.r.db(options.db || this.defaults.db).table(resourceConfig.table || underscore(resourceConfig.name)).insert(attrs, {returnChanges: true}).run()
-    }).then(cursor => cursor.changes[0].new_val)
+    }).then(cursor => {
+      this._handleErrors(cursor)
+      return cursor.changes[0].new_val
+    })
   }
 
   update (resourceConfig, id, attrs, options) {
@@ -362,6 +365,7 @@ class DSRethinkDBAdapter {
     return this.waitForTable(resourceConfig.table || underscore(resourceConfig.name), options).then(() => {
       return this.r.db(options.db || this.defaults.db).table(resourceConfig.table || underscore(resourceConfig.name)).get(id).update(attrs, {returnChanges: true}).run()
     }).then(cursor => {
+      this._handleErrors(cursor)
       if (cursor.changes && cursor.changes.length && cursor.changes[0].new_val) {
         return cursor.changes[0].new_val
       } else {
@@ -377,6 +381,7 @@ class DSRethinkDBAdapter {
     return this.waitForTable(resourceConfig.table || underscore(resourceConfig.name), options).then(() => {
       return this.filterSequence(this.selectTable(resourceConfig, options), params).update(attrs, {returnChanges: true}).run()
     }).then(cursor => {
+      this._handleErrors(cursor)
       if (cursor && cursor.changes && cursor.changes.length) {
         let items = []
         cursor.changes.forEach(change => items.push(change.new_val))
@@ -400,6 +405,15 @@ class DSRethinkDBAdapter {
     return this.waitForTable(resourceConfig.table || underscore(resourceConfig.name), options).then(() => {
       return this.filterSequence(this.selectTable(resourceConfig, options), params).delete().run()
     }).then(() => undefined)
+  }
+
+  _handleErrors (cursor) {
+    if (cursor && cursor.errors > 0) {
+      if (cursor.first_error) {
+        throw new Error(cursor.first_error)
+      }
+      throw new Error('Unknown RethinkDB Error')
+    }
   }
 }
 
