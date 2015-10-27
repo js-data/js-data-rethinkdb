@@ -16,4 +16,4 @@ test:
   override:
     - npm run ci
   post:
-    - killall rethinkdb
+    - sudo killall rethinkdb
