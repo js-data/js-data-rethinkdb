@@ -129,9 +129,7 @@ module.exports =
 	          var subQuery = undefined;
 	          forOwn(params.where, function (criteria, field) {
 	            if (!isObject(criteria)) {
-	              params.where[field] = {
-	                '==': criteria
-	              };
+	              criteria = { '==': criteria };
 	            }
 	            forOwn(criteria, function (v, op) {
 	              if (op === '==' || op === '===') {
@@ -150,6 +148,16 @@ module.exports =
 	                subQuery = subQuery ? subQuery.and(row(field)['default']([]).setIntersection(r.expr(v)['default']([])).count().eq(0)) : row(field)['default']([]).setIntersection(r.expr(v)['default']([])).count().eq(0);
 	              } else if (op === 'isectNotEmpty') {
 	                subQuery = subQuery ? subQuery.and(row(field)['default']([]).setIntersection(r.expr(v)['default']([])).count().ne(0)) : row(field)['default']([]).setIntersection(r.expr(v)['default']([])).count().ne(0);
+	              } else if (op === 'like') {
+	                v = '(i?)' + v; // Case-insensitive
+	                subQuery = subQuery ? subQuery.and(row(field)['default'](null).match(v)) : row(field)['default'](null).match(v);
+	              } else if (op === 'notLike') {
+	                v = '(i?)' + v; // Case-insensitive
+	                subQuery = subQuery ? subQuery.and(row(field)['default'](null).match(v).not()) : row(field)['default'](null).match(v).not();
+	              } else if (op === 'contains') {
+	                subQuery = subQuery ? subQuery.and(row(field)['default']([]).contains(r.expr(v)['default'](null))) : row(field)['default']([]).contains(r.expr(v)['default'](null));
+	              } else if (op === 'notContains') {
+	                subQuery = subQuery ? subQuery.and(row(field)['default']([]).contains(r.expr(v)['default'](null)).not()) : row(field)['default']([]).contains(r.expr(v)['default'](null)).not();
 	              } else if (op === 'in') {
 	                subQuery = subQuery ? subQuery.and(r.expr(v)['default'](r.expr([])).contains(row(field)['default'](null))) : r.expr(v)['default'](r.expr([])).contains(row(field)['default'](null));
 	              } else if (op === 'notIn') {
@@ -170,6 +178,16 @@ module.exports =
 	                subQuery = subQuery ? subQuery.or(row(field)['default']([]).setIntersection(r.expr(v)['default']([])).count().eq(0)) : row(field)['default']([]).setIntersection(r.expr(v)['default']([])).count().eq(0);
 	              } else if (op === '|isectNotEmpty') {
 	                subQuery = subQuery ? subQuery.or(row(field)['default']([]).setIntersection(r.expr(v)['default']([])).count().ne(0)) : row(field)['default']([]).setIntersection(r.expr(v)['default']([])).count().ne(0);
+	              } else if (op === '|like') {
+	                v = '(i?)' + v; // Case-insensitive
+	                subQuery = subQuery ? subQuery.or(row(field)['default'](null).match(v)) : row(field)['default'](null).match(v);
+	              } else if (op === '|notLike') {
+	                v = '(i?)' + v; // Case-insensitive
+	                subQuery = subQuery ? subQuery.or(row(field)['default'](null).match(v).not()) : row(field)['default'](null).match(v).not();
+	              } else if (op === '|contains') {
+	                subQuery = subQuery ? subQuery.or(row(field)['default']([]).contains(r.expr(v)['default'](null))) : row(field)['default']([]).contains(r.expr(v)['default'](null));
+	              } else if (op === '|notContains') {
+	                subQuery = subQuery ? subQuery.or(row(field)['default']([]).contains(r.expr(v)['default'](null)).not()) : row(field)['default']([]).contains(r.expr(v)['default'](null)).not();
 	              } else if (op === '|in') {
 	                subQuery = subQuery ? subQuery.or(r.expr(v)['default'](r.expr([])).contains(row(field)['default'](null))) : r.expr(v)['default'](r.expr([])).contains(row(field)['default'](null));
 	              } else if (op === '|notIn') {
@@ -432,6 +450,7 @@ module.exports =
 	      return this.waitForTable(resourceConfig.table || underscore(resourceConfig.name), options).then(function () {
 	        return _this5.r.db(options.db || _this5.defaults.db).table(resourceConfig.table || underscore(resourceConfig.name)).insert(attrs, { returnChanges: true }).run();
 	      }).then(function (cursor) {
+	        _this5._handleErrors(cursor);
 	        return cursor.changes[0].new_val;
 	      });
 	    }
@@ -445,6 +464,7 @@ module.exports =
 	      return this.waitForTable(resourceConfig.table || underscore(resourceConfig.name), options).then(function () {
 	        return _this6.r.db(options.db || _this6.defaults.db).table(resourceConfig.table || underscore(resourceConfig.name)).get(id).update(attrs, { returnChanges: true }).run();
 	      }).then(function (cursor) {
+	        _this6._handleErrors(cursor);
 	        if (cursor.changes && cursor.changes.length && cursor.changes[0].new_val) {
 	          return cursor.changes[0].new_val;
 	        } else {
@@ -463,6 +483,7 @@ module.exports =
 	      return this.waitForTable(resourceConfig.table || underscore(resourceConfig.name), options).then(function () {
 	        return _this7.filterSequence(_this7.selectTable(resourceConfig, options), params).update(attrs, { returnChanges: true }).run();
 	      }).then(function (cursor) {
+	        _this7._handleErrors(cursor);
 	        if (cursor && cursor.changes && cursor.changes.length) {
 	          var _ret = (function () {
 	            var items = [];
@@ -504,6 +525,16 @@ module.exports =
 	      }).then(function () {
 	        return undefined;
 	      });
+	    }
+	  }, {
+	    key: '_handleErrors',
+	    value: function _handleErrors(cursor) {
+	      if (cursor && cursor.errors > 0) {
+	        if (cursor.first_error) {
+	          throw new Error(cursor.first_error);
+	        }
+	        throw new Error('Unknown RethinkDB Error');
+	      }
 	    }
 	  }]);
 

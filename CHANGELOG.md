@@ -1,3 +1,17 @@
+##### 2.1.0 - 26 October 2015
+
+###### Backwards compatible bug fixes
+- #16 - Handle cursor errors by @BBB
+
+###### Other
+- Removed Grunt
+- Tests now use yield and generators
+
+##### 2.0.3 - 13 October 2015
+
+###### Backwards compatible bug fixes
+- #13, #14 - Using `where` in a query without an operator breaks by @internalfx
+
 ##### 2.0.2 - 09 September 2015
 
 ###### Backwards compatible bug fixes

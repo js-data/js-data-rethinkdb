@@ -1,86 +1,125 @@
-describe('DSRethinkDBAdapter#updateAll', function () {
-  it('should update all items', function () {
-    var id, id2;
-    return adapter.create(User, { name: 'John', age: 20 })
-      .then(function (user) {
-        id = user.id;
-        return adapter.create(User, { name: 'John', age: 30 });
-      }).then(function (user) {
-        id2 = user.id;
-        return adapter.findAll(User, {
-          name: 'John'
-        });
-      }).then(function (users) {
-        users.sort(function (a, b) {
-          return a.age - b.age;
-        });
-        assert.deepEqual(users, [{ id: id, name: 'John', age: 20 }, { id: id2, name: 'John', age: 30 }]);
-        return adapter.updateAll(User, {
-          name: 'Johnny'
-        }, {
-          name: 'John'
-        });
-      }).then(function (users) {
-        users.sort(function (a, b) {
-          return a.age - b.age;
-        });
-        assert.deepEqual(users, [{ id: id, name: 'Johnny', age: 20 }, { id: id2, name: 'Johnny', age: 30 }]);
-        return adapter.findAll(User, {
-          name: 'John'
-        });
-      }).then(function (users) {
-        assert.deepEqual(users, []);
-        assert.equal(users.length, 0);
-        return adapter.findAll(User, {
-          name: 'Johnny'
-        });
-      }).then(function (users) {
-        users.sort(function (a, b) {
-          return a.age - b.age;
-        });
-        assert.deepEqual(users, [{ id: id, name: 'Johnny', age: 20 }, { id: id2, name: 'Johnny', age: 30 }]);
-        return adapter.destroyAll(User);
-      }).then(function (destroyedUser) {
-        assert.isFalse(!!destroyedUser);
-      });
-  });
-  it('should still work if there are no changes', function () {
-    var id, id2;
-    return adapter.create(User, { name: 'John', age: 20 })
-      .then(function (user) {
-        id = user.id;
-        return adapter.create(User, { name: 'John', age: 30 });
-      }).then(function (user) {
-        id2 = user.id;
-        return adapter.findAll(User, {
-          name: 'John'
-        });
-      }).then(function (users) {
-        users.sort(function (a, b) {
-          return a.age - b.age;
-        });
-        assert.deepEqual(users, [{ id: id, name: 'John', age: 20 }, { id: id2, name: 'John', age: 30 }]);
-        return adapter.updateAll(User, {
-          name: 'John'
-        }, {
-          name: 'John'
-        });
-      }).then(function (users) {
-        users.sort(function (a, b) {
-          return a.age - b.age;
-        });
-        assert.deepEqual(users, [{ id: id, name: 'John', age: 20 }, { id: id2, name: 'John', age: 30 }]);
-        return adapter.findAll(User, {
-          name: 'John'
-        });
-      }).then(function (users) {
-        users.sort(function (a, b) {
-          return a.age - b.age;
-        });
-        assert.deepEqual(users, [{ id: id, name: 'John', age: 20 }, { id: id2, name: 'John', age: 30 }]);
-        return adapter.destroyAll(User);
-      }).then(function (destroyedUser) {
-        assert.isFalse(!!destroyedUser);
-      });
-  });
-});
+describe('DSRethinkDBAdapter#updateAll', function() {
+  it('should update all items', function*() {
+    var user = yield adapter.create(User, {
+      name: 'John',
+      age: 20
+    })
+    var user2 = yield adapter.create(User, {
+      name: 'John',
+      age: 30
+    })
+    var users = yield adapter.findAll(User, {
+      name: 'John'
+    })
+    users.sort(function(a, b) {
+      return a.age - b.age
+    })
+    assert.deepEqual(users, [{
+      id: user.id,
+      name: 'John',
+      age: 20
+    }, {
+      id: user2.id,
+      name: 'John',
+      age: 30
+    }])
+    users = yield adapter.updateAll(User, {
+      name: 'Johnny'
+    }, {
+      name: 'John'
+    })
+    users.sort(function(a, b) {
+      return a.age - b.age
+    })
+    assert.deepEqual(users, [{
+      id: user.id,
+      name: 'Johnny',
+      age: 20
+    }, {
+      id: user2.id,
+      name: 'Johnny',
+      age: 30
+    }])
+    users = yield adapter.findAll(User, {
+      name: 'John'
+    })
+    assert.deepEqual(users, [])
+    assert.equal(users.length, 0)
+    users = yield adapter.findAll(User, {
+      name: 'Johnny'
+    })
+    users.sort(function(a, b) {
+      return a.age - b.age
+    })
+    assert.deepEqual(users, [{
+      id: user.id,
+      name: 'Johnny',
+      age: 20
+    }, {
+      id: user2.id,
+      name: 'Johnny',
+      age: 30
+    }])
+    users = yield adapter.destroyAll(User)
+    assert.isFalse(!!users)
+  })
+  it('should still work if there are no changes', function*() {
+    var user = yield adapter.create(User, {
+      name: 'John',
+      age: 20
+    })
+    var user2 = yield adapter.create(User, {
+      name: 'John',
+      age: 30
+    })
+    var users = yield adapter.findAll(User, {
+      name: 'John'
+    })
+    users.sort(function(a, b) {
+      return a.age - b.age
+    })
+    assert.deepEqual(users, [{
+      id: user.id,
+      name: 'John',
+      age: 20
+    }, {
+      id: user2.id,
+      name: 'John',
+      age: 30
+    }])
+    users = yield adapter.updateAll(User, {
+      name: 'John'
+    }, {
+      name: 'John'
+    })
+    users.sort(function(a, b) {
+      return a.age - b.age
+    })
+    assert.deepEqual(users, [{
+      id: user.id,
+      name: 'John',
+      age: 20
+    }, {
+      id: user2.id,
+      name: 'John',
+      age: 30
+    }])
+    users = yield adapter.findAll(User, {
+      name: 'John'
+    })
+    users.sort(function(a, b) {
+      return a.age - b.age
+    })
+    assert.deepEqual(users, [{
+      id: user.id,
+      name: 'John',
+      age: 20
+    }, {
+      id: user2.id,
+      name: 'John',
+      age: 30
+    }])
+    users = yield adapter.destroyAll(User)
+    assert.isFalse(!!users)
+  })
+})

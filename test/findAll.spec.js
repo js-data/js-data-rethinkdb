@@ -1,167 +1,163 @@
-describe('DSRethinkDBAdapter#findAll', function () {
-  it('should filter users', function () {
-    var id, postId;
-
-    return adapter.findAll(User, {
+describe('DSRethinkDBAdapter#findAll', function() {
+  it('should filter users', function*() {
+    var users = yield adapter.findAll(User, {
       age: 30
-    }).then(function (users) {
-      assert.equal(users.length, 0);
-      return adapter.create(User, { name: 'John' });
-    }).then(function (user) {
-      id = user.id;
-      return adapter.create(Post, { title: 'foo', userId: user.id });
-    }).then(function (post) {
-      postId = post.id;
-      assert.equal(post.userId, id);
-      return adapter.findAll(User, {
-        name: 'John'
-      }, { with: ['post', 'comment']});
-    }).then(function (users) {
-      assert.equal(users.length, 1);
-      assert.deepEqual(users[0], { id: id, name: 'John', comments: [], posts: [ { id: postId, userId:id, title: 'foo' } ] });
-      return adapter.destroy(User, id);
-    }).then(function (destroyedUser) {
-      assert.isFalse(!!destroyedUser);
-    });
-  });
-  it('should filter users using the "in" operator', function () {
-    var id;
+    })
+    assert.equal(users.length, 0)
+    var user = yield adapter.create(User, {
+      name: 'John'
+    })
+    var post = yield adapter.create(Post, {
+      title: 'foo',
+      userId: user.id
+    })
+    assert.equal(post.userId, user.id)
+    var users = yield adapter.findAll(User, {
+      name: 'John'
+    }, {
+      with: ['post', 'comment']
+    })
+    assert.equal(users.length, 1)
+    assert.deepEqual(users[0], {
+      id: user.id,
+      name: 'John',
+      comments: [],
+      posts: [{
+        id: post.id,
+        userId: user.id,
+        title: 'foo'
+      }]
+    })
+    user = yield adapter.destroy(User, user.id)
+    assert.isFalse(!!user)
+  })
 
-    return adapter.findAll(User, {
+  it('should filter users using the "in" operator', function*() {
+    var users = yield adapter.findAll(User, {
       where: {
         age: {
           'in': [30]
         }
       }
-    }).then(function (users) {
-      assert.equal(users.length, 0);
-      return adapter.create(User, { name: 'John' });
-    }).then(function (user) {
-      id = user.id;
-      return adapter.findAll(User, {
-        name: 'John'
-      });
-    }).then(function (users) {
-      assert.equal(users.length, 1);
-      assert.deepEqual(users[0], { id: id, name: 'John' });
-      return adapter.destroy(User, id);
-    }).then(function (destroyedUser) {
-      assert.isFalse(!!destroyedUser);
-    });
-  });
-  it('should filter users using the "notContains" operator', function () {
-    var id;
+    })
+    assert.equal(users.length, 0)
+    var user = yield adapter.create(User, {
+      name: 'John'
+    })
+    users = yield adapter.findAll(User, {
+      name: 'John'
+    })
+    assert.equal(users.length, 1)
+    assert.deepEqual(users[0], {
+      id: user.id,
+      name: 'John'
+    })
+    user = yield adapter.destroy(User, user.id)
+    assert.isFalse(!!user)
+  })
 
-    return adapter.findAll(User, {
+  it('should filter users using the "notContains" operator', function*() {
+    var users = yield adapter.findAll(User, {
       where: {
         roles: {
           'notContains': 'user'
         }
       }
-    }).then(function (users) {
-      assert.equal(users.length, 0);
-      return adapter.create(User, { name: 'John', roles: [ 'admin' ] });
-    }).then(function (user) {
-      id = user.id;
-      return adapter.findAll(User, {
-        where: {
-          roles: {
-            'notContains': 'user'
-          }
-        }
-      });
-    }).then(function (users) {
-      assert.equal(users.length, 1);
-      assert.deepEqual(users[0], { id: id, name: 'John', roles: [ 'admin' ] });
-      return adapter.destroy(User, id);
-    }).then(function (destroyedUser) {
-      assert.isFalse(!!destroyedUser);
-    });
-  });  it('should filter users using the "contains" operator', function () {
-    var id;
+    })
+    assert.equal(users.length, 0)
+    
+    var user = yield adapter.create(User, { name: 'John', roles: [ 'admin' ] })
 
-    return adapter.findAll(User, {
+    users = yield adapter.findAll(User, {
+      where: {
+        roles: {
+          'notContains': 'user'
+        }
+      }
+    })
+    assert.equal(users.length, 1)
+    assert.deepEqual(users[0], { id: user.id, name: 'John', roles: [ 'admin' ] })
+
+    user = yield adapter.destroy(User, user.id)
+    assert.isFalse(!!user)
+  })
+
+  it('should filter users using the "contains" operator', function*() {
+    var users = yield adapter.findAll(User, {
       where: {
         roles: {
           'contains': 'admin'
         }
       }
-    }).then(function (users) {
-      assert.equal(users.length, 0);
-      return adapter.create(User, { name: 'John', roles: [ 'admin' ] });
-    }).then(function (user) {
-      id = user.id;
-      return adapter.findAll(User, {
-        where: {
-          roles: {
-            'contains': 'admin'
-          }
-        }
-      });
-    }).then(function (users) {
-      assert.equal(users.length, 1);
-      assert.deepEqual(users[0], { id: id, name: 'John', roles: [ 'admin' ] });
-      return adapter.destroy(User, id);
-    }).then(function (destroyedUser) {
-      assert.isFalse(!!destroyedUser);
-    });
-  });
-  it('should filter users using the "like" operator', function () {
-    var id;
+    })
+    assert.equal(users.length, 0)
+    
+    var user = yield adapter.create(User, { name: 'John', roles: [ 'admin' ] })
 
-    return adapter.findAll(User, {
+    users = yield adapter.findAll(User, {
+      where: {
+        roles: {
+          'contains': 'admin'
+        }
+      }
+    })
+    assert.equal(users.length, 1)
+    assert.deepEqual(users[0], { id: user.id, name: 'John', roles: [ 'admin' ] })
+    
+    user = yield adapter.destroy(User, user.id)
+    assert.isFalse(!!user)
+  })
+
+  it('should filter users using the "like" operator', function*() {
+    var users = yield adapter.findAll(User, {
       where: {
         name: {
           'like': 'J'
         }
       }
-    }).then(function (users) {
-      assert.equal(users.length, 0);
-      return adapter.create(User, { name: 'John' });
-    }).then(function (user) {
-      id = user.id;
-      return adapter.findAll(User, {
-        where: {
-          name: {
-            'like': 'J'
-          }
-        }
-      });
-    }).then(function (users) {
-      assert.equal(users.length, 1);
-      assert.deepEqual(users[0], { id: id, name: 'John' });
-      return adapter.destroy(User, id);
-    }).then(function (destroyedUser) {
-      assert.isFalse(!!destroyedUser);
-    });
-  });
-  it('should filter users using the "notLike" operator', function () {
-    var id;
+    })
 
-    return adapter.findAll(User, {
+    assert.equal(users.length, 0)
+    var user = yield adapter.create(User, { name: 'John' })
+
+    users = yield adapter.findAll(User, {
+      where: {
+        name: {
+          'like': 'J'
+        }
+      }
+    })
+
+    assert.equal(users.length, 1)
+    assert.deepEqual(users[0], { id: user.id, name: 'John' })
+
+    user = yield adapter.destroy(User, user.id)
+    assert.isFalse(!!user)
+  })
+
+  it('should filter users using the "notLike" operator', function*() {
+    var users = yield adapter.findAll(User, {
       where: {
         name: {
           'notLike': 'x'
         }
       }
-    }).then(function (users) {
-      assert.equal(users.length, 0);
-      return adapter.create(User, { name: 'John' });
-    }).then(function (user) {
-      id = user.id;
-      return adapter.findAll(User, {
-        where: {
-          name: {
-            'notLike': 'x'
-          }
+    })
+    assert.equal(users.length, 0);
+
+    var user = yield adapter.create(User, { name: 'John' })
+
+    users = yield adapter.findAll(User, {
+      where: {
+        name: {
+          'notLike': 'x'
         }
-      });
-    }).then(function (users) {
-      assert.equal(users.length, 1);
-      assert.deepEqual(users[0], { id: id, name: 'John' });
-      return adapter.destroy(User, id);
-    }).then(function (destroyedUser) {
-      assert.isFalse(!!destroyedUser);
-    });
-  });
-});
+      }
+    })
+    assert.equal(users.length, 1);
+    assert.deepEqual(users[0], { id: user.id, name: 'John' })
+
+    user = yield adapter.destroy(User, user.id)
+    assert.isFalse(!!user)
+  })
+})
