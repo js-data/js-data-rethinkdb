@@ -31,6 +31,7 @@ describe('DSRethinkDBAdapter#findAll', function() {
     user = yield adapter.destroy(User, user.id)
     assert.isFalse(!!user)
   })
+
   it('should filter users using the "in" operator', function*() {
     var users = yield adapter.findAll(User, {
       where: {
@@ -51,6 +52,111 @@ describe('DSRethinkDBAdapter#findAll', function() {
       id: user.id,
       name: 'John'
     })
+    user = yield adapter.destroy(User, user.id)
+    assert.isFalse(!!user)
+  })
+
+  it('should filter users using the "notContains" operator', function*() {
+    var users = yield adapter.findAll(User, {
+      where: {
+        roles: {
+          'notContains': 'user'
+        }
+      }
+    })
+    assert.equal(users.length, 0)
+    
+    var user = yield adapter.create(User, { name: 'John', roles: [ 'admin' ] })
+
+    users = yield adapter.findAll(User, {
+      where: {
+        roles: {
+          'notContains': 'user'
+        }
+      }
+    })
+    assert.equal(users.length, 1)
+    assert.deepEqual(users[0], { id: user.id, name: 'John', roles: [ 'admin' ] })
+
+    user = yield adapter.destroy(User, user.id)
+    assert.isFalse(!!user)
+  })
+
+  it('should filter users using the "contains" operator', function*() {
+    var users = yield adapter.findAll(User, {
+      where: {
+        roles: {
+          'contains': 'admin'
+        }
+      }
+    })
+    assert.equal(users.length, 0)
+    
+    var user = yield adapter.create(User, { name: 'John', roles: [ 'admin' ] })
+
+    users = yield adapter.findAll(User, {
+      where: {
+        roles: {
+          'contains': 'admin'
+        }
+      }
+    })
+    assert.equal(users.length, 1)
+    assert.deepEqual(users[0], { id: user.id, name: 'John', roles: [ 'admin' ] })
+    
+    user = yield adapter.destroy(User, user.id)
+    assert.isFalse(!!user)
+  })
+
+  it('should filter users using the "like" operator', function*() {
+    var users = yield adapter.findAll(User, {
+      where: {
+        name: {
+          'like': 'J'
+        }
+      }
+    })
+
+    assert.equal(users.length, 0)
+    var user = yield adapter.create(User, { name: 'John' })
+
+    users = yield adapter.findAll(User, {
+      where: {
+        name: {
+          'like': 'J'
+        }
+      }
+    })
+
+    assert.equal(users.length, 1)
+    assert.deepEqual(users[0], { id: user.id, name: 'John' })
+
+    user = yield adapter.destroy(User, user.id)
+    assert.isFalse(!!user)
+  })
+
+  it('should filter users using the "notLike" operator', function*() {
+    var users = yield adapter.findAll(User, {
+      where: {
+        name: {
+          'notLike': 'x'
+        }
+      }
+    })
+    assert.equal(users.length, 0);
+
+    var user = yield adapter.create(User, { name: 'John' })
+
+    users = yield adapter.findAll(User, {
+      where: {
+        name: {
+          'notLike': 'x'
+        }
+      }
+    })
+    assert.equal(users.length, 1);
+    assert.deepEqual(users[0], { id: user.id, name: 'John' })
+
     user = yield adapter.destroy(User, user.id)
     assert.isFalse(!!user)
   })
