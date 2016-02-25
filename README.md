@@ -1,91 +1,80 @@
-<img src="https://raw.githubusercontent.com/js-data/js-data/master/js-data.png" alt="js-data logo" title="js-data" align="right" width="64" height="64" />
+<img src="https://raw.githubusercontent.com/js-data/js-data/master/js-data.png" alt="js-data logo" title="js-data" align="right" width="96" height="96" />
 
-## js-data-rethinkdb [![Slack Status][sl_b]][sl_l] [![npm version][npm_b]][npm_l] [![Circle CI][circle_b]][circle_l] [![npm downloads][dn_b]][dn_l] [![Coverage Status][cov_b]][cov_l] [![Codacy][cod_b]][cod_l]
+# js-data-rethinkdb
+
+[![Slack Status][sl_b]][sl_l]
+[![npm version][npm_b]][npm_l]
+[![Circle CI][circle_b]][circle_l]
+[![npm downloads][dn_b]][dn_l]
+[![Coverage Status][cov_b]][cov_l]
+[![Codacy][cod_b]][cod_l]
 
 RethinkDB adapter for [js-data](http://www.js-data.io/).
 
-### API Documentation
-[DSRethinkDBAdapter](http://www.js-data.io/docs/dsrethinkdbadapter)
+To get started, visit __[http://js-data.io](http://www.js-data.io)__.
 
-### Example App
-[js-data-examples/server/rethinkdb](https://github.com/js-data/js-data-examples/tree/master/server/rethinkdb)
+## Table of contents
 
-### Quick Start
-`npm install --save js-data js-data-rethinkdb rethinkdbdash`.
+* [Quick start](#quick-start)
+* [Example App](#example-app)
+* [Guides and Tutorials](#guides-and-tutorials)
+* [API Reference Docs](#api-reference-docs)
+* [Community](#community)
+* [Support](#support)
+* [Contributing](#contributing)
+* [License](#license)
+
+## Quick Start
+`npm install --save js-data js-data-rethinkdb`.
 
 ```js
 var JSData = require('js-data');
-var DSRethinkDBAdapter = require('js-data-rethinkdb');
+var RethinkDBAdapter = require('js-data-rethinkdb');
 
 var store = new JSData.DS();
-
-// "r" will be available at adapter.r
-var adapter = new DSRethinkDBAdapter();
-
-store.registerAdapter('rethinkdb', adapter, { default: true });
+var adapter = new RethinkDBAdapter();
 
 // "store" will now use the RethinkDB adapter for all async operations
+store.registerAdapter('rethinkdb', adapter, { default: true });
+
+var User = store.defineResource({
+  name: 'user'
+});
 ```
 
-### Changelog
-[CHANGELOG.md](https://github.com/js-data/js-data-rethinkdb/blob/master/CHANGELOG.md)
+## Example App
 
-### Community
-- [Slack Channel](http://slack.js-data.io/) - Better than IRC!
-- [Announcements](http://www.js-data.io/blog)
-- [Mailing List](https://groups.io/org/groupsio/jsdata) - Ask your questions!
-- [Issues](https://github.com/js-data/js-data-rethinkdb/issues) - Found a bug? Feature request? Submit an issue!
-- [GitHub](https://github.com/js-data/js-data-rethinkdb) - View the source code for js-data.
-- [Contributing Guide](https://github.com/js-data/js-data-rethinkdb/blob/master/CONTRIBUTING.md)
+[js-data-examples/server/rethinkdb](https://github.com/js-data/js-data-examples/tree/master/server/rethinkdb)
 
-### Contributing
+## Guides and Tutorials
 
-First, support is handled via the [Slack Channel](http://slack.js-data.io/) and the [Mailing List](https://groups.io/org/groupsio/jsdata). Ask your questions there.
+[Get started at http://js-data.io](http://js-data.io)
 
-When submitting issues on GitHub, please include as much detail as possible to make debugging quick and easy.
+## API Reference Docs
 
-- good - Your versions of js-data, js-data-rethinkdb, etc., relevant console logs/error, code examples that revealed the issue
-- better - A [plnkr](http://plnkr.co/), [fiddle](http://jsfiddle.net/), or [bin](http://jsbin.com/?html,output) that demonstrates the issue
-- best - A Pull Request that fixes the issue, including test coverage for the issue and the fix
+[Visit http://api.js-data.io](http://api.js-data.io).
 
-[Github Issues](https://github.com/js-data/js-data-rethinkdb/issues).
+## Community
 
-#### Submitting Pull Requests
+[Explore the Community](http://js-data.io/docs/community).
 
-1. Contribute to the issue/discussion that is the reason you'll be developing in the first place
-1. Fork js-data-rethinkdb
-1. `git clone git@github.com:<you>/js-data-rethinkdb.git`
-1. `cd js-data-rethinkdb; npm install; bower install;`
-1. Write your code, including relevant documentation and tests
-1. Run `grunt test` (build and test)
-1. Your code will be linted and checked for formatting, the tests will be run
-1. The `dist/` folder & files will be generated, do NOT commit `dist/*`! They will be committed when a release is cut.
-1. Submit your PR and we'll review!
-1. Thanks!
+## Support
 
-### License
+[Find out how to Get Support](http://js-data.io/docs/support).
+
+## Contributing
+
+[Read the Contributing Guide](http://js-data.io/docs/contributing).
+
+## License
 
 The MIT License (MIT)
 
-Copyright (c) 2014-2015 Jason Dobry
+Copyright (c) 2014-2016 js-data-rethinkdb project authors
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+* [LICENSE](https://github.com/js-data/js-data-rethinkdb/blob/master/LICENSE)
+* [AUTHORS](https://github.com/js-data/js-data-rethinkdb/blob/master/AUTHORS)
+* [CONTRIBUTORS](https://github.com/js-data/js-data-rethinkdb/blob/master/CONTRIBUTORS)
 
 [sl_b]: http://slack.js-data.io/badge.svg
 [sl_l]: http://slack.js-data.io

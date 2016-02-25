@@ -1,3 +1,8 @@
+##### 2.2.0 - 25 February 2016
+
+###### Other
+- General improvements
+
 ##### 2.1.0 - 26 October 2015
 
 ###### Backwards compatible bug fixes

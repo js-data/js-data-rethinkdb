@@ -1,126 +1,36 @@
 /*global assert:true */
-'use strict';
+'use strict'
 
-var assert = require('chai').assert;
-assert.equalObjects = function (a, b, m) {
-  assert.deepEqual(JSON.parse(JSON.stringify(a)), JSON.parse(JSON.stringify(b)), m || 'Objects should be equal!');
-};
-var mocha = require('mocha');
-var coMocha = require('co-mocha');
-coMocha(mocha);
-var DSRethinkDBAdapter = require('./');
-var JSData = require('js-data');
-JSData.DSUtils.Promise = require('bluebird');
+// prepare environment for js-data-adapter-tests
+require('babel-polyfill')
+global.assert = require('chai').assert
 
-var adapter, store, DSUtils, DSErrors, User, Post, Comment;
+var JSData = require('js-data')
+var TestRunner = require('js-data-adapter-tests')
+var RethinkDBAdapter = require('./')
 
-var globals = module.exports = {
-  fail: function (msg) {
-    assert.equal('should not reach this!: ' + msg, 'failure');
+TestRunner.init({
+  debug: false,
+  DS: JSData.DS,
+  Adapter: RethinkDBAdapter,
+  adapterConfig: {},
+  storeConfig: {
+    bypassCache: true,
+    linkRelations: false,
+    cacheResponse: false,
+    log: false,
+    debug: false
   },
-  TYPES_EXCEPT_STRING: [123, 123.123, null, undefined, {}, [], true, false, function () {
-  }],
-  TYPES_EXCEPT_STRING_OR_ARRAY: [123, 123.123, null, undefined, {}, true, false, function () {
-  }],
-  TYPES_EXCEPT_STRING_OR_NUMBER: [null, undefined, {}, [], true, false, function () {
-  }],
-  TYPES_EXCEPT_STRING_OR_OBJECT: [123, 123.123, null, undefined, [], true, false, function () {
-  }],
-  TYPES_EXCEPT_STRING_OR_NUMBER_OBJECT: [null, undefined, [], true, false, function () {
-  }],
-  TYPES_EXCEPT_STRING_OR_ARRAY_OR_NUMBER: [null, undefined, {}, true, false, function () {
-  }],
-  TYPES_EXCEPT_NUMBER: ['string', null, undefined, {}, [], true, false, function () {
-  }],
-  TYPES_EXCEPT_OBJECT: ['string', 123, 123.123, null, undefined, true, false, function () {
-  }],
-  TYPES_EXCEPT_BOOLEAN: ['string', 123, 123.123, null, undefined, {}, [], function () {
-  }],
-  TYPES_EXCEPT_FUNCTION: ['string', 123, 123.123, null, undefined, {}, [], true, false],
-  assert: assert,
-  adapter: undefined
-};
+  features: [],
+  methods: [
+    'create',
+    'destroy',
+    'destroyAll',
+    'find',
+    'findAll',
+    'update',
+    'updateAll'
+  ]
+})
 
-var test = new mocha();
-
-var testGlobals = [];
-
-for (var key in globals) {
-  global[key] = globals[key];
-  testGlobals.push(globals[key]);
-}
-test.globals(testGlobals);
-
-beforeEach(function () {
-  store = new JSData.DS({
-    log: false
-  });
-  adapter = new DSRethinkDBAdapter();
-  DSUtils = JSData.DSUtils;
-  DSErrors = JSData.DSErrors;
-  globals.User = global.User = User = store.defineResource({
-    name: 'user',
-    relations: {
-      hasMany: {
-        post: {
-          localField: 'posts',
-          foreignKey: 'userId'
-        },
-        comment: {
-          localField: 'comments',
-          foreignKey: 'userId'
-        }
-      }
-    }
-  });
-  globals.Post = global.Post = Post = store.defineResource({
-    name: 'post',
-    relations: {
-      belongsTo: {
-        user: {
-          localField: 'user',
-          localKey: 'userId'
-        }
-      },
-      hasMany: {
-        comment: {
-          localField: 'comments',
-          foreignKey: 'postId'
-        }
-      }
-    }
-  });
-  globals.Comment = global.Comment = Comment = store.defineResource({
-    name: 'comment',
-    relations: {
-      belongsTo: {
-        post: {
-          localField: 'post',
-          localKey: 'postId'
-        },
-        user: {
-          localField: 'user',
-          localKey: 'userId'
-        }
-      }
-    }
-  });
-
-  globals.adapter = adapter;
-  global.adapter = globals.adapter;
-
-  globals.DSUtils = DSUtils;
-  global.DSUtils = globals.DSUtils;
-
-  globals.DSErrors = DSErrors;
-  global.DSErrors = globals.DSErrors;
-});
-
-afterEach(function* () {
-  globals.adapter = null;
-  global.adapter = null;
-
-  yield adapter.destroyAll(Comment);
-  yield adapter.destroyAll(Post);
-  yield adapter.destroyAll(User);
-});
+// require('./test/find.test')

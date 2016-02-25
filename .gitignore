@@ -32,3 +32,4 @@ bower_components/
 *.iml
 
 rethinkdb_data/
+doc/
