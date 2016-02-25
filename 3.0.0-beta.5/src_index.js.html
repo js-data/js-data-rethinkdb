@@ -1,0 +1,1316 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+	<title>js-data-rethinkdb Source: src/index.js</title>
+
+	<!--[if lt IE 9]>
+	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	<link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.3.0/styles/googlecode.min.css">
+	<link type="text/css" rel="stylesheet" href="styles/site.jsdata.css">
+  <style>
+    a {
+      text-decoration: none !important;
+    }
+    .hljs {
+      padding: 0;
+      background: none;
+    }
+    #toc {
+      margin-top: 62px;
+    }
+    #toc .list-group-item {
+      padding: 5px 15px;
+    }
+    #toc .list-group-item span.toc-h3 {
+      font-weight: bold;
+    }
+    #toc .list-group-item span.toc-h4 {
+      font-family: monospace;
+      letter-spacing: -1px;
+      font-size: 13px;
+    }
+    article h4.name, article dt.name {
+      font-family: monospace;
+      font-weight: bold;
+    }
+    .code-panel.panel pre {
+      background-color: #FBFBFB;
+      border-color: #E6E5E5;
+    }
+    .page-title {
+      color: #000;
+    }
+    span.param-type a {
+      padding: 3px 5px;
+    }
+    span.param-type a:hover {
+      background-color: #158CBA;
+      color: #fff;
+    }
+    .panel ul {
+      padding-left: 0;
+    }
+    .panel ul li {
+      list-style-type: none;
+    }
+  </style>
+
+</head>
+
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top ">
+<div class="container">
+	<div class="navbar-header">
+		<a class="navbar-brand" href="index.html">js-data-rethinkdb</a>
+		<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#topNavigation">
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+        </button>
+	</div>
+	<div class="navbar-collapse collapse" id="topNavigation">
+		<ul class="nav navbar-nav">
+			
+			<li class="dropdown">
+				<a href="modules.list.html" class="dropdown-toggle" data-toggle="dropdown">Modules<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="module-js-data-rethinkdb.html">js-data-rethinkdb</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="Adapter.html">Adapter</a></li><li><a href="Response.html">Response</a></li><li><a href="RethinkDBAdapter.html">RethinkDBAdapter</a></li>
+				</ul>
+			</li>
+			
+		</ul>
+		<div class="col-sm-3 col-md-3">
+            <form class="navbar-form" role="search">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Search" name="q" id="search-input">
+                    <div class="input-group-btn">
+                        <button class="btn btn-default" id="search-submit"><i class="glyphicon glyphicon-search"></i></button>
+                    </div>
+                </div>
+            </form>
+        </div>
+	</div>
+
+</div>
+</div>
+
+
+<div class="container" id="toc-content">
+<div class="row">
+
+	
+
+	<!-- <div class="clearfix"></div> -->
+
+	
+	<div class="col-md-12">
+	
+		<div id="main">
+			
+
+		<h1 class="page-title">Source: src/index.js</h1>
+    
+<section>
+    <article>
+        <pre><code
+            class="javascript linenums">import {utils} from 'js-data'
+import {
+  Adapter,
+  reserved
+} from 'js-data-adapter'
+import rethinkdbdash from 'rethinkdbdash'
+import underscore from 'mout/string/underscore'
+
+const __super__ = Adapter.prototype
+
+const R_OPTS_DEFAULTS = {
+  db: 'test'
+}
+const INSERT_OPTS_DEFAULTS = {}
+const UPDATE_OPTS_DEFAULTS = {}
+const DELETE_OPTS_DEFAULTS = {}
+const RUN_OPTS_DEFAULTS = {}
+
+const equal = function (r, row, field, value) {
+  return row(field).default(null).eq(value)
+}
+
+const notEqual = function (r, row, field, value) {
+  return row(field).default(null).ne(value)
+}
+
+/**
+ * Default predicate functions for the filtering operators.
+ *
+ * @name module:js-data-rethinkdb.OPERATORS
+ * @property {Function} == Equality operator.
+ * @property {Function} != Inequality operator.
+ * @property {Function} > "Greater than" operator.
+ * @property {Function} >= "Greater than or equal to" operator.
+ * @property {Function} &lt; "Less than" operator.
+ * @property {Function} &lt;= "Less than or equal to" operator.
+ * @property {Function} isectEmpty Operator to test that the intersection
+ * between two arrays is empty.
+ * @property {Function} isectNotEmpty Operator to test that the intersection
+ * between two arrays is NOT empty.
+ * @property {Function} in Operator to test whether a value is found in the
+ * provided array.
+ * @property {Function} notIn Operator to test whether a value is NOT found in
+ * the provided array.
+ * @property {Function} contains Operator to test whether an array contains the
+ * provided value.
+ * @property {Function} notContains Operator to test whether an array does NOT
+ * contain the provided value.
+ */
+export const OPERATORS = {
+  '==': equal,
+  '===': equal,
+  '!=': notEqual,
+  '!==': notEqual,
+  '>': function (r, row, field, value) {
+    return row(field).default(null).gt(value)
+  },
+  '>=': function (r, row, field, value) {
+    return row(field).default(null).ge(value)
+  },
+  '&lt;': function (r, row, field, value) {
+    return row(field).default(null).lt(value)
+  },
+  '&lt;=': function (r, row, field, value) {
+    return row(field).default(null).le(value)
+  },
+  'isectEmpty': function (r, row, field, value) {
+    return row(field).default([]).setIntersection(r.expr(value).default([])).count().eq(0)
+  },
+  'isectNotEmpty': function (r, row, field, value) {
+    return row(field).default([]).setIntersection(r.expr(value).default([])).count().ne(0)
+  },
+  'in': function (r, row, field, value) {
+    return r.expr(value).default(r.expr([])).contains(row(field).default(null))
+  },
+  'notIn': function (r, row, field, value) {
+    return r.expr(value).default(r.expr([])).contains(row(field).default(null)).not()
+  },
+  'contains': function (r, row, field, value) {
+    return row(field).default([]).contains(value)
+  },
+  'notContains': function (r, row, field, value) {
+    return row(field).default([]).contains(value).not()
+  }
+}
+
+Object.freeze(OPERATORS)
+
+/**
+ * RethinkDBAdapter class.
+ *
+ * @example
+ * // Use Container instead of DataStore on the server
+ * import {Container} from 'js-data'
+ * import {RethinkDBAdapter} from 'js-data-rethinkdb'
+ *
+ * // Create a store to hold your Mappers
+ * const store = new Container()
+ *
+ * // Create an instance of RethinkDBAdapter with default settings
+ * const adapter = new RethinkDBAdapter()
+ *
+ * // Mappers in "store" will use the RethinkDB adapter by default
+ * store.registerAdapter('rethinkdb', adapter, { default: true })
+ *
+ * // Create a Mapper that maps to a "user" table
+ * store.defineMapper('user')
+ *
+ * @class RethinkDBAdapter
+ * @extends Adapter
+ * @param {Object} [opts] Configuration options.
+ * @param {boolean} [opts.debug=false] See {@link Adapter#debug}.
+ * @param {Object} [opts.deleteOpts={}] See {@link RethinkDBAdapter#deleteOpts}.
+ * @param {Object} [opts.insertOpts={}] See {@link RethinkDBAdapter#insertOpts}.
+ * @param {Object} [opts.operators={@link module:js-data-rethinkdb.OPERATORS}] See {@link RethinkDBAdapter#operators}.
+ * @param {Object} [opts.r] See {@link RethinkDBAdapter#r}.
+ * @param {boolean} [opts.raw=false] See {@link Adapter#raw}.
+ * @param {Object} [opts.rOpts={}] See {@link RethinkDBAdapter#rOpts}.
+ * @param {Object} [opts.runOpts={}] See {@link RethinkDBAdapter#runOpts}.
+ * @param {Object} [opts.updateOpts={}] See {@link RethinkDBAdapter#updateOpts}.
+ */
+export function RethinkDBAdapter (opts) {
+  utils.classCallCheck(this, RethinkDBAdapter)
+  opts || (opts = {})
+
+  // Setup non-enumerable properties
+  Object.defineProperties(this, {
+    /**
+     * The rethinkdbdash instance used by this adapter. Use this directly when
+     * you need to write custom queries.
+     *
+     * @example &lt;caption>Use default instance.&lt;/caption>
+     * import {RethinkDBAdapter} from 'js-data-rethinkdb'
+     * const adapter = new RethinkDBAdapter()
+     * adapter.r.dbDrop('foo').then(...)
+     *
+     * @example &lt;caption>Configure default instance.&lt;/caption>
+     * import {RethinkDBAdapter} from 'js-data-rethinkdb'
+     * const adapter = new RethinkDBAdapter({
+     *   rOpts: {
+     *     user: 'myUser',
+     *     password: 'myPassword'
+     *   }
+     * })
+     * adapter.r.dbDrop('foo').then(...)
+     *
+     * @example &lt;caption>Provide a custom instance.&lt;/caption>
+     * import rethinkdbdash from 'rethinkdbdash'
+     * import {RethinkDBAdapter} from 'js-data-rethinkdb'
+     * const r = rethinkdbdash()
+     * const adapter = new RethinkDBAdapter({
+     *   r: r
+     * })
+     * adapter.r.dbDrop('foo').then(...)
+     *
+     * @name RethinkDBAdapter#r
+     * @type {Object}
+     */
+    r: {
+      writable: true,
+      value: undefined
+    },
+    databases: {
+      value: {}
+    },
+    indices: {
+      value: {}
+    },
+    tables: {
+      value: {}
+    }
+  })
+
+  Adapter.call(this, opts)
+
+  /**
+   * Default options to pass to r#insert.
+   *
+   * @name RethinkDBAdapter#insertOpts
+   * @type {Object}
+   * @default {}
+   */
+  this.insertOpts || (this.insertOpts = {})
+  utils.fillIn(this.insertOpts, INSERT_OPTS_DEFAULTS)
+
+  /**
+   * Default options to pass to r#update.
+   *
+   * @name RethinkDBAdapter#updateOpts
+   * @type {Object}
+   * @default {}
+   */
+  this.updateOpts || (this.updateOpts = {})
+  utils.fillIn(this.updateOpts, UPDATE_OPTS_DEFAULTS)
+
+  /**
+   * Default options to pass to r#delete.
+   *
+   * @name RethinkDBAdapter#deleteOpts
+   * @type {Object}
+   * @default {}
+   */
+  this.deleteOpts || (this.deleteOpts = {})
+  utils.fillIn(this.deleteOpts, DELETE_OPTS_DEFAULTS)
+
+  /**
+   * Default options to pass to r#run.
+   *
+   * @name RethinkDBAdapter#runOpts
+   * @type {Object}
+   * @default {}
+   */
+  this.runOpts || (this.runOpts = {})
+  utils.fillIn(this.runOpts, RUN_OPTS_DEFAULTS)
+
+  /**
+   * Override the default predicate functions for the specified operators.
+   *
+   * @name RethinkDBAdapter#operators
+   * @type {Object}
+   * @default {}
+   */
+  this.operators || (this.operators = {})
+  utils.fillIn(this.operators, OPERATORS)
+
+  /**
+   * Options to pass to a new `rethinkdbdash` instance, if one was not provided
+   * at {@link RethinkDBAdapter#r}. See the [rethinkdbdash README][readme] for
+   * instance options.
+   *
+   * [readme]: https://github.com/neumino/rethinkdbdash#importing-the-driver
+   *
+   * @example &lt;caption>Connect to localhost:8080, and let the driver find other instances.&lt;/caption>
+   * import {RethinkDBAdapter} from 'js-data-rethinkdb'
+   * const adapter = new RethinkDBAdapter({
+   *   rOpts: {
+   *     discovery: true
+   *   }
+   * })
+   *
+   * @example &lt;caption>Connect to and only to localhost:8080.&lt;/caption>
+   * import {RethinkDBAdapter} from 'js-data-rethinkdb'
+   * const adapter = new RethinkDBAdapter()
+   *
+   * @example &lt;caption>Do not create a connection pool.&lt;/caption>
+   * import {RethinkDBAdapter} from 'js-data-rethinkdb'
+   * const adapter = new RethinkDBAdapter({
+   *   rOpts: {
+   *     pool: false
+   *   }
+   * })
+   *
+   * @example &lt;caption>Connect to a cluster seeding from `192.168.0.100`, `192.168.0.101`, `192.168.0.102`.&lt;/caption>
+   * import {RethinkDBAdapter} from 'js-data-rethinkdb'
+   * const adapter = new RethinkDBAdapter({
+   *   rOpts: {
+   *     servers: [
+   *       { host: '192.168.0.100', port: 28015 },
+   *       { host: '192.168.0.101', port: 28015 },
+   *       { host: '192.168.0.102', port: 28015 }
+   *     ]
+   *   }
+   * })
+   *
+   * @name RethinkDBAdapter#rOpts
+   * @see https://github.com/neumino/rethinkdbdash#importing-the-driver
+   * @type {Object}
+   */
+  this.rOpts || (this.rOpts = {})
+  utils.fillIn(this.rOpts, R_OPTS_DEFAULTS)
+
+  this.r || (this.r = rethinkdbdash(this.rOpts))
+}
+
+// Setup prototype inheritance from Adapter
+RethinkDBAdapter.prototype = Object.create(Adapter.prototype, {
+  constructor: {
+    value: RethinkDBAdapter,
+    enumerable: false,
+    writable: true,
+    configurable: true
+  }
+})
+
+Object.defineProperty(RethinkDBAdapter, '__super__', {
+  configurable: true,
+  value: Adapter
+})
+
+/**
+ * Alternative to ES6 class syntax for extending `RethinkDBAdapter`.
+ *
+ * @example &lt;caption>Using the ES2015 class syntax.&lt;/caption>
+ * class MyRethinkDBAdapter extends RethinkDBAdapter {...}
+ * const adapter = new MyRethinkDBAdapter()
+ *
+ * @example &lt;caption>Using {@link RethinkDBAdapter.extend}.&lt;/caption>
+ * var instanceProps = {...}
+ * var classProps = {...}
+ *
+ * var MyRethinkDBAdapter = RethinkDBAdapter.extend(instanceProps, classProps)
+ * var adapter = new MyRethinkDBAdapter()
+ *
+ * @method RethinkDBAdapter.extend
+ * @static
+ * @param {Object} [instanceProps] Properties that will be added to the
+ * prototype of the subclass.
+ * @param {Object} [classProps] Properties that will be added as static
+ * properties to the subclass itself.
+ * @return {Constructor} Subclass of `RethinkDBAdapter`.
+ */
+RethinkDBAdapter.extend = utils.extend
+
+utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
+  _handleErrors (cursor) {
+    if (cursor &amp;&amp; cursor.errors > 0) {
+      if (cursor.first_error) {
+        throw new Error(cursor.first_error)
+      }
+      throw new Error('Unknown RethinkDB Error')
+    }
+  },
+
+  _count (mapper, query, opts) {
+    opts || (opts = {})
+    query || (query = {})
+
+    return this.filterSequence(this.selectTable(mapper, opts), query)
+      .count()
+      .run(this.getOpt('runOpts', opts))
+      .then((count) => [count, {}])
+  },
+
+  _create (mapper, props, opts) {
+    props || (props = {})
+    opts || (opts = {})
+
+    const insertOpts = this.getOpt('insertOpts', opts)
+    insertOpts.returnChanges = true
+
+    return this.selectTable(mapper, opts)
+      .insert(props, insertOpts)
+      .run(this.getOpt('runOpts', opts))
+      .then((cursor) => {
+        this._handleErrors(cursor)
+        let record
+        if (cursor &amp;&amp; cursor.changes &amp;&amp; cursor.changes.length &amp;&amp; cursor.changes[0].new_val) {
+          record = cursor.changes[0].new_val
+        }
+        return [record, cursor]
+      })
+  },
+
+  _createMany (mapper, props, opts) {
+    props || (props = {})
+    opts || (opts = {})
+
+    const insertOpts = this.getOpt('insertOpts', opts)
+    insertOpts.returnChanges = true
+
+    return this.selectTable(mapper, opts)
+      .insert(props, insertOpts)
+      .run(this.getOpt('runOpts', opts))
+      .then((cursor) => {
+        this._handleErrors(cursor)
+        let records = []
+        if (cursor &amp;&amp; cursor.changes &amp;&amp; cursor.changes.length &amp;&amp; cursor.changes) {
+          records = cursor.changes.map((change) => change.new_val)
+        }
+        return [records, cursor]
+      })
+  },
+
+  _destroy (mapper, id, opts) {
+    opts || (opts = {})
+
+    return this.selectTable(mapper, opts)
+      .get(id)
+      .delete(this.getOpt('deleteOpts', opts))
+      .run(this.getOpt('runOpts', opts))
+      .then((cursor) => {
+        this._handleErrors(cursor)
+        return [undefined, cursor]
+      })
+  },
+
+  _destroyAll (mapper, query, opts) {
+    query || (query = {})
+    opts || (opts = {})
+
+    return this.filterSequence(this.selectTable(mapper, opts), query)
+      .delete(this.getOpt('deleteOpts', opts))
+      .run(this.getOpt('runOpts', opts))
+      .then((cursor) => {
+        this._handleErrors(cursor)
+        return [undefined, cursor]
+      })
+  },
+
+  _find (mapper, id, opts) {
+    opts || (opts = {})
+
+    return this.selectTable(mapper, opts)
+      .get(id)
+      .run(this.getOpt('runOpts', opts))
+      .then((record) => [record, {}])
+  },
+
+  _findAll (mapper, query, opts) {
+    opts || (opts = {})
+    query || (query = {})
+
+    return this.filterSequence(this.selectTable(mapper, opts), query)
+      .run(this.getOpt('runOpts', opts))
+      .then((records) => [records, {}])
+  },
+
+  _sum (mapper, field, query, opts) {
+    if (!utils.isString(field)) {
+      throw new Error('field must be a string!')
+    }
+    opts || (opts = {})
+    query || (query = {})
+
+    return this.filterSequence(this.selectTable(mapper, opts), query)
+      .sum(field)
+      .run(this.getOpt('runOpts', opts))
+      .then((sum) => [sum, {}])
+  },
+
+  _update (mapper, id, props, opts) {
+    props || (props = {})
+    opts || (opts = {})
+
+    const updateOpts = this.getOpt('updateOpts', opts)
+    updateOpts.returnChanges = true
+
+    return this.selectTable(mapper, opts)
+      .get(id)
+      .update(props, updateOpts)
+      .run(this.getOpt('runOpts', opts))
+      .then((cursor) => {
+        let record
+        this._handleErrors(cursor)
+        if (cursor &amp;&amp; cursor.changes &amp;&amp; cursor.changes.length &amp;&amp; cursor.changes[0].new_val) {
+          record = cursor.changes[0].new_val
+        } else {
+          throw new Error('Not Found')
+        }
+        return [record, cursor]
+      })
+  },
+
+  _updateAll (mapper, props, query, opts) {
+    props || (props = {})
+    query || (query = {})
+    opts || (opts = {})
+
+    const updateOpts = this.getOpt('updateOpts', opts)
+    updateOpts.returnChanges = true
+
+    return this.filterSequence(this.selectTable(mapper, opts), query)
+      .update(props, updateOpts)
+      .run(this.getOpt('runOpts', opts))
+      .then((cursor) => {
+        let records = []
+        this._handleErrors(cursor)
+        if (cursor &amp;&amp; cursor.changes &amp;&amp; cursor.changes.length) {
+          records = cursor.changes.map((change) => change.new_val)
+        }
+        return [records, cursor]
+      })
+  },
+
+  _updateMany (mapper, records, opts) {
+    records || (records = [])
+    opts || (opts = {})
+
+    const insertOpts = this.getOpt('insertOpts', opts)
+    insertOpts.returnChanges = true
+    insertOpts.conflict = 'update'
+
+    return this.selectTable(mapper, opts)
+      .insert(records, insertOpts)
+      .run(this.getOpt('runOpts', opts))
+      .then((cursor) => {
+        records = []
+        this._handleErrors(cursor)
+        if (cursor &amp;&amp; cursor.changes &amp;&amp; cursor.changes.length) {
+          records = cursor.changes.map((change) => change.new_val)
+        }
+        return [records, cursor]
+      })
+  },
+
+  selectDb (opts) {
+    return this.r.db(utils.isUndefined(opts.db) ? this.rOpts.db : opts.db)
+  },
+
+  selectTable (mapper, opts) {
+    return this.selectDb(opts).table(mapper.table || underscore(mapper.name))
+  },
+
+  /**
+   * Apply the specified selection query to the provided RQL sequence.
+   *
+   * @name RethinkDBAdapter#filterSequence
+   * @method
+   * @param {Object} mapper The mapper.
+   * @param {Object} [query] Selection query.
+   * @param {Object} [query.where] Filtering criteria.
+   * @param {string|Array} [query.orderBy] Sorting criteria.
+   * @param {string|Array} [query.sort] Same as `query.sort`.
+   * @param {number} [query.limit] Limit results.
+   * @param {number} [query.skip] Offset results.
+   * @param {number} [query.offset] Same as `query.skip`.
+   * @param {Object} [opts] Configuration options.
+   * @param {Object} [opts.operators] Override the default predicate functions
+   * for specified operators.
+   */
+  filterSequence (sequence, query, opts) {
+    const r = this.r
+
+    query = utils.plainCopy(query || {})
+    opts || (opts = {})
+    opts.operators || (opts.operators = {})
+    query.where || (query.where = {})
+    query.orderBy || (query.orderBy = query.sort)
+    query.orderBy || (query.orderBy = [])
+    query.skip || (query.skip = query.offset)
+
+    // Transform non-keyword properties to "where" clause configuration
+    utils.forOwn(query, (config, keyword) => {
+      if (reserved.indexOf(keyword) === -1) {
+        if (utils.isObject(config)) {
+          query.where[keyword] = config
+        } else {
+          query.where[keyword] = {
+            '==': config
+          }
+        }
+        delete query[keyword]
+      }
+    })
+
+    let rql = sequence
+
+    // Filter
+    if (Object.keys(query.where).length !== 0) {
+      // Filter sequence using filter function
+      rql = rql.filter((row) => {
+        let subQuery
+        // Apply filter for each field
+        utils.forOwn(query.where, (criteria, field) => {
+          if (!utils.isObject(criteria)) {
+            criteria = { '==': criteria }
+          }
+          // Apply filter for each operator
+          utils.forOwn(criteria, (value, operator) => {
+            let isOr = false
+            if (operator &amp;&amp; operator[0] === '|') {
+              operator = operator.substr(1)
+              isOr = true
+            }
+            let predicateFn = this.getOperator(operator, opts)
+            if (predicateFn) {
+              const predicateResult = predicateFn(r, row, field, value)
+              if (isOr) {
+                subQuery = subQuery ? subQuery.or(predicateResult) : predicateResult
+              } else {
+                subQuery = subQuery ? subQuery.and(predicateResult) : predicateResult
+              }
+            } else {
+              throw new Error(`Operator ${operator} not supported!`)
+            }
+          })
+        })
+        return subQuery || true
+      })
+    }
+
+    // Sort
+    if (query.orderBy) {
+      if (utils.isString(query.orderBy)) {
+        query.orderBy = [
+          [query.orderBy, 'asc']
+        ]
+      }
+      for (var i = 0; i &lt; query.orderBy.length; i++) {
+        if (utils.isString(query.orderBy[i])) {
+          query.orderBy[i] = [query.orderBy[i], 'asc']
+        }
+        rql = (query.orderBy[i][1] || '').toUpperCase() === 'DESC' ? rql.orderBy(r.desc(query.orderBy[i][0])) : rql.orderBy(query.orderBy[i][0])
+      }
+    }
+
+    // Offset
+    if (query.skip) {
+      rql = rql.skip(+query.skip)
+    }
+
+    // Limit
+    if (query.limit) {
+      rql = rql.limit(+query.limit)
+    }
+
+    return rql
+  },
+
+  waitForDb (opts) {
+    opts || (opts = {})
+    const db = utils.isUndefined(opts.db) ? this.rOpts.db : opts.db
+    if (!this.databases[db]) {
+      this.databases[db] = this.r.branch(
+        this.r.dbList().contains(db),
+        true,
+        this.r.dbCreate(db)
+      ).run()
+    }
+    return this.databases[db]
+  },
+
+  waitForTable (mapper, opts) {
+    opts || (opts = {})
+    const table = utils.isString(mapper) ? mapper : (mapper.table || underscore(mapper.name))
+    let db = utils.isUndefined(opts.db) ? this.rOpts.db : opts.db
+    return this.waitForDb(opts).then(() => {
+      this.tables[db] = this.tables[db] || {}
+      if (!this.tables[db][table]) {
+        this.tables[db][table] = this.r.branch(this.r.db(db).tableList().contains(table), true, this.r.db(db).tableCreate(table)).run()
+      }
+      return this.tables[db][table]
+    })
+  },
+
+  waitForIndex (table, index, opts) {
+    opts || (opts = {})
+    let db = utils.isUndefined(opts.db) ? this.rOpts.db : opts.db
+    return this.waitForDb(opts).then(() => this.waitForTable(table, opts)).then(() => {
+      this.indices[db] = this.indices[db] || {}
+      this.indices[db][table] = this.indices[db][table] || {}
+      if (!this.tables[db][table][index]) {
+        this.tables[db][table][index] = this.r.branch(this.r.db(db).table(table).indexList().contains(index), true, this.r.db(db).table(table).indexCreate(index)).run().then(() => {
+          return this.r.db(db).table(table).indexWait(index).run()
+        })
+      }
+      return this.tables[db][table][index]
+    })
+  },
+
+  /**
+   * Return the number of records that match the selection query.
+   *
+   * @name RethinkDBAdapter#count
+   * @method
+   * @param {Object} mapper the mapper.
+   * @param {Object} [query] Selection query.
+   * @param {Object} [query.where] Filtering criteria.
+   * @param {string|Array} [query.orderBy] Sorting criteria.
+   * @param {string|Array} [query.sort] Same as `query.sort`.
+   * @param {number} [query.limit] Limit results.
+   * @param {number} [query.skip] Offset results.
+   * @param {number} [query.offset] Same as `query.skip`.
+   * @param {Object} [opts] Configuration options.
+   * @param {Object} [opts.operators] Override the default predicate functions
+   * for specified operators.
+   * @param {boolean} [opts.raw=false] Whether to return a more detailed
+   * response object.
+   * @param {Object} [opts.runOpts] Options to pass to r#run.
+   * @return {Promise}
+   */
+  count (mapper, query, opts) {
+    opts || (opts = {})
+    query || (query = {})
+
+    return this.waitForTable(mapper, opts)
+      .then(() => __super__.count.call(this, mapper, query, opts))
+  },
+
+  /**
+   * Create a new record.
+   *
+   * @name RethinkDBAdapter#create
+   * @method
+   * @param {Object} mapper The mapper.
+   * @param {Object} props The record to be created.
+   * @param {Object} [opts] Configuration options.
+   * @param {Object} [opts.insertOpts] Options to pass to r#insert.
+   * @param {boolean} [opts.raw=false] Whether to return a more detailed
+   * response object.
+   * @param {Object} [opts.runOpts] Options to pass to r#run.
+   * @return {Promise}
+   */
+  create (mapper, props, opts) {
+    props || (props = {})
+    opts || (opts = {})
+
+    return this.waitForTable(mapper, opts)
+      .then(() => __super__.create.call(this, mapper, props, opts))
+  },
+
+  /**
+   * Create multiple records in a single batch.
+   *
+   * @name RethinkDBAdapter#createMany
+   * @method
+   * @param {Object} mapper The mapper.
+   * @param {Object} props The records to be created.
+   * @param {Object} [opts] Configuration options.
+   * @param {Object} [opts.insertOpts] Options to pass to r#insert.
+   * @param {boolean} [opts.raw=false] Whether to return a more detailed
+   * response object.
+   * @param {Object} [opts.runOpts] Options to pass to r#run.
+   * @return {Promise}
+   */
+  createMany (mapper, props, opts) {
+    props || (props = {})
+    opts || (opts = {})
+
+    return this.waitForTable(mapper, opts)
+      .then(() => __super__.createMany.call(this, mapper, props, opts))
+  },
+
+  /**
+   * Destroy the record with the given primary key.
+   *
+   * @name RethinkDBAdapter#destroy
+   * @method
+   * @param {Object} mapper The mapper.
+   * @param {(string|number)} id Primary key of the record to destroy.
+   * @param {Object} [opts] Configuration options.
+   * @param {Object} [opts.deleteOpts] Options to pass to r#delete.
+   * @param {boolean} [opts.raw=false] Whether to return a more detailed
+   * response object.
+   * @param {Object} [opts.runOpts] Options to pass to r#run.
+   * @return {Promise}
+   */
+  destroy (mapper, id, opts) {
+    opts || (opts = {})
+
+    return this.waitForTable(mapper, opts)
+      .then(() => __super__.destroy.call(this, mapper, id, opts))
+  },
+
+  /**
+   * Destroy the records that match the selection query.
+   *
+   * @name RethinkDBAdapter#destroyAll
+   * @method
+   * @param {Object} mapper the mapper.
+   * @param {Object} [query] Selection query.
+   * @param {Object} [query.where] Filtering criteria.
+   * @param {string|Array} [query.orderBy] Sorting criteria.
+   * @param {string|Array} [query.sort] Same as `query.sort`.
+   * @param {number} [query.limit] Limit results.
+   * @param {number} [query.skip] Offset results.
+   * @param {number} [query.offset] Same as `query.skip`.
+   * @param {Object} [opts] Configuration options.
+   * @param {Object} [opts.deleteOpts] Options to pass to r#delete.
+   * @param {Object} [opts.operators] Override the default predicate functions
+   * for specified operators.
+   * @param {boolean} [opts.raw=false] Whether to return a more detailed
+   * response object.
+   * @param {Object} [opts.runOpts] Options to pass to r#run.
+   * @return {Promise}
+   */
+  destroyAll (mapper, query, opts) {
+    opts || (opts = {})
+    query || (query = {})
+
+    return this.waitForTable(mapper, opts)
+      .then(() => __super__.destroyAll.call(this, mapper, query, opts))
+  },
+
+  /**
+   * Retrieve the record with the given primary key.
+   *
+   * @name RethinkDBAdapter#find
+   * @method
+   * @param {Object} mapper The mapper.
+   * @param {(string|number)} id Primary key of the record to retrieve.
+   * @param {Object} [opts] Configuration options.
+   * @param {boolean} [opts.raw=false] Whether to return a more detailed
+   * response object.
+   * @param {Object} [opts.runOpts] Options to pass to r#run.
+   * @param {string[]} [opts.with=[]] Relations to eager load.
+   * @return {Promise}
+   */
+  find (mapper, id, opts) {
+    opts || (opts = {})
+    opts.with || (opts.with = [])
+
+    const relationList = mapper.relationList || []
+    let tasks = [this.waitForTable(mapper, opts)]
+
+    relationList.forEach((def) => {
+      const relationName = def.relation
+      const relationDef = def.getRelation()
+      if (!opts.with || opts.with.indexOf(relationName) === -1) {
+        return
+      }
+      if (def.foreignKey &amp;&amp; def.type !== 'belongsTo') {
+        if (def.type === 'belongsTo') {
+          tasks.push(this.waitForIndex(mapper.table || underscore(mapper.name), def.foreignKey, opts))
+        } else {
+          tasks.push(this.waitForIndex(relationDef.table || underscore(relationDef.name), def.foreignKey, opts))
+        }
+      }
+    })
+    return Promise.all(tasks).then(() => __super__.find.call(this, mapper, id, opts))
+  },
+
+  /**
+   * Retrieve the records that match the selection query.
+   *
+   * @name RethinkDBAdapter#findAll
+   * @method
+   * @param {Object} mapper The mapper.
+   * @param {Object} [query] Selection query.
+   * @param {Object} [query.where] Filtering criteria.
+   * @param {string|Array} [query.orderBy] Sorting criteria.
+   * @param {string|Array} [query.sort] Same as `query.sort`.
+   * @param {number} [query.limit] Limit results.
+   * @param {number} [query.skip] Offset results.
+   * @param {number} [query.offset] Same as `query.skip`.
+   * @param {Object} [opts] Configuration options.
+   * @param {Object} [opts.operators] Override the default predicate functions
+   * for specified operators.
+   * @param {boolean} [opts.raw=false] Whether to return a more detailed
+   * response object.
+   * @param {Object} [opts.runOpts] Options to pass to r#run.
+   * @param {string[]} [opts.with=[]] Relations to eager load.
+   * @return {Promise}
+   */
+  findAll (mapper, query, opts) {
+    opts || (opts = {})
+    opts.with || (opts.with = [])
+    query || (query = {})
+
+    const relationList = mapper.relationList || []
+    let tasks = [this.waitForTable(mapper, opts)]
+
+    relationList.forEach((def) => {
+      const relationName = def.relation
+      const relationDef = def.getRelation()
+      if (!opts.with || opts.with.indexOf(relationName) === -1) {
+        return
+      }
+      if (def.foreignKey &amp;&amp; def.type !== 'belongsTo') {
+        if (def.type === 'belongsTo') {
+          tasks.push(this.waitForIndex(mapper.table || underscore(mapper.name), def.foreignKey, opts))
+        } else {
+          tasks.push(this.waitForIndex(relationDef.table || underscore(relationDef.name), def.foreignKey, opts))
+        }
+      }
+    })
+    return Promise.all(tasks).then(() => __super__.findAll.call(this, mapper, query, opts))
+  },
+
+  /**
+   * Resolve the predicate function for the specified operator based on the
+   * given options and this adapter's settings.
+   *
+   * @name RethinkDBAdapter#getOperator
+   * @method
+   * @param {string} operator The name of the operator.
+   * @param {Object} [opts] Configuration options.
+   * @param {Object} [opts.operators] Override the default predicate functions
+   * for specified operators.
+   * @return {*} The predicate function for the specified operator.
+   */
+  getOperator (operator, opts) {
+    opts || (opts = {})
+    opts.operators || (opts.operators = {})
+    let ownOps = this.operators || {}
+    return utils.isUndefined(opts.operators[operator]) ? ownOps[operator] : opts.operators[operator]
+  },
+
+  /**
+   * Return the sum of the specified field of records that match the selection
+   * query.
+   *
+   * @name RethinkDBAdapter#sum
+   * @method
+   * @param {Object} mapper The mapper.
+   * @param {string} field The field to sum.
+   * @param {Object} [query] Selection query.
+   * @param {Object} [query.where] Filtering criteria.
+   * @param {string|Array} [query.orderBy] Sorting criteria.
+   * @param {string|Array} [query.sort] Same as `query.sort`.
+   * @param {number} [query.limit] Limit results.
+   * @param {number} [query.skip] Offset results.
+   * @param {number} [query.offset] Same as `query.skip`.
+   * @param {Object} [opts] Configuration options.
+   * @param {Object} [opts.operators] Override the default predicate functions
+   * for specified operators.
+   * @param {boolean} [opts.raw=false] Whether to return a more detailed
+   * response object.
+   * @param {Object} [opts.runOpts] Options to pass to r#run.
+   * @return {Promise}
+   */
+  sum (mapper, field, query, opts) {
+    opts || (opts = {})
+    query || (query = {})
+
+    return this.waitForTable(mapper, opts)
+      .then(() => __super__.sum.call(this, mapper, field, query, opts))
+  },
+
+  /**
+   * Apply the given update to the record with the specified primary key.
+   *
+   * @name RethinkDBAdapter#update
+   * @method
+   * @param {Object} mapper The mapper.
+   * @param {(string|number)} id The primary key of the record to be updated.
+   * @param {Object} props The update to apply to the record.
+   * @param {Object} [opts] Configuration options.
+   * @param {Object} [opts.updateOpts] Options to pass to r#update.
+   * @param {boolean} [opts.raw=false] Whether to return a more detailed
+   * response object.
+   * @param {Object} [opts.runOpts] Options to pass to r#run.
+   * @return {Promise}
+   */
+  update (mapper, id, props, opts) {
+    props || (props = {})
+    opts || (opts = {})
+
+    return this.waitForTable(mapper, opts)
+      .then(() => __super__.update.call(this, mapper, id, props, opts))
+  },
+
+  /**
+   * Apply the given update to all records that match the selection query.
+   *
+   * @name RethinkDBAdapter#updateAll
+   * @method
+   * @param {Object} mapper The mapper.
+   * @param {Object} props The update to apply to the selected records.
+   * @param {Object} [query] Selection query.
+   * @param {Object} [query.where] Filtering criteria.
+   * @param {string|Array} [query.orderBy] Sorting criteria.
+   * @param {string|Array} [query.sort] Same as `query.sort`.
+   * @param {number} [query.limit] Limit results.
+   * @param {number} [query.skip] Offset results.
+   * @param {number} [query.offset] Same as `query.skip`.
+   * @param {Object} [opts] Configuration options.
+   * @param {Object} [opts.operators] Override the default predicate functions
+   * for specified operators.
+   * @param {boolean} [opts.raw=false] Whether to return a more detailed
+   * response object.
+   * @param {Object} [opts.runOpts] Options to pass to r#run.
+   * @param {Object} [opts.updateOpts] Options to pass to r#update.
+   * @return {Promise}
+   */
+  updateAll (mapper, props, query, opts) {
+    props || (props = {})
+    query || (query = {})
+    opts || (opts = {})
+
+    return this.waitForTable(mapper, opts)
+      .then(() => __super__.updateAll.call(this, mapper, props, query, opts))
+  },
+
+  /**
+   * Update the given records in a single batch.
+   *
+   * @name RethinkDBAdapter#updateMany
+   * @method
+   * @param {Object} mapper The mapper.
+   * @param {Object[]} records The records to update.
+   * @param {Object} [opts] Configuration options.
+   * @param {Object} [opts.insertOpts] Options to pass to r#insert.
+   * @param {boolean} [opts.raw=false] Whether to return a more detailed
+   * response object.
+   * @param {Object} [opts.runOpts] Options to pass to r#run.
+   * @return {Promise}
+   */
+  updateMany (mapper, records, opts) {
+    records || (records = [])
+    opts || (opts = {})
+
+    return this.waitForTable(mapper, opts)
+      .then(() => __super__.updateMany.call(this, mapper, records, opts))
+  }
+})
+
+/**
+ * Details of the current version of the `js-data-rethinkdb` module.
+ *
+ * @example &lt;caption>ES2015 modules import&lt;/caption>
+ * import {version} from 'js-data-rethinkdb'
+ * console.log(version.full)
+ *
+ * @example &lt;caption>CommonJS import&lt;/caption>
+ * var version = require('js-data-rethinkdb').version
+ * console.log(version.full)
+ *
+ * @name module:js-data-rethinkdb.version
+ * @type {Object}
+ * @property {string} version.full The full semver value.
+ * @property {number} version.major The major version number.
+ * @property {number} version.minor The minor version number.
+ * @property {number} version.patch The patch version number.
+ * @property {(string|boolean)} version.alpha The alpha version value,
+ * otherwise `false` if the current version is not alpha.
+ * @property {(string|boolean)} version.beta The beta version value,
+ * otherwise `false` if the current version is not beta.
+ */
+export const version = '&lt;%= version %>'
+
+/**
+ * {@link RethinkDBAdapter} class.
+ *
+ * @example &lt;caption>ES2015 modules import&lt;/caption>
+ * import {RethinkDBAdapter} from 'js-data-rethinkdb'
+ * const adapter = new RethinkDBAdapter()
+ *
+ * @example &lt;caption>CommonJS import&lt;/caption>
+ * var RethinkDBAdapter = require('js-data-rethinkdb').RethinkDBAdapter
+ * var adapter = new RethinkDBAdapter()
+ *
+ * @name module:js-data-rethinkdb.RethinkDBAdapter
+ * @see RethinkDBAdapter
+ * @type {Constructor}
+ */
+
+/**
+ * Registered as `js-data-rethinkdb` in NPM.
+ *
+ * @example &lt;caption>Install from NPM&lt;/caption>
+ * npm i --save js-data-rethinkdb@beta js-data@beta rethinkdbdash
+ *
+ * @example &lt;caption>ES2015 modules import&lt;/caption>
+ * import {RethinkDBAdapter} from 'js-data-rethinkdb'
+ * const adapter = new RethinkDBAdapter()
+ *
+ * @example &lt;caption>CommonJS import&lt;/caption>
+ * var RethinkDBAdapter = require('js-data-rethinkdb').RethinkDBAdapter
+ * var adapter = new RethinkDBAdapter()
+ *
+ * @module js-data-rethinkdb
+ */
+</code></pre>
+    </article>
+</section>
+
+
+
+
+
+		</div>
+	</div>
+
+</div>
+</div>
+
+<div class="modal fade" id="searchResults">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Search results</h4>
+      </div>
+      <div class="modal-body"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div>
+
+<footer>
+
+	<div style="text-align:center"><a href="/">api.js-data.io</a>&nbsp;&#8226;&nbsp;<a href="http://js-data.io">js-data.io</a></div>
+
+
+	<span class="copyright">
+	js-data-rethinkdb Copyright © 2014-2016 js-data-rethinkdb project authors
+	</span>
+
+<span class="jsdoc-message">
+	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a>
+	
+		on 2016-05-10T21:00:41-07:00
+	
+	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
+</span>
+</footer>
+
+<script src="scripts/docstrap.lib.js"></script>
+<script src="scripts/toc.js"></script>
+<script type="text/javascript" src="scripts/fulltext-search-ui.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.3.0/highlight.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.3.0/languages/javascript.min.js"></script>
+
+<script>
+$( function () {
+	$( "[id*='$']" ).each( function () {
+		var $this = $( this );
+
+		$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
+	} );
+
+	$( ".tutorial-section pre, .readme-section pre" ).each( function () {
+		var $this = $( this );
+
+		var example = $this.find( "code" );
+		exampleText = example.html();
+		var lang = /{@lang (.*?)}/.exec( exampleText );
+		if ( lang && lang[1] ) {
+			exampleText = exampleText.replace( lang[0], "" );
+			example.html( exampleText );
+			lang = lang[1];
+		} else {
+			var langClassMatch = example.parent()[0].className.match(/lang\-(\S+)/);
+			lang = langClassMatch ? langClassMatch[1] : "javascript";
+		}
+
+		if ( lang ) {
+
+			$this
+			.addClass( lang )
+			.addClass( "linenums" )
+			.html( example.html() );
+
+		}
+	} );
+
+	hljs.initHighlightingOnLoad();
+
+	$.catchAnchorLinks( {
+        navbarOffset: 10
+	} );
+	$( "#toc" ).toc( {
+		anchorName  : function ( i, heading, prefix ) {
+			var id = $( heading ).attr( "id" );
+			return id && id.replace(/\~/g, '-inner-').replace(/\./g, '-static-') || ( prefix + i );
+		},
+		selectors   : "#toc-content h1,#toc-content h2,#toc-content h3,#toc-content h4",
+		showAndHide : false,
+		smoothScrolling: true,
+    highlightOnScroll: false
+	} );
+
+	$( "#main span[id^='toc']" ).addClass( "toc-shim" );
+	$( '.dropdown-toggle' ).dropdown();
+
+    $( "table" ).each( function () {
+      var $this = $( this );
+      $this.addClass('table');
+    } );
+
+} );
+</script>
+
+
+
+<!--Navigation and Symbol Display-->
+
+
+<!--Google Analytics-->
+
+<script>
+	(function ( i, s, o, g, r, a, m ) {
+		i['GoogleAnalyticsObject'] = r;
+		i[r] = i[r] || function () {
+			(i[r].q = i[r].q || []).push( arguments )
+		}, i[r].l = 1 * new Date();
+		a = s.createElement( o ),
+			m = s.getElementsByTagName( o )[0];
+		a.async = 1;
+		a.src = g;
+		m.parentNode.insertBefore( a, m )
+	})( window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga' );
+
+	ga( 'create', 'UA-55528236-2', 'api.js-data.io' );
+	ga( 'send', 'pageview' );
+</script>
+
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		SearcherDisplay.init();
+	});
+</script>
+
+</body>
+</html>

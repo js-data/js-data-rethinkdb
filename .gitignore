@@ -1,0 +1,5 @@
+doc/
+coverage/
+node_modules/
+rethinkdb_data/
+.nyc_output/
