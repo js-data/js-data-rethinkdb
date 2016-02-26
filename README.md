@@ -28,18 +28,16 @@ To get started, visit __[http://js-data.io](http://www.js-data.io)__.
 `npm install --save js-data js-data-rethinkdb`.
 
 ```js
-var JSData = require('js-data');
-var RethinkDBAdapter = require('js-data-rethinkdb');
+import {Container} from 'js-data'
+import RethinkDBAdapter from 'js-data-rethinkdb'
 
-var store = new JSData.DS();
-var adapter = new RethinkDBAdapter();
+const store = new Container()
+const adapter = new RethinkDBAdapter()
 
 // "store" will now use the RethinkDB adapter for all async operations
 store.registerAdapter('rethinkdb', adapter, { default: true });
 
-var User = store.defineResource({
-  name: 'user'
-});
+store.defineMapper('user');
 ```
 
 ## Example App
