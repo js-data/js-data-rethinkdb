@@ -1,7 +1,7 @@
 {
   "name": "js-data-rethinkdb",
   "description": "RethinkDB adapter for js-data.",
-  "version": "2.2.0",
+  "version": "3.0.0-alpha.1",
   "homepage": "https://github.com/js-data/js-data-rethinkdb",
   "repository": {
     "type": "git",
@@ -36,8 +36,8 @@
     "doc": "jsdoc -c conf.json src && node scripts/cleanup.js",
     "bundle": "rollup -c rollup.config.js -f cjs -o dist/js-data-rethinkdb.js -m dist/js-data-rethinkdb.js.map src/index.js",
     "lint": "standard src/index.js mocha.start.js test/**/*.js",
-    "mocha": "mocha -t 20000 -R dot mocha.start.js test/**/*.js",
-    "cover": "istanbul cover --hook-run-in-context node_modules/mocha/bin/_mocha -- -t 20000 -R dot mocha.start.js test/**/*.js",
+    "mocha": "mocha -t 20000 -R dot -r source-map-support/register mocha.start.js test/**/*.js",
+    "cover": "istanbul cover --hook-run-in-context node_modules/mocha/bin/_mocha -- -t 20000 -R dot -r source-map-support/register mocha.start.js test/**/*.js",
     "test": "npm run lint && npm run bundle && npm run cover",
     "release": "npm test && npm run doc && node scripts/authors.js",
     "ci": "npm run test && cat coverage/lcov.info | coveralls || true && cat ./coverage/lcov.info | codacy-coverage || true"
@@ -46,7 +46,7 @@
     "mout": "0.11.1"
   },
   "peerDependencies": {
-    "js-data": ">=2.0.0 <3",
+    "js-data": "^3.0.0-alpha.15",
     "rethinkdbdash": ">=1.15.0"
   },
   "devDependencies": {
@@ -62,7 +62,7 @@
     "coveralls": "2.11.6",
     "ink-docstrap": "1.1.2",
     "istanbul": "0.4.2",
-    "js-data-adapter-tests": "1.5.0",
+    "js-data-adapter-tests": "^2.0.0-alpha.6",
     "jsdoc": "3.4.0",
     "mocha": "2.4.5",
     "rollup": "0.25.4",

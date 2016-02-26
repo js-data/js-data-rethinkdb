@@ -1,9 +1,19 @@
 let rethinkdbdash = require('rethinkdbdash')
-let JSData = require('js-data')
-let { DSUtils } = JSData
-let { upperCase, contains, forOwn, isEmpty, keys, deepMixIn, forEach, isObject, isString, removeCircular, omit } = DSUtils
+import {utils} from 'js-data'
+const {
+  addHiddenPropsToTarget,
+  fillIn,
+  forEachRelation,
+  forOwn,
+  get,
+  isArray,
+  isObject,
+  isString,
+  isUndefined,
+  resolve
+} = utils
 
-let underscore = require('mout/string/underscore')
+const underscore = require('mout/string/underscore')
 
 const reserved = [
   'orderBy',
@@ -13,24 +23,6 @@ const reserved = [
   'skip',
   'where'
 ]
-
-const addHiddenPropsToTarget = function (target, props) {
-  DSUtils.forOwn(props, function (value, key) {
-    props[key] = {
-      writable: true,
-      value
-    }
-  })
-  Object.defineProperties(target, props)
-}
-
-const fillIn = function (dest, src) {
-  DSUtils.forOwn(src, function (value, key) {
-    if (!dest.hasOwnProperty(key) || dest[key] === undefined) {
-      dest[key] = value
-    }
-  })
-}
 
 const unique = function (array) {
   const seen = {}
@@ -45,19 +37,110 @@ const unique = function (array) {
   return final
 }
 
-class Defaults {
-
+const noop = function (...args) {
+  const self = this
+  const opts = args[args.length - 1]
+  self.dbg(opts.op, ...args)
+  return resolve()
 }
 
-addHiddenPropsToTarget(Defaults.prototype, {
-  host: 'localhost',
-  port: 28015,
+const noop2 = function (...args) {
+  const self = this
+  const opts = args[args.length - 2]
+  self.dbg(opts.op, ...args)
+  return resolve()
+}
+
+const DEFAULTS = {
+  /**
+   * TODO
+   *
+   * @name RethinkDBAdapter#authKey
+   * @type {string}
+   */
   authKey: '',
+
+  /**
+   * TODO
+   *
+   * @name RethinkDBAdapter#bufferSize
+   * @type {number}
+   * @default 10
+   */
+  bufferSize: 10,
+
+  /**
+   * TODO
+   *
+   * @name RethinkDBAdapter#db
+   * @type {string}
+   * @default "test"
+   */
   db: 'test',
+
+  /**
+   * TODO
+   *
+   * @name RethinkDBAdapter#debug
+   * @type {boolean}
+   * @default false
+   */
+  debug: false,
+
+  /**
+   * TODO
+   *
+   * @name RethinkDBAdapter#host
+   * @type {string}
+   * @default "localhost"
+   */
+  host: 'localhost',
+
+  /**
+   * TODO
+   *
+   * @name RethinkDBAdapter#min
+   * @type {number}
+   * @default 10
+   */
   min: 10,
+
+  /**
+   * TODO
+   *
+   * @name RethinkDBAdapter#max
+   * @type {number}
+   * @default 50
+   */
   max: 50,
-  bufferSize: 10
-})
+
+  /**
+   * TODO
+   *
+   * @name RethinkDBAdapter#port
+   * @type {number}
+   * @default 10
+   */
+  port: 28015,
+
+  /**
+   * TODO
+   *
+   * @name RethinkDBAdapter#raw
+   * @type {boolean}
+   * @default false
+   */
+  raw: false,
+
+  /**
+   * TODO
+   *
+   * @name RethinkDBAdapter#returnDeletedIds
+   * @type {boolean}
+   * @default false
+   */
+  returnDeletedIds: false
+}
 
 /**
  * RethinkDBAdapter class.
@@ -81,11 +164,10 @@ addHiddenPropsToTarget(Defaults.prototype, {
  */
 export default function RethinkDBAdapter (opts) {
   const self = this
-
-  self.defaults = new Defaults()
-  deepMixIn(self.defaults, opts)
+  opts || (opts = {})
+  fillIn(opts, DEFAULTS)
   fillIn(self, opts)
-  self.r = rethinkdbdash(self.defaults)
+  self.r = rethinkdbdash(opts)
   self.databases = {}
   self.tables = {}
   self.indices = {}
@@ -100,9 +182,128 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
       throw new Error('Unknown RethinkDB Error')
     }
   },
+  /**
+   * @name RethinkDBAdapter#afterCreate
+   * @method
+   */
+  afterCreate: noop2,
+
+  /**
+   * @name RethinkDBAdapter#afterCreateMany
+   * @method
+   */
+  afterCreateMany: noop2,
+
+  /**
+   * @name RethinkDBAdapter#afterDestroy
+   * @method
+   */
+  afterDestroy: noop2,
+
+  /**
+   * @name RethinkDBAdapter#afterDestroyAll
+   * @method
+   */
+  afterDestroyAll: noop2,
+
+  /**
+   * @name RethinkDBAdapter#afterFind
+   * @method
+   */
+  afterFind: noop2,
+
+  /**
+   * @name RethinkDBAdapter#afterFindAll
+   * @method
+   */
+  afterFindAll: noop2,
+
+  /**
+   * @name RethinkDBAdapter#afterUpdate
+   * @method
+   */
+  afterUpdate: noop2,
+
+  /**
+   * @name RethinkDBAdapter#afterUpdateAll
+   * @method
+   */
+  afterUpdateAll: noop2,
+
+  /**
+   * @name RethinkDBAdapter#afterUpdateMany
+   * @method
+   */
+  afterUpdateMany: noop2,
+
+  /**
+   * @name RethinkDBAdapter#beforeCreate
+   * @method
+   */
+  beforeCreate: noop,
+
+  /**
+   * @name RethinkDBAdapter#beforeCreateMany
+   * @method
+   */
+  beforeCreateMany: noop,
+
+  /**
+   * @name RethinkDBAdapter#beforeDestroy
+   * @method
+   */
+  beforeDestroy: noop,
+
+  /**
+   * @name RethinkDBAdapter#beforeDestroyAll
+   * @method
+   */
+  beforeDestroyAll: noop,
+
+  /**
+   * @name RethinkDBAdapter#beforeFind
+   * @method
+   */
+  beforeFind: noop,
+
+  /**
+   * @name RethinkDBAdapter#beforeFindAll
+   * @method
+   */
+  beforeFindAll: noop,
+
+  /**
+   * @name RethinkDBAdapter#beforeUpdate
+   * @method
+   */
+  beforeUpdate: noop,
+
+  /**
+   * @name RethinkDBAdapter#beforeUpdateAll
+   * @method
+   */
+  beforeUpdateAll: noop,
+
+  /**
+   * @name RethinkDBAdapter#beforeUpdateMany
+   * @method
+   */
+  beforeUpdateMany: noop,
+
+  /**
+   * @name RethinkDBAdapter#dbg
+   * @method
+   */
+  dbg (...args) {
+    this.log('debug', ...args)
+  },
+
+  selectDb (opts) {
+    return this.r.db(isUndefined(opts.db) ? this.db : opts.db)
+  },
 
   selectTable (Resource, opts) {
-    return this.r.db(opts.db || this.defaults.db).table(Resource.table || underscore(Resource.name))
+    return this.selectDb(opts).table(Resource.table || underscore(Resource.name))
   },
 
   filterSequence (sequence, params) {
@@ -112,9 +313,9 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
     params.orderBy = params.orderBy || params.sort
     params.skip = params.skip || params.offset
 
-    forEach(keys(params), function (k) {
+    Object.keys(params).forEach(function (k) {
       let v = params[k]
-      if (!contains(reserved, k)) {
+      if (reserved.indexOf(k) === -1) {
         if (isObject(v)) {
           params.where[k] = v
         } else {
@@ -128,12 +329,12 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
 
     let query = sequence
 
-    if (!isEmpty(params.where)) {
-      query = query.filter((row) => {
+    if (Object.keys(params.where).length !== 0) {
+      query = query.filter(function (row) {
         let subQuery
         forOwn(params.where, function (criteria, field) {
           if (!isObject(criteria)) {
-            criteria = {'==': criteria}
+            criteria = { '==': criteria }
           }
           forOwn(criteria, function (v, op) {
             if (op === '==' || op === '===') {
@@ -156,6 +357,10 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
               subQuery = subQuery ? subQuery.and(r.expr(v).default(r.expr([])).contains(row(field).default(null))) : r.expr(v).default(r.expr([])).contains(row(field).default(null))
             } else if (op === 'notIn') {
               subQuery = subQuery ? subQuery.and(r.expr(v).default(r.expr([])).contains(row(field).default(null)).not()) : r.expr(v).default(r.expr([])).contains(row(field).default(null)).not()
+            } else if (op === 'contains') {
+              subQuery = subQuery ? subQuery.and(row(field).default([]).contains(v)) : row(field).default([]).contains(v)
+            } else if (op === 'notContains') {
+              subQuery = subQuery ? subQuery.and(row(field).default([]).contains(v).not()) : row(field).default([]).contains(v).not()
             } else if (op === '|==' || op === '|===') {
               subQuery = subQuery ? subQuery.or(row(field).default(null).eq(v)) : row(field).default(null).eq(v)
             } else if (op === '|!=' || op === '|!==') {
@@ -176,10 +381,14 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
               subQuery = subQuery ? subQuery.or(r.expr(v).default(r.expr([])).contains(row(field).default(null))) : r.expr(v).default(r.expr([])).contains(row(field).default(null))
             } else if (op === '|notIn') {
               subQuery = subQuery ? subQuery.or(r.expr(v).default(r.expr([])).contains(row(field).default(null)).not()) : r.expr(v).default(r.expr([])).contains(row(field).default(null)).not()
+            } else if (op === '|contains') {
+              subQuery = subQuery ? subQuery.or(row(field).default([]).contains(v)) : row(field).default([]).contains(v)
+            } else if (op === '|notContains') {
+              subQuery = subQuery ? subQuery.or(row(field).default([]).contains(v).not()) : row(field).default([]).contains(v).not()
             }
           })
         })
-        return subQuery
+        return subQuery || true
       })
     }
 
@@ -193,7 +402,7 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
         if (isString(params.orderBy[i])) {
           params.orderBy[i] = [params.orderBy[i], 'asc']
         }
-        query = upperCase(params.orderBy[i][1]) === 'DESC' ? query.orderBy(r.desc(params.orderBy[i][0])) : query.orderBy(params.orderBy[i][0])
+        query = (params.orderBy[i][1] || '').toUpperCase() === 'DESC' ? query.orderBy(r.desc(params.orderBy[i][0])) : query.orderBy(params.orderBy[i][0])
       }
     }
 
@@ -210,8 +419,8 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
 
   waitForDb (opts) {
     const self = this
-    opts = opts || {}
-    let db = opts.db || self.defaults.db
+    opts || (opts = {})
+    const db = isUndefined(opts.db) ? self.db : opts.db
     if (!self.databases[db]) {
       self.databases[db] = self.r.branch(
         self.r.dbList().contains(db),
@@ -227,21 +436,90 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
    *
    * @name RethinkDBAdapter#create
    * @method
-   * @param {Object} Resource The Resource.
+   * @param {Object} mapper The mapper.
    * @param {Object} props The record to be created.
    * @param {Object} [opts] Configuration options.
+   * @param {boolean} [opts.raw=false] TODO
    * @return {Promise}
    */
-  create (Resource, props, opts) {
+  create (mapper, props, opts) {
     const self = this
-    props = removeCircular(omit(props, Resource.relationFields || []))
+    let op
+    props || (props = {})
     opts || (opts = {})
 
-    return self.waitForTable(Resource.table || underscore(Resource.name), opts).then(function () {
-      return self.selectTable(Resource, opts).insert(props, {returnChanges: true}).run()
+    return self.waitForTable(mapper.table || underscore(mapper.name), opts).then(function () {
+      // beforeCreate lifecycle hook
+      op = opts.op = 'beforeCreate'
+      return resolve(self[op](mapper, props, opts))
+    }).then(function (_props) {
+      // Allow for re-assignment from lifecycle hook
+      _props = isUndefined(_props) ? props : _props
+      return self.selectTable(mapper, opts).insert(_props, { returnChanges: true }).run()
     }).then(function (cursor) {
       self._handleErrors(cursor)
-      return cursor.changes[0].new_val
+      let record
+      if (cursor && cursor.changes && cursor.changes.length && cursor.changes[0].new_val) {
+        record = cursor.changes[0].new_val
+      }
+      // afterCreate lifecycle hook
+      op = opts.op = 'afterCreate'
+      return self[op](mapper, props, opts, record).then(function (_record) {
+        // Allow for re-assignment from lifecycle hook
+        record = isUndefined(_record) ? record : _record
+        const result = {}
+        fillIn(result, cursor)
+        result.data = record
+        result.created = record ? 1 : 0
+        return self.getRaw(opts) ? result : result.data
+      })
+    })
+  },
+
+  /**
+   * Create multiple records in a single batch.
+   *
+   * @name RethinkDBAdapter#createMany
+   * @method
+   * @param {Object} mapper The mapper.
+   * @param {Object} props The records to be created.
+   * @param {Object} [opts] Configuration options.
+   * @param {boolean} [opts.raw=false] TODO
+   * @return {Promise}
+   */
+  createMany (mapper, props, opts) {
+    const self = this
+    let op
+    props || (props = {})
+    opts || (opts = {})
+
+    return self.waitForTable(mapper.table || underscore(mapper.name), opts).then(function () {
+      // beforeCreateMany lifecycle hook
+      op = opts.op = 'beforeCreateMany'
+      return resolve(self[op](mapper, props, opts))
+    }).then(function (_props) {
+      // Allow for re-assignment from lifecycle hook
+      _props = isUndefined(_props) ? props : _props
+      return self.selectTable(mapper, opts).insert(_props, { returnChanges: true }).run()
+    }).then(function (cursor) {
+      self._handleErrors(cursor)
+      let records = []
+      if (cursor && cursor.changes && cursor.changes.length && cursor.changes) {
+        records = cursor.changes.map(function (change) {
+          return change.new_val
+        })
+      }
+      // afterCreateMany lifecycle hook
+      op = opts.op = 'afterCreateMany'
+      return self[op](mapper, props, opts, records).then(function (_records) {
+        // Allow for re-assignment from lifecycle hook
+        records = isUndefined(_records) ? records : _records
+        const result = {}
+        fillIn(result, cursor)
+        result.data = records
+        result.created = records.length
+        return self.getRaw(opts) ? result : result.data
+      })
     })
   },
 
@@ -250,19 +528,43 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
    *
    * @name RethinkDBAdapter#destroy
    * @method
-   * @param {Object} Resource The Resource.
+   * @param {Object} mapper The mapper.
    * @param {(string|number)} id Primary key of the record to destroy.
    * @param {Object} [opts] Configuration options.
+   * @param {boolean} [opts.raw=false] TODO
+   * @param {boolean} [opts.returnDeletedIds=false] Whether to return the
+   * primary keys of any deleted records.
    * @return {Promise}
    */
-  destroy (Resource, id, opts) {
+  destroy (mapper, id, opts) {
     const self = this
+    let op
     opts || (opts = {})
+    const returnDeletedIds = isUndefined(opts.returnDeletedIds) ? self.returnDeletedIds : !!opts.returnDeletedIds
 
-    return self.waitForTable(Resource.table || underscore(Resource.name), opts).then(function () {
-      return self.selectTable(Resource, opts).get(id).delete().run()
+    return self.waitForTable(mapper.table || underscore(mapper.name), opts).then(function () {
+      // beforeDestroy lifecycle hook
+      op = opts.op = 'beforeDestroy'
+      return resolve(self[op](mapper, id, opts))
     }).then(function () {
-      return undefined
+      op = opts.op = 'destroy'
+      self.dbg(op, id, opts)
+      return self.selectTable(mapper, opts).get(id).delete().run()
+    }).then(function (cursor) {
+      let deleted = 0
+      if (cursor && cursor.deleted) {
+        deleted = cursor.deleted
+      }
+      // afterDestroy lifecycle hook
+      op = opts.op = 'afterDestroy'
+      return resolve(self[op](mapper, id, opts, deleted ? id : undefined)).then(function (_id) {
+        // Allow for re-assignment from lifecycle hook
+        id = isUndefined(_id) && returnDeletedIds ? id : _id
+        const result = {}
+        fillIn(result, cursor)
+        result.data = deleted ? id : undefined
+        return self.getRaw(opts) ? result : result.data
+      })
     })
   },
 
@@ -271,20 +573,58 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
    *
    * @name RethinkDBAdapter#destroyAll
    * @method
-   * @param {Object} Resource the Resource.
+   * @param {Object} mapper the mapper.
    * @param {Object} [query] Selection query.
    * @param {Object} [opts] Configuration options.
+   * @param {boolean} [opts.raw=false] TODO
+   * @param {boolean} [opts.returnDeletedIds=false] Whether to return the
+   * primary keys of any deleted records.
    * @return {Promise}
    */
-  destroyAll (Resource, query, opts) {
+  destroyAll (mapper, query, opts) {
     const self = this
+    const idAttribute = mapper.idAttribute
+    let op
     query || (query = {})
     opts || (opts = {})
+    const returnDeletedIds = isUndefined(opts.returnDeletedIds) ? self.returnDeletedIds : !!opts.returnDeletedIds
 
-    return self.waitForTable(Resource.table || underscore(Resource.name), opts).then(function () {
-      return self.filterSequence(self.selectTable(Resource, opts), query).delete().run()
+    return self.waitForTable(mapper.table || underscore(mapper.name), opts).then(function () {
+      // beforeDestroyAll lifecycle hook
+      op = opts.op = 'beforeDestroyAll'
+      return resolve(self[op](mapper, query, opts))
     }).then(function () {
-      return undefined
+      op = opts.op = 'destroyAll'
+      self.dbg(op, query, opts)
+      return self
+        .filterSequence(self.selectTable(mapper, opts), query)
+        .delete({ returnChanges: returnDeletedIds })
+        .merge(function (cursor) {
+          return {
+            changes: cursor('changes').default([]).map(function (record) {
+              return record('old_val').default({})(idAttribute).default({})
+            }).filter(function (id) {
+              return id
+            })
+          }
+        })
+        .run()
+    }).then(function (cursor) {
+      let deletedIds
+      if (cursor && cursor.changes && returnDeletedIds) {
+        deletedIds = cursor.changes
+        delete cursor.changes
+      }
+      // afterDestroyAll lifecycle hook
+      op = opts.op = 'afterDestroyAll'
+      return resolve(self[op](mapper, query, opts, deletedIds)).then(function (_deletedIds) {
+        // Allow for re-assignment from lifecycle hook
+        deletedIds = isUndefined(_deletedIds) ? deletedIds : _deletedIds
+        const result = {}
+        fillIn(result, cursor)
+        result.data = deletedIds
+        return self.getRaw(opts) ? result : result.data
+      })
     })
   },
 
@@ -299,7 +639,7 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
    * @return {*}
    */
   makeHasManyForeignKey (Resource, def, record) {
-    return DSUtils.get(record, Resource.idAttribute)
+    return def.getForeignKey(record)
   },
 
   /**
@@ -309,11 +649,11 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
    * @method
    * @return {Promise}
    */
-  loadHasMany (Resource, def, records, __options) {
+  loadHasMany (Resource, def, records, __opts) {
     const self = this
     let singular = false
 
-    if (DSUtils.isObject(records) && !DSUtils.isArray(records)) {
+    if (isObject(records) && !isArray(records)) {
       singular = true
       records = [records]
     }
@@ -330,7 +670,7 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
         return id
       })
     }
-    return self.findAll(Resource.getResource(def.relation), query, __options).then(function (relatedItems) {
+    return self.findAll(def.getRelation(), query, __opts).then(function (relatedItems) {
       records.forEach(function (record) {
         let attached = []
         // avoid unneccesary iteration when we only have one record
@@ -338,12 +678,12 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
           attached = relatedItems
         } else {
           relatedItems.forEach(function (relatedItem) {
-            if (DSUtils.get(relatedItem, def.foreignKey) === record[Resource.idAttribute]) {
+            if (get(relatedItem, def.foreignKey) === record[Resource.idAttribute]) {
               attached.push(relatedItem)
             }
           })
         }
-        DSUtils.set(record, def.localField, attached)
+        def.setLocalField(record, attached)
       })
     })
   },
@@ -355,15 +695,15 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
    * @method
    * @return {Promise}
    */
-  loadHasOne (Resource, def, records, __options) {
-    if (DSUtils.isObject(records) && !DSUtils.isArray(records)) {
+  loadHasOne (Resource, def, records, __opts) {
+    if (isObject(records) && !isArray(records)) {
       records = [records]
     }
-    return this.loadHasMany(Resource, def, records, __options).then(function () {
+    return this.loadHasMany(Resource, def, records, __opts).then(function () {
       records.forEach(function (record) {
-        const relatedData = DSUtils.get(record, def.localField)
-        if (DSUtils.isArray(relatedData) && relatedData.length) {
-          DSUtils.set(record, def.localField, relatedData[0])
+        const relatedData = def.getLocalField(record)
+        if (isArray(relatedData) && relatedData.length) {
+          def.setLocalField(record, relatedData[0])
         }
       })
     })
@@ -377,7 +717,7 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
    * @return {*}
    */
   makeBelongsToForeignKey (Resource, def, record) {
-    return DSUtils.get(record, def.localKey)
+    return def.getForeignKey(record)
   },
 
   /**
@@ -387,18 +727,18 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
    * @method
    * @return {Promise}
    */
-  loadBelongsTo (Resource, def, records, __options) {
+  loadBelongsTo (mapper, def, records, __opts) {
     const self = this
-    const relationDef = Resource.getResource(def.relation)
+    const relationDef = def.getRelation()
 
-    if (DSUtils.isObject(records) && !DSUtils.isArray(records)) {
+    if (isObject(records) && !isArray(records)) {
       const record = records
-      return self.find(relationDef, self.makeBelongsToForeignKey(Resource, def, record), __options).then(function (relatedItem) {
-        DSUtils.set(record, def.localField, relatedItem)
+      return self.find(relationDef, self.makeBelongsToForeignKey(mapper, def, record), __opts).then(function (relatedItem) {
+        def.setLocalField(record, relatedItem)
       })
     } else {
       const keys = records.map(function (record) {
-        return self.makeBelongsToForeignKey(Resource, def, record)
+        return self.makeBelongsToForeignKey(mapper, def, record)
       }).filter(function (key) {
         return key
       })
@@ -408,11 +748,11 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
             'in': keys
           }
         }
-      }, __options).then(function (relatedItems) {
+      }, __opts).then(function (relatedItems) {
         records.forEach(function (record) {
           relatedItems.forEach(function (relatedItem) {
-            if (relatedItem[relationDef.idAttribute] === record[def.localKey]) {
-              DSUtils.set(record, def.localField, relatedItem)
+            if (relatedItem[relationDef.idAttribute] === record[def.foreignKey]) {
+              def.setLocalField(record, relatedItem)
             }
           })
         })
@@ -425,103 +765,106 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
    *
    * @name RethinkDBAdapter#find
    * @method
-   * @param {Object} Resource The Resource.
+   * @param {Object} mapper The mapper.
    * @param {(string|number)} id Primary key of the record to retrieve.
    * @param {Object} [opts] Configuration options.
+   * @param {boolean} [opts.raw=false] TODO
    * @param {string[]} [opts.with=[]] TODO
    * @return {Promise}
    */
-  find (Resource, id, opts) {
+  find (mapper, id, opts) {
     const self = this
+    let record, op
     opts || (opts = {})
     opts.with || (opts.with = [])
 
-    let instance
-    const table = Resource.table || underscore(Resource.name)
-    const relationList = Resource.relationList || []
+    const table = mapper.table || underscore(mapper.name)
+    const relationList = mapper.relationList || []
     let tasks = [self.waitForTable(table, opts)]
 
     relationList.forEach(function (def) {
       const relationName = def.relation
-      const relationDef = Resource.getResource(relationName)
-      if (!relationDef) {
-        throw new JSData.DSErrors.NER(relationName)
-      } else if (!opts.with || !contains(opts.with, relationName)) {
+      const relationDef = def.getRelation()
+      if (!opts.with || opts.with.indexOf(relationName) === -1) {
         return
       }
-      if (def.foreignKey) {
-        tasks.push(self.waitForIndex(relationDef.table || underscore(relationDef.name), def.foreignKey, opts))
-      } else if (def.localKey) {
-        tasks.push(self.waitForIndex(Resource.table || underscore(Resource.name), def.localKey, opts))
+      if (def.foreignKey && def.type !== 'belongsTo') {
+        if (def.type === 'belongsTo') {
+          tasks.push(self.waitForIndex(mapper.table || underscore(mapper.name), def.foreignKey, opts))
+        } else {
+          tasks.push(self.waitForIndex(relationDef.table || underscore(relationDef.name), def.foreignKey, opts))
+        }
       }
     })
-    return DSUtils.Promise.all(tasks).then(function () {
-      return self.selectTable(Resource, opts).get(id).run()
-    }).then(function (_instance) {
-      if (!_instance) {
-        throw new Error('Not Found!')
+    return Promise.all(tasks).then(function () {
+      // beforeFind lifecycle hook
+      op = opts.op = 'beforeFind'
+      return resolve(self[op](mapper, id, opts)).then(function () {
+        op = opts.op = 'find'
+        self.dbg(op, id, opts)
+        return self.selectTable(mapper, opts).get(id).run()
+      })
+    }).then(function (_record) {
+      if (!_record) {
+        return
       }
-      instance = _instance
-      let tasks = []
+      record = _record
+      const tasks = []
 
-      relationList.forEach(function (def) {
-        let relationName = def.relation
-        let relationDef = Resource.getResource(relationName)
-        let containedName = null
-        if (opts.with.indexOf(relationName) !== -1) {
-          containedName = relationName
-        } else if (opts.with.indexOf(def.localField) !== -1) {
-          containedName = def.localField
-        }
-        if (containedName) {
-          let __options = DSUtils.deepMixIn({}, opts.orig ? opts.orig() : opts)
-          __options.with = opts.with.slice()
-          __options = DSUtils._(relationDef, __options)
-          DSUtils.remove(__options.with, containedName)
-          __options.with.forEach(function (relation, i) {
-            if (relation && relation.indexOf(containedName) === 0 && relation.length >= containedName.length && relation[containedName.length] === '.') {
-              __options.with[i] = relation.substr(containedName.length + 1)
-            } else {
-              __options.with[i] = ''
-            }
-          })
+      forEachRelation(mapper, opts, function (def, __opts) {
+        const relatedMapper = def.getRelation()
+        let task
 
-          let task
-
-          if (def.foreignKey && (def.type === 'hasOne' || def.type === 'hasMany')) {
-            if (def.type === 'hasOne') {
-              task = self.loadHasOne(Resource, def, instance, __options)
-            } else {
-              task = self.loadHasMany(Resource, def, instance, __options)
-            }
-          } else if (def.type === 'hasMany' && def.localKeys) {
-            let localKeys = []
-            let itemKeys = instance[def.localKeys] || []
-            itemKeys = DSUtils.isArray(itemKeys) ? itemKeys : DSUtils.keys(itemKeys)
-            localKeys = localKeys.concat(itemKeys || [])
-            task = self.findAll(Resource.getResource(relationName), {
-              where: {
-                [relationDef.idAttribute]: {
-                  'in': unique(localKeys).filter((x) => x)
-                }
+        if (def.foreignKey && (def.type === 'hasOne' || def.type === 'hasMany')) {
+          if (def.type === 'hasOne') {
+            task = self.loadHasOne(mapper, def, record, __opts)
+          } else {
+            task = self.loadHasMany(mapper, def, record, __opts)
+          }
+        } else if (def.type === 'hasMany' && def.localKeys) {
+          let localKeys = []
+          let itemKeys = get(record, def.localKeys) || []
+          itemKeys = isArray(itemKeys) ? itemKeys : Object.keys(itemKeys)
+          localKeys = localKeys.concat(itemKeys)
+          task = self.findAll(relatedMapper, {
+            where: {
+              [relatedMapper.idAttribute]: {
+                'in': unique(localKeys).filter(function (x) { return x })
               }
-            }, __options).then(function (relatedItems) {
-              DSUtils.set(instance, def.localField, relatedItems)
-              return relatedItems
-            })
-          } else if (def.type === 'belongsTo' || (def.type === 'hasOne' && def.localKey)) {
-            task = self.loadBelongsTo(Resource, def, instance, __options)
-          }
-
-          if (task) {
-            tasks.push(task)
-          }
+            }
+          }, __opts).then(function (relatedItems) {
+            def.setLocalField(record, relatedItems)
+          })
+        } else if (def.type === 'hasMany' && def.foreignKeys) {
+          task = self.findAll(relatedMapper, {
+            where: {
+              [def.foreignKeys]: {
+                'contains': get(record, mapper.idAttribute)
+              }
+            }
+          }, __opts).then(function (relatedItems) {
+            def.setLocalField(record, relatedItems)
+          })
+        } else if (def.type === 'belongsTo') {
+          task = self.loadBelongsTo(mapper, def, record, __opts)
+        }
+        if (task) {
+          tasks.push(task)
         }
       })
 
-      return DSUtils.Promise.all(tasks)
+      return Promise.all(tasks)
     }).then(function () {
-      return instance
+      // afterFind lifecycle hook
+      op = opts.op = 'afterFind'
+      return resolve(self[op](mapper, id, opts, record)).then(function (_record) {
+        // Allow for re-assignment from lifecycle hook
+        record = isUndefined(_record) ? record : _record
+        return self.getRaw(opts) ? {
+          data: record,
+          found: record ? 1 : 0
+        } : record
+      })
     })
   },
 
@@ -530,112 +873,162 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
    *
    * @name RethinkDBAdapter#findAll
    * @method
-   * @param {Object} Resource The Resource.
+   * @param {Object} mapper The mapper.
    * @param {Object} query Selection query.
    * @param {Object} [opts] Configuration options.
+   * @param {boolean} [opts.raw=false] TODO
    * @param {string[]} [opts.with=[]] TODO
    * @return {Promise}
    */
-  findAll (Resource, query, opts) {
+  findAll (mapper, query, opts) {
     const self = this
     opts || (opts = {})
     opts.with || (opts.with = [])
 
-    let items = null
-    const table = Resource.table || underscore(Resource.name)
-    const relationList = Resource.relationList || []
+    let records = []
+    let op
+    const table = mapper.table || underscore(mapper.name)
+    const relationList = mapper.relationList || []
     let tasks = [self.waitForTable(table, opts)]
 
     relationList.forEach(function (def) {
       const relationName = def.relation
-      const relationDef = Resource.getResource(relationName)
-      if (!relationDef) {
-        throw new JSData.DSErrors.NER(relationName)
-      } else if (!opts.with || !contains(opts.with, relationName)) {
+      const relationDef = def.getRelation()
+      if (!opts.with || opts.with.indexOf(relationName) === -1) {
         return
       }
-      if (def.foreignKey) {
-        tasks.push(self.waitForIndex(relationDef.table || underscore(relationDef.name), def.foreignKey, opts))
-      } else if (def.localKey) {
-        tasks.push(self.waitForIndex(Resource.table || underscore(Resource.name), def.localKey, opts))
+      if (def.foreignKey && def.type !== 'belongsTo') {
+        if (def.type === 'belongsTo') {
+          tasks.push(self.waitForIndex(mapper.table || underscore(mapper.name), def.foreignKey, opts))
+        } else {
+          tasks.push(self.waitForIndex(relationDef.table || underscore(relationDef.name), def.foreignKey, opts))
+        }
       }
     })
-    return DSUtils.Promise.all(tasks).then(function () {
-      return self.filterSequence(self.selectTable(Resource, opts), query).run()
-    }).then(function (_items) {
-      items = _items
-      let tasks = []
-      const relationList = Resource.relationList || []
-      relationList.forEach(function (def) {
-        let relationName = def.relation
-        let relationDef = Resource.getResource(relationName)
-        let containedName = null
-        if (opts.with.indexOf(relationName) !== -1) {
-          containedName = relationName
-        } else if (opts.with.indexOf(def.localField) !== -1) {
-          containedName = def.localField
-        }
-        if (containedName) {
-          let __options = DSUtils.deepMixIn({}, opts.orig ? opts.orig() : opts)
-          __options.with = opts.with.slice()
-          __options = DSUtils._(relationDef, __options)
-          DSUtils.remove(__options.with, containedName)
-          __options.with.forEach(function (relation, i) {
-            if (relation && relation.indexOf(containedName) === 0 && relation.length >= containedName.length && relation[containedName.length] === '.') {
-              __options.with[i] = relation.substr(containedName.length + 1)
-            } else {
-              __options.with[i] = ''
-            }
+    return Promise.all(tasks).then(function () {
+      // beforeFindAll lifecycle hook
+      op = opts.op = 'beforeFindAll'
+      return resolve(self[op](mapper, query, opts))
+    }).then(function () {
+      op = opts.op = 'findAll'
+      self.dbg(op, query, opts)
+      return self.filterSequence(self.selectTable(mapper, opts), query).run()
+    }).then(function (_records) {
+      records = _records
+      const tasks = []
+      forEachRelation(mapper, opts, function (def, __opts) {
+        const relatedMapper = def.getRelation()
+        const idAttribute = mapper.idAttribute
+        let task
+        if (def.foreignKey && (def.type === 'hasOne' || def.type === 'hasMany')) {
+          if (def.type === 'hasMany') {
+            task = self.loadHasMany(mapper, def, records, __opts)
+          } else {
+            task = self.loadHasOne(mapper, def, records, __opts)
+          }
+        } else if (def.type === 'hasMany' && def.localKeys) {
+          let localKeys = []
+          records.forEach(function (item) {
+            let itemKeys = item[def.localKeys] || []
+            itemKeys = isArray(itemKeys) ? itemKeys : Object.keys(itemKeys)
+            localKeys = localKeys.concat(itemKeys)
           })
-
-          let task
-
-          if (def.foreignKey && (def.type === 'hasOne' || def.type === 'hasMany')) {
-            if (def.type === 'hasMany') {
-              task = self.loadHasMany(Resource, def, items, __options)
-            } else {
-              task = self.loadHasOne(Resource, def, items, __options)
-            }
-          } else if (def.type === 'hasMany' && def.localKeys) {
-            let localKeys = []
-            items.forEach(function (item) {
-              let itemKeys = item[def.localKeys] || []
-              itemKeys = DSUtils.isArray(itemKeys) ? itemKeys : Object.keys(itemKeys)
-              localKeys = localKeys.concat(itemKeys || [])
-            })
-            task = self.findAll(Resource.getResource(relationName), {
-              where: {
-                [relationDef.idAttribute]: {
-                  'in': unique(localKeys).filter((x) => x)
-                }
+          task = self.findAll(relatedMapper, {
+            where: {
+              [relatedMapper.idAttribute]: {
+                'in': unique(localKeys).filter(function (x) { return x })
               }
-            }, __options).then(function (relatedItems) {
-              items.forEach(function (item) {
-                let attached = []
-                let itemKeys = item[def.localKeys] || []
-                itemKeys = DSUtils.isArray(itemKeys) ? itemKeys : DSUtils.keys(itemKeys)
-                relatedItems.forEach(function (relatedItem) {
-                  if (itemKeys && itemKeys.indexOf(relatedItem[relationDef.idAttribute]) !== -1) {
-                    attached.push(relatedItem)
-                  }
-                })
-                DSUtils.set(item, def.localField, attached)
+            }
+          }, __opts).then(function (relatedItems) {
+            records.forEach(function (item) {
+              let attached = []
+              let itemKeys = get(item, def.localKeys) || []
+              itemKeys = isArray(itemKeys) ? itemKeys : Object.keys(itemKeys)
+              relatedItems.forEach(function (relatedItem) {
+                if (itemKeys && itemKeys.indexOf(relatedItem[relatedMapper.idAttribute]) !== -1) {
+                  attached.push(relatedItem)
+                }
               })
-              return relatedItems
+              def.setLocalField(item, attached)
             })
-          } else if (def.type === 'belongsTo' || (def.type === 'hasOne' && def.localKey)) {
-            task = self.loadBelongsTo(Resource, def, items, __options)
-          }
-
-          if (task) {
-            tasks.push(task)
-          }
+            return relatedItems
+          })
+        } else if (def.type === 'hasMany' && def.foreignKeys) {
+          task = self.findAll(relatedMapper, {
+            where: {
+              [def.foreignKeys]: {
+                'isectNotEmpty': records.map(function (record) {
+                  return get(record, idAttribute)
+                })
+              }
+            }
+          }, __opts).then(function (relatedItems) {
+            const foreignKeysField = def.foreignKeys
+            records.forEach(function (record) {
+              const _relatedItems = []
+              const id = get(record, idAttribute)
+              relatedItems.forEach(function (relatedItem) {
+                const foreignKeys = get(relatedItems, foreignKeysField) || []
+                if (foreignKeys.indexOf(id) !== -1) {
+                  _relatedItems.push(relatedItem)
+                }
+              })
+              def.setLocalField(record, _relatedItems)
+            })
+          })
+        } else if (def.type === 'belongsTo') {
+          task = self.loadBelongsTo(mapper, def, records, __opts)
+        }
+        if (task) {
+          tasks.push(task)
         }
       })
-      return DSUtils.Promise.all(tasks)
+      return Promise.all(tasks)
     }).then(function () {
-      return items
+      // afterFindAll lifecycle hook
+      op = opts.op = 'afterFindAll'
+      return resolve(self[op](mapper, query, opts, records)).then(function (_records) {
+        // Allow for re-assignment from lifecycle hook
+        records = isUndefined(_records) ? records : _records
+        return self.getRaw(opts) ? {
+          data: records,
+          found: records.length
+        } : records
+      })
     })
+  },
+
+  /**
+   * TODO
+   *
+   * @name RethinkDBAdapter#getRaw
+   * @method
+   */
+  getRaw (opts) {
+    opts || (opts = {})
+    return !!(isUndefined(opts.raw) ? this.raw : opts.raw)
+  },
+
+  /**
+   * TODO
+   *
+   * @name RethinkDBAdapter#log
+   * @method
+   */
+  log (level, ...args) {
+    if (level && !args.length) {
+      args.push(level)
+      level = 'debug'
+    }
+    if (level === 'debug' && !this.debug) {
+      return
+    }
+    const prefix = `${level.toUpperCase()}: (RethinkDBAdapter)`
+    if (console[level]) {
+      console[level](prefix, ...args)
+    } else {
+      console.log(prefix, ...args)
+    }
   },
 
   /**
@@ -643,24 +1036,47 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
    *
    * @name RethinkDBAdapter#update
    * @method
-   * @param {Object} Resource The Resource.
+   * @param {Object} mapper The mapper.
    * @param {(string|number)} id The primary key of the record to be updated.
    * @param {Object} props The update to apply to the record.
    * @param {Object} [opts] Configuration options.
+   * @param {boolean} [opts.raw=false] TODO
    * @return {Promise}
    */
-  update (resourceConfig, id, attrs, options) {
-    attrs = removeCircular(omit(attrs, resourceConfig.relationFields || []))
-    options = options || {}
-    return this.waitForTable(resourceConfig.table || underscore(resourceConfig.name), options).then(() => {
-      return this.r.db(options.db || this.defaults.db).table(resourceConfig.table || underscore(resourceConfig.name)).get(id).update(attrs, {returnChanges: true}).run()
-    }).then((cursor) => {
-      this._handleErrors(cursor)
-      if (cursor.changes && cursor.changes.length && cursor.changes[0].new_val) {
-        return cursor.changes[0].new_val
+  update (mapper, id, props, opts) {
+    const self = this
+    props || (props = {})
+    opts || (opts = {})
+    let op
+
+    return self.waitForTable(mapper.table || underscore(mapper.name), opts).then(function () {
+      // beforeUpdate lifecycle hook
+      op = opts.op = 'beforeUpdate'
+      return resolve(self[op](mapper, id, props, opts))
+    }).then(function (_props) {
+      // Allow for re-assignment from lifecycle hook
+      _props = isUndefined(_props) ? props : _props
+      return self.selectTable(mapper, opts).get(id).update(_props, { returnChanges: true }).run()
+    }).then(function (cursor) {
+      let record
+      self._handleErrors(cursor)
+      if (cursor && cursor.changes && cursor.changes.length && cursor.changes[0].new_val) {
+        record = cursor.changes[0].new_val
       } else {
-        return this.selectTable(resourceConfig, options).get(id).run()
+        throw new Error('Not Found')
       }
+
+      // afterUpdate lifecycle hook
+      op = opts.op = 'afterUpdate'
+      return resolve(self[op](mapper, id, props, opts, record)).then(function (_record) {
+        // Allow for re-assignment from lifecycle hook
+        record = isUndefined(_record) ? record : _record
+        const result = {}
+        fillIn(result, cursor)
+        result.data = record
+        result.updated = record ? 1 : 0
+        return self.getRaw(opts) ? result : result.data
+      })
     })
   },
 
@@ -669,33 +1085,102 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
    *
    * @name RethinkDBAdapter#updateAll
    * @method
-   * @param {Object} Resource The Resource.
+   * @param {Object} mapper The mapper.
    * @param {Object} props The update to apply to the selected records.
    * @param {Object} [query] Selection query.
    * @param {Object} [opts] Configuration options.
+   * @param {boolean} [opts.raw=false] TODO
    * @return {Promise}
    */
-  updateAll (resourceConfig, attrs, params, options) {
-    attrs = removeCircular(omit(attrs, resourceConfig.relationFields || []))
-    options = options || {}
-    params = params || {}
-    return this.waitForTable(resourceConfig.table || underscore(resourceConfig.name), options).then(() => {
-      return this.filterSequence(this.selectTable(resourceConfig, options), params).update(attrs, {returnChanges: true}).run()
-    }).then((cursor) => {
-      this._handleErrors(cursor)
+  updateAll (mapper, props, query, opts) {
+    const self = this
+    props || (props = {})
+    query || (query = {})
+    opts || (opts = {})
+    let op
+
+    return self.waitForTable(mapper.table || underscore(mapper.name), opts).then(function () {
+      // beforeUpdateAll lifecycle hook
+      op = opts.op = 'beforeUpdateAll'
+      return resolve(self[op](mapper, props, query, opts))
+    }).then(function (_props) {
+      // Allow for re-assignment from lifecycle hook
+      _props = isUndefined(_props) ? props : _props
+      return self.filterSequence(self.selectTable(mapper, opts), query).update(_props, { returnChanges: true }).run()
+    }).then(function (cursor) {
+      let records = []
+      self._handleErrors(cursor)
       if (cursor && cursor.changes && cursor.changes.length) {
-        let items = []
-        cursor.changes.forEach((change) => items.push(change.new_val))
-        return items
-      } else {
-        return this.filterSequence(this.selectTable(resourceConfig, options), params).run()
+        records = cursor.changes.map(function (change) { return change.new_val })
       }
+      // afterUpdateAll lifecycle hook
+      op = opts.op = 'afterUpdateAll'
+      return self[op](mapper, props, query, opts, records).then(function (_records) {
+        // Allow for re-assignment from lifecycle hook
+        records = isUndefined(_records) ? records : _records
+        const result = {}
+        fillIn(result, cursor)
+        result.data = records
+        result.updated = records.length
+        return self.getRaw(opts) ? result : result.data
+      })
+    })
+  },
+
+  /**
+   * Update the given records in a single batch.
+   *
+   * @name RethinkDBAdapter#updateMany
+   * @method
+   * @param {Object} mapper The mapper.
+   * @param {Object[]} records The records to update.
+   * @param {Object} [opts] Configuration options.
+   * @param {boolean} [opts.raw=false] TODO
+   * @return {Promise}
+   */
+  updateMany (mapper, records, opts) {
+    const self = this
+    records || (records = [])
+    opts || (opts = {})
+    let op
+    const idAttribute = mapper.idAttribute
+
+    records = records.filter(function (record) {
+      return get(record, idAttribute)
+    })
+
+    return self.waitForTable(mapper.table || underscore(mapper.name), opts).then(function () {
+      // beforeUpdateMany lifecycle hook
+      op = opts.op = 'beforeUpdateMany'
+      return resolve(self[op](mapper, records, opts))
+    }).then(function (_records) {
+      // Allow for re-assignment from lifecycle hook
+      _records = isUndefined(_records) ? records : _records
+      return self.selectTable(mapper, opts).insert(_records, { returnChanges: true, conflict: 'update' }).run()
+    }).then(function (cursor) {
+      let updatedRecords
+      self._handleErrors(cursor)
+      if (cursor && cursor.changes && cursor.changes.length) {
+        updatedRecords = cursor.changes.map(function (change) { return change.new_val })
+      }
+
+      // afterUpdateMany lifecycle hook
+      op = opts.op = 'afterUpdateMany'
+      return resolve(self[op](mapper, records, opts, updatedRecords)).then(function (_records) {
+        // Allow for re-assignment from lifecycle hook
+        records = isUndefined(_records) ? updatedRecords : _records
+        const result = {}
+        fillIn(result, cursor)
+        result.data = records
+        result.updated = records.length
+        return self.getRaw(opts) ? result : result.data
+      })
     })
   },
 
   waitForTable (table, options) {
     options = options || {}
-    let db = options.db || this.defaults.db
+    let db = isUndefined(options.db) ? this.db : options.db
     return this.waitForDb(options).then(() => {
       this.tables[db] = this.tables[db] || {}
       if (!this.tables[db][table]) {
@@ -707,7 +1192,7 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
 
   waitForIndex (table, index, options) {
     options = options || {}
-    let db = options.db || this.defaults.db
+    let db = isUndefined(options.db) ? this.db : options.db
     return this.waitForDb(options).then(() => this.waitForTable(table, options)).then(() => {
       this.indices[db] = this.indices[db] || {}
       this.indices[db][table] = this.indices[db][table] || {}

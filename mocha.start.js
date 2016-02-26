@@ -11,7 +11,7 @@ var RethinkDBAdapter = require('./')
 
 TestRunner.init({
   debug: false,
-  DS: JSData.DS,
+  JSData: JSData,
   Adapter: RethinkDBAdapter,
   adapterConfig: {},
   storeConfig: {
@@ -21,15 +21,9 @@ TestRunner.init({
     log: false,
     debug: false
   },
-  features: [],
-  methods: [
-    'create',
-    'destroy',
-    'destroyAll',
-    'find',
-    'findAll',
-    'update',
-    'updateAll'
+  features: [
+    'findHasManyLocalKeys',
+    'findHasManyForeignKeys'
   ]
 })
 

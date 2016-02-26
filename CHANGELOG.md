@@ -1,3 +1,14 @@
+##### 3.0.0-alpha.1 - 26 February 2016
+
+###### Breaking API changes
+- Now depends on js-data 3.x
+- Now longer uses internal `defaults` property, settings are on the adapter instance itself
+
+###### Backwards compatible API changes
+- Added createMany and updateMany methods
+- Added lifecycle hooks for all methods
+- Added contains, notContains, |contains, and |notContains operators
+
 ##### 2.2.0 - 25 February 2016
 
 ###### Other
