@@ -168,8 +168,7 @@ const RUN_OPTS_DEFAULTS = {}
  * @param {number} [opts.max=50] Maximum connections in pool.
  * @param {number} [opts.min=10] Minimum connections in pool.
  * @param {number} [opts.port=28015] RethinkDB port.
- * @param {boolean} [opts.raw=false] Whether to return detailed result objects
- * instead of just record data.
+ * @param {boolean} [opts.raw=false] Whether to return a more detailed response object.
  */
 export default function RethinkDBAdapter (opts) {
   const self = this
