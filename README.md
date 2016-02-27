@@ -25,7 +25,7 @@ To get started, visit __[http://js-data.io](http://www.js-data.io)__.
 * [License](#license)
 
 ## Quick Start
-`npm install --save js-data js-data-rethinkdb`.
+`npm install --save js-data js-data-rethinkdb rethinkdbdash`.
 
 ```js
 // Use Container instead of DataStore on the server
