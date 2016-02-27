@@ -552,17 +552,17 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
       return self.selectTable(mapper, opts).get(id).delete().run()
     }).then(function (cursor) {
       let deleted = 0
-      if (cursor && cursor.deleted) {
+      if (cursor && cursor.deleted && returnDeletedIds) {
         deleted = cursor.deleted
       }
       // afterDestroy lifecycle hook
       op = opts.op = 'afterDestroy'
       return resolve(self[op](mapper, id, opts, deleted ? id : undefined)).then(function (_id) {
         // Allow for re-assignment from lifecycle hook
-        id = isUndefined(_id) && returnDeletedIds ? id : _id
+        id = isUndefined(_id) && deleted ? id : _id
         const result = {}
         fillIn(result, cursor)
-        result.data = deleted ? id : undefined
+        result.data = id
         return self.getRaw(opts) ? result : result.data
       })
     })

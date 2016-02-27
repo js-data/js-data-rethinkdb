@@ -1,3 +1,8 @@
+##### 3.0.0-alpha.2 - 26 February 2016
+
+###### Backwards compatible bug fixes
+- Fixed edge case with returnDeletedIds
+
 ##### 3.0.0-alpha.1 - 26 February 2016
 
 ###### Breaking API changes
