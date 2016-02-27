@@ -28,16 +28,30 @@ To get started, visit __[http://js-data.io](http://www.js-data.io)__.
 `npm install --save js-data js-data-rethinkdb`.
 
 ```js
+// Use Container instead of DataStore on the server
 import {Container} from 'js-data'
 import RethinkDBAdapter from 'js-data-rethinkdb'
 
+// Create a store to hold your Mappers
 const store = new Container()
+
+// Create an instance of RethinkDBAdapter with default settings
 const adapter = new RethinkDBAdapter()
 
-// "store" will now use the RethinkDB adapter for all async operations
-store.registerAdapter('rethinkdb', adapter, { default: true });
+// Mappers in "store" will use the RethinkDB adapter by default
+store.registerAdapter('rethinkdb', adapter, { default: true })
 
-store.defineMapper('user');
+// Create a Mapper that maps to a "user" table
+store.defineMapper('user')
+```
+
+```js
+async function findAllAdminUsers () {
+  // Find all users where "user.role" == "admin"
+  return await store.findAll('user', {
+    role: 'admin'
+  })
+}
 ```
 
 ## Example App

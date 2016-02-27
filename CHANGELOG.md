@@ -1,3 +1,9 @@
+##### 3.0.0-alpha.3 - 26 February 2016
+
+###### Backwards compatible API changes
+- Removed returnDeletedIds option
+- Added insertOpts, updateOpts, deleteOpts, and runOpts options
+
 ##### 3.0.0-alpha.2 - 26 February 2016
 
 ###### Backwards compatible bug fixes

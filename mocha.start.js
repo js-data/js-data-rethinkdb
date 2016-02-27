@@ -27,4 +27,4 @@ TestRunner.init({
   ]
 })
 
-// require('./test/find.test')
+require('./test/handleErrors.test')

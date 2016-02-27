@@ -1,5 +1,7 @@
-let rethinkdbdash = require('rethinkdbdash')
 import {utils} from 'js-data'
+import rethinkdbdash from 'rethinkdbdash'
+import underscore from 'mout/string/underscore'
+
 const {
   addHiddenPropsToTarget,
   fillIn,
@@ -12,8 +14,6 @@ const {
   isUndefined,
   resolve
 } = utils
-
-const underscore = require('mout/string/underscore')
 
 const reserved = [
   'orderBy',
@@ -53,7 +53,7 @@ const noop2 = function (...args) {
 
 const DEFAULTS = {
   /**
-   * TODO
+   * RethinkDB authorization key.
    *
    * @name RethinkDBAdapter#authKey
    * @type {string}
@@ -61,7 +61,7 @@ const DEFAULTS = {
   authKey: '',
 
   /**
-   * TODO
+   * Buffer size for connection pool.
    *
    * @name RethinkDBAdapter#bufferSize
    * @type {number}
@@ -70,7 +70,7 @@ const DEFAULTS = {
   bufferSize: 10,
 
   /**
-   * TODO
+   * Default database.
    *
    * @name RethinkDBAdapter#db
    * @type {string}
@@ -79,7 +79,7 @@ const DEFAULTS = {
   db: 'test',
 
   /**
-   * TODO
+   * Whether to log debugging information.
    *
    * @name RethinkDBAdapter#debug
    * @type {boolean}
@@ -88,7 +88,7 @@ const DEFAULTS = {
   debug: false,
 
   /**
-   * TODO
+   * RethinkDB host.
    *
    * @name RethinkDBAdapter#host
    * @type {string}
@@ -97,7 +97,7 @@ const DEFAULTS = {
   host: 'localhost',
 
   /**
-   * TODO
+   * Minimum connections in pool.
    *
    * @name RethinkDBAdapter#min
    * @type {number}
@@ -106,7 +106,7 @@ const DEFAULTS = {
   min: 10,
 
   /**
-   * TODO
+   * Maximum connections in pool.
    *
    * @name RethinkDBAdapter#max
    * @type {number}
@@ -115,7 +115,7 @@ const DEFAULTS = {
   max: 50,
 
   /**
-   * TODO
+   * RethinkDB port.
    *
    * @name RethinkDBAdapter#port
    * @type {number}
@@ -124,49 +124,106 @@ const DEFAULTS = {
   port: 28015,
 
   /**
-   * TODO
+   * Whether to return a more detailed response object.
    *
    * @name RethinkDBAdapter#raw
    * @type {boolean}
    * @default false
    */
-  raw: false,
-
-  /**
-   * TODO
-   *
-   * @name RethinkDBAdapter#returnDeletedIds
-   * @type {boolean}
-   * @default false
-   */
-  returnDeletedIds: false
+  raw: false
 }
+
+const INSERT_OPTS_DEFAULTS = {}
+const UPDATE_OPTS_DEFAULTS = {}
+const DELETE_OPTS_DEFAULTS = {}
+const RUN_OPTS_DEFAULTS = {}
 
 /**
  * RethinkDBAdapter class.
  *
  * @example
- * import {DS} from 'js-data'
- * import RethinkDBAdapter from 'js-data-rethinkdb'
- * const store = new DS()
- * const adapter = new RethinkDBAdapter()
- * store.registerAdapter('rethinkdb', adapter, { 'default': true })
+ * // Use Container instead of DataStore on the server
+ * import {Container} from 'js-data'
+ * import RethinkdbDBAdapter from 'js-data-rethinkdb'
+ *
+ * // Create a store to hold your Mappers
+ * const store = new Container()
+ *
+ * // Create an instance of RethinkdbDBAdapter with default settings
+ * const adapter = new RethinkdbDBAdapter()
+ *
+ * // Mappers in "store" will use the RethinkDB adapter by default
+ * store.registerAdapter('rethinkdb', adapter, { default: true })
+ *
+ * // Create a Mapper that maps to a "user" table
+ * store.defineMapper('user')
  *
  * @class RethinkDBAdapter
  * @param {Object} [opts] Configuration opts.
- * @param {string} [opts.host='localhost'] TODO
- * @param {number} [opts.port=28015] TODO
- * @param {string} [opts.authKey=''] TODO
- * @param {string} [opts.db='test'] TODO
- * @param {number} [opts.min=10] TODO
- * @param {number} [opts.max=50] TODO
- * @param {number} [opts.bufferSize=10] TODO
+ * @param {string} [opts.authKey=""] RethinkDB authorization key.
+ * @param {number} [opts.bufferSize=10] Buffer size for connection pool.
+ * @param {string} [opts.db="test"] Default database.
+ * @param {boolean} [opts.debug=false] Whether to log debugging information.
+ * @param {string} [opts.host="localhost"] RethinkDB host.
+ * @param {number} [opts.max=50] Maximum connections in pool.
+ * @param {number} [opts.min=10] Minimum connections in pool.
+ * @param {number} [opts.port=28015] RethinkDB port.
+ * @param {boolean} [opts.raw=false] Whether to return detailed result objects
+ * instead of just record data.
  */
 export default function RethinkDBAdapter (opts) {
   const self = this
   opts || (opts = {})
   fillIn(opts, DEFAULTS)
   fillIn(self, opts)
+
+  /**
+   * Default options to pass to r#insert.
+   *
+   * @name RethinkDBAdapter#insertOpts
+   * @type {Object}
+   * @default {}
+   */
+  self.insertOpts || (self.insertOpts = {})
+  fillIn(self.insertOpts, INSERT_OPTS_DEFAULTS)
+
+  /**
+   * Default options to pass to r#update.
+   *
+   * @name RethinkDBAdapter#updateOpts
+   * @type {Object}
+   * @default {}
+   */
+  self.updateOpts || (self.updateOpts = {})
+  fillIn(self.updateOpts, UPDATE_OPTS_DEFAULTS)
+
+  /**
+   * Default options to pass to r#delete.
+   *
+   * @name RethinkDBAdapter#deleteOpts
+   * @type {Object}
+   * @default {}
+   */
+  self.deleteOpts || (self.deleteOpts = {})
+  fillIn(self.deleteOpts, DELETE_OPTS_DEFAULTS)
+
+  /**
+   * Default options to pass to r#run.
+   *
+   * @name RethinkDBAdapter#runOpts
+   * @type {Object}
+   * @default {}
+   */
+  self.runOpts || (self.runOpts = {})
+  fillIn(self.runOpts, RUN_OPTS_DEFAULTS)
+
+  /**
+   * The rethinkdbdash instance used by this adapter. Use this directly when you
+   * need to write custom queries.
+   *
+   * @name RethinkDBAdapter#r
+   * @type {Object}
+   */
   self.r = rethinkdbdash(opts)
   self.databases = {}
   self.tables = {}
@@ -439,7 +496,10 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
    * @param {Object} mapper The mapper.
    * @param {Object} props The record to be created.
    * @param {Object} [opts] Configuration options.
-   * @param {boolean} [opts.raw=false] TODO
+   * @param {Object} [opts.insertOpts] Options to pass to r#insert.
+   * @param {boolean} [opts.raw=false] Whether to return a more detailed
+   * response object.
+   * @param {Object} [opts.runOpts] Options to pass to r#run.
    * @return {Promise}
    */
   create (mapper, props, opts) {
@@ -448,14 +508,16 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
     props || (props = {})
     opts || (opts = {})
 
-    return self.waitForTable(mapper.table || underscore(mapper.name), opts).then(function () {
+    return self.waitForTable(mapper, opts).then(function () {
       // beforeCreate lifecycle hook
       op = opts.op = 'beforeCreate'
       return resolve(self[op](mapper, props, opts))
     }).then(function (_props) {
       // Allow for re-assignment from lifecycle hook
       _props = isUndefined(_props) ? props : _props
-      return self.selectTable(mapper, opts).insert(_props, { returnChanges: true }).run()
+      const insertOpts = self.getOpt('insertOpts', opts)
+      insertOpts.returnChanges = true
+      return self.selectTable(mapper, opts).insert(_props, insertOpts).run(self.getOpt('runOpts', opts))
     }).then(function (cursor) {
       self._handleErrors(cursor)
       let record
@@ -471,7 +533,7 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
         fillIn(result, cursor)
         result.data = record
         result.created = record ? 1 : 0
-        return self.getRaw(opts) ? result : result.data
+        return self.getOpt('raw', opts) ? result : result.data
       })
     })
   },
@@ -484,7 +546,10 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
    * @param {Object} mapper The mapper.
    * @param {Object} props The records to be created.
    * @param {Object} [opts] Configuration options.
-   * @param {boolean} [opts.raw=false] TODO
+   * @param {Object} [opts.insertOpts] Options to pass to r#insert.
+   * @param {boolean} [opts.raw=false] Whether to return a more detailed
+   * response object.
+   * @param {Object} [opts.runOpts] Options to pass to r#run.
    * @return {Promise}
    */
   createMany (mapper, props, opts) {
@@ -493,14 +558,16 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
     props || (props = {})
     opts || (opts = {})
 
-    return self.waitForTable(mapper.table || underscore(mapper.name), opts).then(function () {
+    return self.waitForTable(mapper, opts).then(function () {
       // beforeCreateMany lifecycle hook
       op = opts.op = 'beforeCreateMany'
       return resolve(self[op](mapper, props, opts))
     }).then(function (_props) {
       // Allow for re-assignment from lifecycle hook
       _props = isUndefined(_props) ? props : _props
-      return self.selectTable(mapper, opts).insert(_props, { returnChanges: true }).run()
+      const insertOpts = self.getOpt('insertOpts', opts)
+      insertOpts.returnChanges = true
+      return self.selectTable(mapper, opts).insert(_props, insertOpts).run(self.getOpt('runOpts', opts))
     }).then(function (cursor) {
       self._handleErrors(cursor)
       let records = []
@@ -518,7 +585,7 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
         fillIn(result, cursor)
         result.data = records
         result.created = records.length
-        return self.getRaw(opts) ? result : result.data
+        return self.getOpt('raw', opts) ? result : result.data
       })
     })
   },
@@ -531,40 +598,34 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
    * @param {Object} mapper The mapper.
    * @param {(string|number)} id Primary key of the record to destroy.
    * @param {Object} [opts] Configuration options.
-   * @param {boolean} [opts.raw=false] TODO
-   * @param {boolean} [opts.returnDeletedIds=false] Whether to return the
-   * primary keys of any deleted records.
+   * @param {Object} [opts.deleteOpts] Options to pass to r#delete.
+   * @param {boolean} [opts.raw=false] Whether to return a more detailed
+   * response object.
+   * @param {Object} [opts.runOpts] Options to pass to r#run.
    * @return {Promise}
    */
   destroy (mapper, id, opts) {
     const self = this
     let op
     opts || (opts = {})
-    const returnDeletedIds = isUndefined(opts.returnDeletedIds) ? self.returnDeletedIds : !!opts.returnDeletedIds
 
-    return self.waitForTable(mapper.table || underscore(mapper.name), opts).then(function () {
+    return self.waitForTable(mapper, opts).then(function () {
       // beforeDestroy lifecycle hook
       op = opts.op = 'beforeDestroy'
       return resolve(self[op](mapper, id, opts))
     }).then(function () {
       op = opts.op = 'destroy'
       self.dbg(op, id, opts)
-      return self.selectTable(mapper, opts).get(id).delete().run()
+      return self.selectTable(mapper, opts).get(id).delete(self.getOpt('deleteOpts', opts)).run(self.getOpt('runOpts', opts))
     }).then(function (cursor) {
-      let deleted = 0
-      if (cursor && cursor.deleted && returnDeletedIds) {
-        deleted = cursor.deleted
-      }
       // afterDestroy lifecycle hook
       op = opts.op = 'afterDestroy'
-      return resolve(self[op](mapper, id, opts, deleted ? id : undefined)).then(function (_id) {
+      return resolve(self[op](mapper, id, opts, cursor)).then(function (_cursor) {
         // Allow for re-assignment from lifecycle hook
-        id = isUndefined(_id) && deleted ? id : _id
-        const result = {}
-        fillIn(result, cursor)
-        result.data = id
-        return self.getRaw(opts) ? result : result.data
+        return isUndefined(_cursor) ? cursor : _cursor
       })
+    }).then(function (cursor) {
+      return self.getOpt('raw', opts) ? cursor : undefined
     })
   },
 
@@ -576,20 +637,19 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
    * @param {Object} mapper the mapper.
    * @param {Object} [query] Selection query.
    * @param {Object} [opts] Configuration options.
-   * @param {boolean} [opts.raw=false] TODO
-   * @param {boolean} [opts.returnDeletedIds=false] Whether to return the
-   * primary keys of any deleted records.
+   * @param {Object} [opts.deleteOpts] Options to pass to r#delete.
+   * @param {boolean} [opts.raw=false] Whether to return a more detailed
+   * response object.
+   * @param {Object} [opts.runOpts] Options to pass to r#run.
    * @return {Promise}
    */
   destroyAll (mapper, query, opts) {
     const self = this
-    const idAttribute = mapper.idAttribute
     let op
     query || (query = {})
     opts || (opts = {})
-    const returnDeletedIds = isUndefined(opts.returnDeletedIds) ? self.returnDeletedIds : !!opts.returnDeletedIds
 
-    return self.waitForTable(mapper.table || underscore(mapper.name), opts).then(function () {
+    return self.waitForTable(mapper, opts).then(function () {
       // beforeDestroyAll lifecycle hook
       op = opts.op = 'beforeDestroyAll'
       return resolve(self[op](mapper, query, opts))
@@ -598,33 +658,17 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
       self.dbg(op, query, opts)
       return self
         .filterSequence(self.selectTable(mapper, opts), query)
-        .delete({ returnChanges: returnDeletedIds })
-        .merge(function (cursor) {
-          return {
-            changes: cursor('changes').default([]).map(function (record) {
-              return record('old_val').default({})(idAttribute).default({})
-            }).filter(function (id) {
-              return id
-            })
-          }
-        })
-        .run()
+        .delete(self.getOpt('deleteOpts', opts))
+        .run(self.getOpt('runOpts', opts))
     }).then(function (cursor) {
-      let deletedIds
-      if (cursor && cursor.changes && returnDeletedIds) {
-        deletedIds = cursor.changes
-        delete cursor.changes
-      }
       // afterDestroyAll lifecycle hook
       op = opts.op = 'afterDestroyAll'
-      return resolve(self[op](mapper, query, opts, deletedIds)).then(function (_deletedIds) {
+      return resolve(self[op](mapper, query, opts, cursor)).then(function (_cursor) {
         // Allow for re-assignment from lifecycle hook
-        deletedIds = isUndefined(_deletedIds) ? deletedIds : _deletedIds
-        const result = {}
-        fillIn(result, cursor)
-        result.data = deletedIds
-        return self.getRaw(opts) ? result : result.data
+        return isUndefined(_cursor) ? cursor : _cursor
       })
+    }).then(function (cursor) {
+      return self.getOpt('raw', opts) ? cursor : undefined
     })
   },
 
@@ -768,7 +812,9 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
    * @param {Object} mapper The mapper.
    * @param {(string|number)} id Primary key of the record to retrieve.
    * @param {Object} [opts] Configuration options.
-   * @param {boolean} [opts.raw=false] TODO
+   * @param {boolean} [opts.raw=false] Whether to return a more detailed
+   * response object.
+   * @param {Object} [opts.runOpts] Options to pass to r#run.
    * @param {string[]} [opts.with=[]] TODO
    * @return {Promise}
    */
@@ -778,9 +824,8 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
     opts || (opts = {})
     opts.with || (opts.with = [])
 
-    const table = mapper.table || underscore(mapper.name)
     const relationList = mapper.relationList || []
-    let tasks = [self.waitForTable(table, opts)]
+    let tasks = [self.waitForTable(mapper, opts)]
 
     relationList.forEach(function (def) {
       const relationName = def.relation
@@ -802,7 +847,7 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
       return resolve(self[op](mapper, id, opts)).then(function () {
         op = opts.op = 'find'
         self.dbg(op, id, opts)
-        return self.selectTable(mapper, opts).get(id).run()
+        return self.selectTable(mapper, opts).get(id).run(self.getOpt('runOpts', opts))
       })
     }).then(function (_record) {
       if (!_record) {
@@ -860,7 +905,7 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
       return resolve(self[op](mapper, id, opts, record)).then(function (_record) {
         // Allow for re-assignment from lifecycle hook
         record = isUndefined(_record) ? record : _record
-        return self.getRaw(opts) ? {
+        return self.getOpt('raw', opts) ? {
           data: record,
           found: record ? 1 : 0
         } : record
@@ -876,7 +921,9 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
    * @param {Object} mapper The mapper.
    * @param {Object} query Selection query.
    * @param {Object} [opts] Configuration options.
-   * @param {boolean} [opts.raw=false] TODO
+   * @param {boolean} [opts.raw=false] Whether to return a more detailed
+   * response object.
+   * @param {Object} [opts.runOpts] Options to pass to r#run.
    * @param {string[]} [opts.with=[]] TODO
    * @return {Promise}
    */
@@ -887,9 +934,8 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
 
     let records = []
     let op
-    const table = mapper.table || underscore(mapper.name)
     const relationList = mapper.relationList || []
-    let tasks = [self.waitForTable(table, opts)]
+    let tasks = [self.waitForTable(mapper, opts)]
 
     relationList.forEach(function (def) {
       const relationName = def.relation
@@ -912,7 +958,7 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
     }).then(function () {
       op = opts.op = 'findAll'
       self.dbg(op, query, opts)
-      return self.filterSequence(self.selectTable(mapper, opts), query).run()
+      return self.filterSequence(self.selectTable(mapper, opts), query).run(self.getOpt('runOpts', opts))
     }).then(function (_records) {
       records = _records
       const tasks = []
@@ -990,7 +1036,7 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
       return resolve(self[op](mapper, query, opts, records)).then(function (_records) {
         // Allow for re-assignment from lifecycle hook
         records = isUndefined(_records) ? records : _records
-        return self.getRaw(opts) ? {
+        return self.getOpt('raw', opts) ? {
           data: records,
           found: records.length
         } : records
@@ -999,14 +1045,18 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
   },
 
   /**
-   * TODO
+   * Resolve the value of the specified option based on the given options and
+   * this adapter's settings.
    *
-   * @name RethinkDBAdapter#getRaw
+   * @name RethinkDBAdapter#getOpt
    * @method
+   * @param {string} opt The name of the option.
+   * @param {Object} [opts] Configuration options.
+   * @return {*} The value of the specified option.
    */
-  getRaw (opts) {
+  getOpt (opt, opts) {
     opts || (opts = {})
-    return !!(isUndefined(opts.raw) ? this.raw : opts.raw)
+    return isUndefined(opts[opt]) ? this[opt] : opts[opt]
   },
 
   /**
@@ -1040,7 +1090,10 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
    * @param {(string|number)} id The primary key of the record to be updated.
    * @param {Object} props The update to apply to the record.
    * @param {Object} [opts] Configuration options.
-   * @param {boolean} [opts.raw=false] TODO
+   * @param {Object} [opts.updateOpts] Options to pass to r#update.
+   * @param {boolean} [opts.raw=false] Whether to return a more detailed
+   * response object.
+   * @param {Object} [opts.runOpts] Options to pass to r#run.
    * @return {Promise}
    */
   update (mapper, id, props, opts) {
@@ -1049,14 +1102,16 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
     opts || (opts = {})
     let op
 
-    return self.waitForTable(mapper.table || underscore(mapper.name), opts).then(function () {
+    return self.waitForTable(mapper, opts).then(function () {
       // beforeUpdate lifecycle hook
       op = opts.op = 'beforeUpdate'
       return resolve(self[op](mapper, id, props, opts))
     }).then(function (_props) {
       // Allow for re-assignment from lifecycle hook
       _props = isUndefined(_props) ? props : _props
-      return self.selectTable(mapper, opts).get(id).update(_props, { returnChanges: true }).run()
+      const updateOpts = self.getOpt('updateOpts', opts)
+      updateOpts.returnChanges = true
+      return self.selectTable(mapper, opts).get(id).update(_props, updateOpts).run(self.getOpt('runOpts', opts))
     }).then(function (cursor) {
       let record
       self._handleErrors(cursor)
@@ -1075,7 +1130,7 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
         fillIn(result, cursor)
         result.data = record
         result.updated = record ? 1 : 0
-        return self.getRaw(opts) ? result : result.data
+        return self.getOpt('raw', opts) ? result : result.data
       })
     })
   },
@@ -1089,7 +1144,10 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
    * @param {Object} props The update to apply to the selected records.
    * @param {Object} [query] Selection query.
    * @param {Object} [opts] Configuration options.
-   * @param {boolean} [opts.raw=false] TODO
+   * @param {Object} [opts.updateOpts] Options to pass to r#update.
+   * @param {boolean} [opts.raw=false] Whether to return a more detailed
+   * response object.
+   * @param {Object} [opts.runOpts] Options to pass to r#run.
    * @return {Promise}
    */
   updateAll (mapper, props, query, opts) {
@@ -1099,14 +1157,16 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
     opts || (opts = {})
     let op
 
-    return self.waitForTable(mapper.table || underscore(mapper.name), opts).then(function () {
+    return self.waitForTable(mapper, opts).then(function () {
       // beforeUpdateAll lifecycle hook
       op = opts.op = 'beforeUpdateAll'
       return resolve(self[op](mapper, props, query, opts))
     }).then(function (_props) {
       // Allow for re-assignment from lifecycle hook
       _props = isUndefined(_props) ? props : _props
-      return self.filterSequence(self.selectTable(mapper, opts), query).update(_props, { returnChanges: true }).run()
+      const updateOpts = self.getOpt('updateOpts', opts)
+      updateOpts.returnChanges = true
+      return self.filterSequence(self.selectTable(mapper, opts), query).update(_props, updateOpts).run(self.getOpt('runOpts', opts))
     }).then(function (cursor) {
       let records = []
       self._handleErrors(cursor)
@@ -1122,7 +1182,7 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
         fillIn(result, cursor)
         result.data = records
         result.updated = records.length
-        return self.getRaw(opts) ? result : result.data
+        return self.getOpt('raw', opts) ? result : result.data
       })
     })
   },
@@ -1135,7 +1195,10 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
    * @param {Object} mapper The mapper.
    * @param {Object[]} records The records to update.
    * @param {Object} [opts] Configuration options.
-   * @param {boolean} [opts.raw=false] TODO
+   * @param {Object} [opts.insertOpts] Options to pass to r#insert.
+   * @param {boolean} [opts.raw=false] Whether to return a more detailed
+   * response object.
+   * @param {Object} [opts.runOpts] Options to pass to r#run.
    * @return {Promise}
    */
   updateMany (mapper, records, opts) {
@@ -1149,14 +1212,17 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
       return get(record, idAttribute)
     })
 
-    return self.waitForTable(mapper.table || underscore(mapper.name), opts).then(function () {
+    return self.waitForTable(mapper, opts).then(function () {
       // beforeUpdateMany lifecycle hook
       op = opts.op = 'beforeUpdateMany'
       return resolve(self[op](mapper, records, opts))
     }).then(function (_records) {
       // Allow for re-assignment from lifecycle hook
       _records = isUndefined(_records) ? records : _records
-      return self.selectTable(mapper, opts).insert(_records, { returnChanges: true, conflict: 'update' }).run()
+      const insertOpts = self.getOpt('insertOpts', opts)
+      insertOpts.returnChanges = true
+      insertOpts.conflict = 'update'
+      return self.selectTable(mapper, opts).insert(_records, insertOpts).run(self.getOpt('runOpts', opts))
     }).then(function (cursor) {
       let updatedRecords
       self._handleErrors(cursor)
@@ -1173,12 +1239,13 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
         fillIn(result, cursor)
         result.data = records
         result.updated = records.length
-        return self.getRaw(opts) ? result : result.data
+        return self.getOpt('raw', opts) ? result : result.data
       })
     })
   },
 
-  waitForTable (table, options) {
+  waitForTable (mapper, options) {
+    const table = isString(mapper) ? mapper : (mapper.table || underscore(mapper.name))
     options = options || {}
     let db = isUndefined(options.db) ? this.db : options.db
     return this.waitForDb(options).then(() => {
