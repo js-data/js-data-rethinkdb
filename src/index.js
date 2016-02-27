@@ -844,11 +844,11 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
     return Promise.all(tasks).then(function () {
       // beforeFind lifecycle hook
       op = opts.op = 'beforeFind'
-      return resolve(self[op](mapper, id, opts)).then(function () {
+      return resolve(self[op](mapper, id, opts))
+    }).then(function () {
         op = opts.op = 'find'
         self.dbg(op, id, opts)
         return self.selectTable(mapper, opts).get(id).run(self.getOpt('runOpts', opts))
-      })
     }).then(function (_record) {
       if (!_record) {
         return
