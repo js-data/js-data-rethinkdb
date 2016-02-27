@@ -1,3 +1,8 @@
+##### 3.0.0-alpha.4 - 26 February 2016
+
+###### Other
+- Finished JSDoc comments
+
 ##### 3.0.0-alpha.3 - 26 February 2016
 
 ###### Backwards compatible API changes

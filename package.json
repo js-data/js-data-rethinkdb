@@ -1,7 +1,7 @@
 {
   "name": "js-data-rethinkdb",
   "description": "RethinkDB adapter for js-data.",
-  "version": "3.0.0-alpha.3",
+  "version": "3.0.0-alpha.4",
   "homepage": "https://github.com/js-data/js-data-rethinkdb",
   "repository": {
     "type": "git",
@@ -60,7 +60,7 @@
     "coveralls": "2.11.8",
     "ink-docstrap": "1.1.2",
     "istanbul": "0.4.2",
-    "js-data-adapter-tests": "^2.0.0-alpha.8",
+    "js-data-adapter-tests": "^2.0.0-alpha.9",
     "jsdoc": "3.4.0",
     "mocha": "2.4.5",
     "rollup": "0.25.4",

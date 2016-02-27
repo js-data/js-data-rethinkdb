@@ -392,8 +392,8 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
   selectDb: function selectDb(opts) {
     return this.r.db(isUndefined(opts.db) ? this.db : opts.db);
   },
-  selectTable: function selectTable(Resource, opts) {
-    return this.selectDb(opts).table(Resource.table || underscore(Resource.name));
+  selectTable: function selectTable(mapper, opts) {
+    return this.selectDb(opts).table(mapper.table || underscore(mapper.name));
   },
   filterSequence: function filterSequence(sequence, params) {
     var r = this.r;
@@ -700,7 +700,7 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
 
 
   /**
-   * TODO
+   * Return the foreignKey from the given record for the provided relationship.
    *
    * There may be reasons why you may want to override this method, like when
    * the id of the parent doesn't exactly match up to the key on the child.
@@ -709,19 +709,19 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
    * @method
    * @return {*}
    */
-  makeHasManyForeignKey: function makeHasManyForeignKey(Resource, def, record) {
+  makeHasManyForeignKey: function makeHasManyForeignKey(mapper, def, record) {
     return def.getForeignKey(record);
   },
 
 
   /**
-   * TODO
+   * Load a hasMany relationship.
    *
    * @name RethinkDBAdapter#loadHasMany
    * @method
    * @return {Promise}
    */
-  loadHasMany: function loadHasMany(Resource, def, records, __opts) {
+  loadHasMany: function loadHasMany(mapper, def, records, __opts) {
     var self = this;
     var singular = false;
 
@@ -730,7 +730,7 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
       records = [records];
     }
     var IDs = records.map(function (record) {
-      return self.makeHasManyForeignKey(Resource, def, record);
+      return self.makeHasManyForeignKey(mapper, def, record);
     });
     var query = {};
     var criteria = query[def.foreignKey] = {};
@@ -750,7 +750,7 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
           attached = relatedItems;
         } else {
           relatedItems.forEach(function (relatedItem) {
-            if (get(relatedItem, def.foreignKey) === record[Resource.idAttribute]) {
+            if (get(relatedItem, def.foreignKey) === record[mapper.idAttribute]) {
               attached.push(relatedItem);
             }
           });
@@ -762,17 +762,17 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
 
 
   /**
-   * TODO
+   * Load a hasOne relationship.
    *
    * @name RethinkDBAdapter#loadHasOne
    * @method
    * @return {Promise}
    */
-  loadHasOne: function loadHasOne(Resource, def, records, __opts) {
+  loadHasOne: function loadHasOne(mapper, def, records, __opts) {
     if (isObject(records) && !isArray(records)) {
       records = [records];
     }
-    return this.loadHasMany(Resource, def, records, __opts).then(function () {
+    return this.loadHasMany(mapper, def, records, __opts).then(function () {
       records.forEach(function (record) {
         var relatedData = def.getLocalField(record);
         if (isArray(relatedData) && relatedData.length) {
@@ -784,19 +784,19 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
 
 
   /**
-   * TODO
+   * Return the foreignKey from the given record for the provided relationship.
    *
    * @name RethinkDBAdapter#makeBelongsToForeignKey
    * @method
    * @return {*}
    */
-  makeBelongsToForeignKey: function makeBelongsToForeignKey(Resource, def, record) {
+  makeBelongsToForeignKey: function makeBelongsToForeignKey(mapper, def, record) {
     return def.getForeignKey(record);
   },
 
 
   /**
-   * TODO
+   * Load a belongsTo relationship.
    *
    * @name RethinkDBAdapter#loadBelongsTo
    * @method
@@ -851,7 +851,7 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
    * @param {boolean} [opts.raw=false] Whether to return a more detailed
    * response object.
    * @param {Object} [opts.runOpts] Options to pass to r#run.
-   * @param {string[]} [opts.with=[]] TODO
+   * @param {string[]} [opts.with=[]] Relations to eager load.
    * @return {Promise}
    */
   find: function find(mapper, id, opts) {
@@ -881,11 +881,11 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
     return Promise.all(tasks).then(function () {
       // beforeFind lifecycle hook
       op = opts.op = 'beforeFind';
-      return resolve(self[op](mapper, id, opts)).then(function () {
-        op = opts.op = 'find';
-        self.dbg(op, id, opts);
-        return self.selectTable(mapper, opts).get(id).run(self.getOpt('runOpts', opts));
-      });
+      return resolve(self[op](mapper, id, opts));
+    }).then(function () {
+      op = opts.op = 'find';
+      self.dbg(op, id, opts);
+      return self.selectTable(mapper, opts).get(id).run(self.getOpt('runOpts', opts));
     }).then(function (_record) {
       if (!_record) {
         return;
@@ -960,7 +960,7 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
    * @param {boolean} [opts.raw=false] Whether to return a more detailed
    * response object.
    * @param {Object} [opts.runOpts] Options to pass to r#run.
-   * @param {string[]} [opts.with=[]] TODO
+   * @param {string[]} [opts.with=[]] Relations to eager load.
    * @return {Promise}
    */
   findAll: function findAll(mapper, query, opts) {
@@ -1098,7 +1098,7 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
 
 
   /**
-   * TODO
+   * Logging utility method.
    *
    * @name RethinkDBAdapter#log
    * @method
