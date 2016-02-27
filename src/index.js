@@ -152,9 +152,7 @@ const notEqual = function (r, row, field, value) {
  *
  * @name RethinkDBAdapter.OPERATORS
  * @property {Function} == Equality operator.
- * @property {Function} === Same as `==`.
  * @property {Function} != Inequality operator.
- * @property {Function} !== Same as `!=`.
  * @property {Function} > "Greater than" operator.
  * @property {Function} >= "Greater than or equal to" operator.
  * @property {Function} < "Less than" operator.
