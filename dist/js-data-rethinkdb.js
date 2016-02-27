@@ -39,6 +39,7 @@ var isArray = jsData.utils.isArray;
 var isObject = jsData.utils.isObject;
 var isString = jsData.utils.isString;
 var isUndefined = jsData.utils.isUndefined;
+var plainCopy = jsData.utils.plainCopy;
 var resolve = jsData.utils.resolve;
 
 
@@ -168,6 +169,76 @@ var UPDATE_OPTS_DEFAULTS = {};
 var DELETE_OPTS_DEFAULTS = {};
 var RUN_OPTS_DEFAULTS = {};
 
+var equal = function equal(r, row, field, value) {
+  return row(field).default(null).eq(value);
+};
+
+var notEqual = function notEqual(r, row, field, value) {
+  return row(field).default(null).ne(value);
+};
+
+/**
+ * Default predicate functions for the filtering operators.
+ *
+ * @name RethinkDBAdapter.OPERATORS
+ * @property {Function} == Equality operator.
+ * @property {Function} === Same as `==`.
+ * @property {Function} != Inequality operator.
+ * @property {Function} !== Same as `!=`.
+ * @property {Function} > "Greater than" operator.
+ * @property {Function} >= "Greater than or equal to" operator.
+ * @property {Function} < "Less than" operator.
+ * @property {Function} <= "Less than or equal to" operator.
+ * @property {Function} isectEmpty Operator to test that the intersection
+ * between two arrays is empty.
+ * @property {Function} isectNotEmpty Operator to test that the intersection
+ * between two arrays is NOT empty.
+ * @property {Function} in Operator to test whether a value is found in the
+ * provided array.
+ * @property {Function} notIn Operator to test whether a value is NOT found in
+ * the provided array.
+ * @property {Function} contains Operator to test whether an array contains the
+ * provided value.
+ * @property {Function} notContains Operator to test whether an array does NOT
+ * contain the provided value.
+ */
+var OPERATORS = {
+  '==': equal,
+  '===': equal,
+  '!=': notEqual,
+  '!==': notEqual,
+  '>': function _(r, row, field, value) {
+    return row(field).default(null).gt(value);
+  },
+  '>=': function _(r, row, field, value) {
+    return row(field).default(null).ge(value);
+  },
+  '<': function _(r, row, field, value) {
+    return row(field).default(null).lt(value);
+  },
+  '<=': function _(r, row, field, value) {
+    return row(field).default(null).le(value);
+  },
+  'isectEmpty': function isectEmpty(r, row, field, value) {
+    return row(field).default([]).setIntersection(r.expr(value).default([])).count().eq(0);
+  },
+  'isectNotEmpty': function isectNotEmpty(r, row, field, value) {
+    return row(field).default([]).setIntersection(r.expr(value).default([])).count().ne(0);
+  },
+  'in': function _in(r, row, field, value) {
+    return r.expr(value).default(r.expr([])).contains(row(field).default(null));
+  },
+  'notIn': function notIn(r, row, field, value) {
+    return r.expr(value).default(r.expr([])).contains(row(field).default(null)).not();
+  },
+  'contains': function contains(r, row, field, value) {
+    return row(field).default([]).contains(value);
+  },
+  'notContains': function notContains(r, row, field, value) {
+    return row(field).default([]).contains(value).not();
+  }
+};
+
 /**
  * RethinkDBAdapter class.
  *
@@ -197,9 +268,10 @@ var RUN_OPTS_DEFAULTS = {};
  * @param {string} [opts.host="localhost"] RethinkDB host.
  * @param {number} [opts.max=50] Maximum connections in pool.
  * @param {number} [opts.min=10] Minimum connections in pool.
+ * @param {Object} [opts.operators] Override the default predicate functions for
+ * specified operators.
  * @param {number} [opts.port=28015] RethinkDB port.
- * @param {boolean} [opts.raw=false] Whether to return detailed result objects
- * instead of just record data.
+ * @param {boolean} [opts.raw=false] Whether to return a more detailed response object.
  */
 function RethinkDBAdapter(opts) {
   var self = this;
@@ -246,6 +318,15 @@ function RethinkDBAdapter(opts) {
    */
   self.runOpts || (self.runOpts = {});
   fillIn(self.runOpts, RUN_OPTS_DEFAULTS);
+
+  /**
+   * Override the default predicate functions for specified operators.
+   *
+   * @name RethinkDBAdapter#operators
+   * @type {Object}
+   * @default {}
+   */
+  self.operators || (self.operators = {});
 
   /**
    * The rethinkdbdash instance used by this adapter. Use this directly when you
@@ -395,85 +476,78 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
   selectTable: function selectTable(mapper, opts) {
     return this.selectDb(opts).table(mapper.table || underscore(mapper.name));
   },
-  filterSequence: function filterSequence(sequence, params) {
-    var r = this.r;
-    params = params || {};
-    params.where = params.where || {};
-    params.orderBy = params.orderBy || params.sort;
-    params.skip = params.skip || params.offset;
 
-    Object.keys(params).forEach(function (k) {
-      var v = params[k];
-      if (reserved.indexOf(k) === -1) {
-        if (isObject(v)) {
-          params.where[k] = v;
+
+  /**
+   * Apply the specified selection query to the provided RQL sequence.
+   *
+   * @name RethinkDBAdapter#filterSequence
+   * @method
+   * @param {Object} mapper The mapper.
+   * @param {Object} [query] Selection query.
+   * @param {Object} [query.where] Filtering criteria.
+   * @param {string|Array} [query.orderBy] Sorting criteria.
+   * @param {string|Array} [query.sort] Same as `query.sort`.
+   * @param {number} [query.limit] Limit results.
+   * @param {number} [query.skip] Offset results.
+   * @param {number} [query.offset] Same as `query.skip`.
+   * @param {Object} [opts] Configuration options.
+   * @param {Object} [opts.operators] Override the default predicate functions
+   * for specified operators.
+   */
+  filterSequence: function filterSequence(sequence, query, opts) {
+    var self = this;
+    var r = self.r;
+
+    query = plainCopy(query || {});
+    opts || (opts = {});
+    opts.operators || (opts.operators = {});
+    query.where || (query.where = {});
+    query.orderBy || (query.orderBy = query.sort);
+    query.orderBy || (query.orderBy = []);
+    query.skip || (query.skip = query.offset);
+
+    // Transform non-keyword properties to "where" clause configuration
+    forOwn(query, function (config, keyword) {
+      if (reserved.indexOf(keyword) === -1) {
+        if (isObject(config)) {
+          query.where[keyword] = config;
         } else {
-          params.where[k] = {
-            '==': v
+          query.where[keyword] = {
+            '==': config
           };
         }
-        delete params[k];
+        delete query[keyword];
       }
     });
 
-    var query = sequence;
+    var rql = sequence;
 
-    if (Object.keys(params.where).length !== 0) {
-      query = query.filter(function (row) {
+    // Filter
+    if (Object.keys(query.where).length !== 0) {
+      // Filter sequence using filter function
+      rql = rql.filter(function (row) {
         var subQuery = undefined;
-        forOwn(params.where, function (criteria, field) {
+        // Apply filter for each field
+        forOwn(query.where, function (criteria, field) {
           if (!isObject(criteria)) {
             criteria = { '==': criteria };
           }
-          forOwn(criteria, function (v, op) {
-            if (op === '==' || op === '===') {
-              subQuery = subQuery ? subQuery.and(row(field).default(null).eq(v)) : row(field).default(null).eq(v);
-            } else if (op === '!=' || op === '!==') {
-              subQuery = subQuery ? subQuery.and(row(field).default(null).ne(v)) : row(field).default(null).ne(v);
-            } else if (op === '>') {
-              subQuery = subQuery ? subQuery.and(row(field).default(null).gt(v)) : row(field).default(null).gt(v);
-            } else if (op === '>=') {
-              subQuery = subQuery ? subQuery.and(row(field).default(null).ge(v)) : row(field).default(null).ge(v);
-            } else if (op === '<') {
-              subQuery = subQuery ? subQuery.and(row(field).default(null).lt(v)) : row(field).default(null).lt(v);
-            } else if (op === '<=') {
-              subQuery = subQuery ? subQuery.and(row(field).default(null).le(v)) : row(field).default(null).le(v);
-            } else if (op === 'isectEmpty') {
-              subQuery = subQuery ? subQuery.and(row(field).default([]).setIntersection(r.expr(v).default([])).count().eq(0)) : row(field).default([]).setIntersection(r.expr(v).default([])).count().eq(0);
-            } else if (op === 'isectNotEmpty') {
-              subQuery = subQuery ? subQuery.and(row(field).default([]).setIntersection(r.expr(v).default([])).count().ne(0)) : row(field).default([]).setIntersection(r.expr(v).default([])).count().ne(0);
-            } else if (op === 'in') {
-              subQuery = subQuery ? subQuery.and(r.expr(v).default(r.expr([])).contains(row(field).default(null))) : r.expr(v).default(r.expr([])).contains(row(field).default(null));
-            } else if (op === 'notIn') {
-              subQuery = subQuery ? subQuery.and(r.expr(v).default(r.expr([])).contains(row(field).default(null)).not()) : r.expr(v).default(r.expr([])).contains(row(field).default(null)).not();
-            } else if (op === 'contains') {
-              subQuery = subQuery ? subQuery.and(row(field).default([]).contains(v)) : row(field).default([]).contains(v);
-            } else if (op === 'notContains') {
-              subQuery = subQuery ? subQuery.and(row(field).default([]).contains(v).not()) : row(field).default([]).contains(v).not();
-            } else if (op === '|==' || op === '|===') {
-              subQuery = subQuery ? subQuery.or(row(field).default(null).eq(v)) : row(field).default(null).eq(v);
-            } else if (op === '|!=' || op === '|!==') {
-              subQuery = subQuery ? subQuery.or(row(field).default(null).ne(v)) : row(field).default(null).ne(v);
-            } else if (op === '|>') {
-              subQuery = subQuery ? subQuery.or(row(field).default(null).gt(v)) : row(field).default(null).gt(v);
-            } else if (op === '|>=') {
-              subQuery = subQuery ? subQuery.or(row(field).default(null).ge(v)) : row(field).default(null).ge(v);
-            } else if (op === '|<') {
-              subQuery = subQuery ? subQuery.or(row(field).default(null).lt(v)) : row(field).default(null).lt(v);
-            } else if (op === '|<=') {
-              subQuery = subQuery ? subQuery.or(row(field).default(null).le(v)) : row(field).default(null).le(v);
-            } else if (op === '|isectEmpty') {
-              subQuery = subQuery ? subQuery.or(row(field).default([]).setIntersection(r.expr(v).default([])).count().eq(0)) : row(field).default([]).setIntersection(r.expr(v).default([])).count().eq(0);
-            } else if (op === '|isectNotEmpty') {
-              subQuery = subQuery ? subQuery.or(row(field).default([]).setIntersection(r.expr(v).default([])).count().ne(0)) : row(field).default([]).setIntersection(r.expr(v).default([])).count().ne(0);
-            } else if (op === '|in') {
-              subQuery = subQuery ? subQuery.or(r.expr(v).default(r.expr([])).contains(row(field).default(null))) : r.expr(v).default(r.expr([])).contains(row(field).default(null));
-            } else if (op === '|notIn') {
-              subQuery = subQuery ? subQuery.or(r.expr(v).default(r.expr([])).contains(row(field).default(null)).not()) : r.expr(v).default(r.expr([])).contains(row(field).default(null)).not();
-            } else if (op === '|contains') {
-              subQuery = subQuery ? subQuery.or(row(field).default([]).contains(v)) : row(field).default([]).contains(v);
-            } else if (op === '|notContains') {
-              subQuery = subQuery ? subQuery.or(row(field).default([]).contains(v).not()) : row(field).default([]).contains(v).not();
+          // Apply filter for each operator
+          forOwn(criteria, function (value, operator) {
+            var isOr = false;
+            if (operator && operator[0] === '|') {
+              operator = operator.substr(1);
+              isOr = true;
+            }
+            var predicateFn = self.getOperator(operator, opts);
+            if (predicateFn) {
+              var predicateResult = predicateFn(r, row, field, value);
+              if (isOr) {
+                subQuery = subQuery ? subQuery.or(predicateResult) : predicateResult;
+              } else {
+                subQuery = subQuery ? subQuery.and(predicateResult) : predicateResult;
+              }
             }
           });
         });
@@ -481,27 +555,30 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
       });
     }
 
-    if (params.orderBy) {
-      if (isString(params.orderBy)) {
-        params.orderBy = [[params.orderBy, 'asc']];
+    // Sort
+    if (query.orderBy) {
+      if (isString(query.orderBy)) {
+        query.orderBy = [[query.orderBy, 'asc']];
       }
-      for (var i = 0; i < params.orderBy.length; i++) {
-        if (isString(params.orderBy[i])) {
-          params.orderBy[i] = [params.orderBy[i], 'asc'];
+      for (var i = 0; i < query.orderBy.length; i++) {
+        if (isString(query.orderBy[i])) {
+          query.orderBy[i] = [query.orderBy[i], 'asc'];
         }
-        query = (params.orderBy[i][1] || '').toUpperCase() === 'DESC' ? query.orderBy(r.desc(params.orderBy[i][0])) : query.orderBy(params.orderBy[i][0]);
+        rql = (query.orderBy[i][1] || '').toUpperCase() === 'DESC' ? rql.orderBy(r.desc(query.orderBy[i][0])) : rql.orderBy(query.orderBy[i][0]);
       }
     }
 
-    if (params.skip) {
-      query = query.skip(+params.skip);
+    // Offset
+    if (query.skip) {
+      rql = rql.skip(+query.skip);
     }
 
-    if (params.limit) {
-      query = query.limit(+params.limit);
+    // Limit
+    if (query.limit) {
+      rql = rql.limit(+query.limit);
     }
 
-    return query;
+    return rql;
   },
   waitForDb: function waitForDb(opts) {
     var self = this;
@@ -665,8 +742,16 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
    * @method
    * @param {Object} mapper the mapper.
    * @param {Object} [query] Selection query.
+   * @param {Object} [query.where] Filtering criteria.
+   * @param {string|Array} [query.orderBy] Sorting criteria.
+   * @param {string|Array} [query.sort] Same as `query.sort`.
+   * @param {number} [query.limit] Limit results.
+   * @param {number} [query.skip] Offset results.
+   * @param {number} [query.offset] Same as `query.skip`.
    * @param {Object} [opts] Configuration options.
    * @param {Object} [opts.deleteOpts] Options to pass to r#delete.
+   * @param {Object} [opts.operators] Override the default predicate functions
+   * for specified operators.
    * @param {boolean} [opts.raw=false] Whether to return a more detailed
    * response object.
    * @param {Object} [opts.runOpts] Options to pass to r#run.
@@ -955,8 +1040,16 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
    * @name RethinkDBAdapter#findAll
    * @method
    * @param {Object} mapper The mapper.
-   * @param {Object} query Selection query.
+   * @param {Object} [query] Selection query.
+   * @param {Object} [query.where] Filtering criteria.
+   * @param {string|Array} [query.orderBy] Sorting criteria.
+   * @param {string|Array} [query.sort] Same as `query.sort`.
+   * @param {number} [query.limit] Limit results.
+   * @param {number} [query.skip] Offset results.
+   * @param {number} [query.offset] Same as `query.skip`.
    * @param {Object} [opts] Configuration options.
+   * @param {Object} [opts.operators] Override the default predicate functions
+   * for specified operators.
    * @param {boolean} [opts.raw=false] Whether to return a more detailed
    * response object.
    * @param {Object} [opts.runOpts] Options to pass to r#run.
@@ -1082,6 +1175,26 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
 
 
   /**
+   * Resolve the predicate function for the specified operator based on the
+   * given options and this adapter's settings.
+   *
+   * @name RethinkDBAdapter#getOperator
+   * @method
+   * @param {string} operator The name of the operator.
+   * @param {Object} [opts] Configuration options.
+   * @param {Object} [opts.operators] Override the default predicate functions
+   * for specified operators.
+   * @return {*} The predicate function for the specified operator.
+   */
+  getOperator: function getOperator(operator, opts) {
+    opts || (opts = {});
+    opts.operators || (opts.operators = {});
+    var ownOps = this.operators || {};
+    return isUndefined(opts.operators[operator]) ? ownOps[operator] || OPERATORS[operator] : opts.operators[operator];
+  },
+
+
+  /**
    * Resolve the value of the specified option based on the given options and
    * this adapter's settings.
    *
@@ -1093,7 +1206,7 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
    */
   getOpt: function getOpt(opt, opts) {
     opts || (opts = {});
-    return isUndefined(opts[opt]) ? this[opt] : opts[opt];
+    return isUndefined(opts[opt]) ? plainCopy(this[opt]) : plainCopy(opts[opt]);
   },
 
 
@@ -1191,11 +1304,19 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
    * @param {Object} mapper The mapper.
    * @param {Object} props The update to apply to the selected records.
    * @param {Object} [query] Selection query.
+   * @param {Object} [query.where] Filtering criteria.
+   * @param {string|Array} [query.orderBy] Sorting criteria.
+   * @param {string|Array} [query.sort] Same as `query.sort`.
+   * @param {number} [query.limit] Limit results.
+   * @param {number} [query.skip] Offset results.
+   * @param {number} [query.offset] Same as `query.skip`.
    * @param {Object} [opts] Configuration options.
-   * @param {Object} [opts.updateOpts] Options to pass to r#update.
+   * @param {Object} [opts.operators] Override the default predicate functions
+   * for specified operators.
    * @param {boolean} [opts.raw=false] Whether to return a more detailed
    * response object.
    * @param {Object} [opts.runOpts] Options to pass to r#run.
+   * @param {Object} [opts.updateOpts] Options to pass to r#update.
    * @return {Promise}
    */
   updateAll: function updateAll(mapper, props, query, opts) {
@@ -1329,6 +1450,8 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
     });
   }
 });
+
+RethinkDBAdapter.OPERATORS = OPERATORS;
 
 module.exports = RethinkDBAdapter;
 //# sourceMappingURL=js-data-rethinkdb.js.map

@@ -1,3 +1,11 @@
+##### 3.0.0-alpha.5 - 27 February 2016
+
+###### Backwards compatible API changes
+- Added ability to override query operators used by RethinkDBAdapter#filterSequence.
+
+###### Other
+- Improved JSDoc comments.
+
 ##### 3.0.0-alpha.4 - 26 February 2016
 
 ###### Other
