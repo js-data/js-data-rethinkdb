@@ -1,3 +1,8 @@
+##### 3.0.0-alpha.6 - 01 March 2016
+
+###### Backwards compatible bug fixes
+- Couple of fixes based on the latest js-data-adapter-tests
+
 ##### 3.0.0-alpha.5 - 27 February 2016
 
 ###### Backwards compatible API changes

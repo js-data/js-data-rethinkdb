@@ -5,6 +5,7 @@ function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'defau
 var jsData = require('js-data');
 var rethinkdbdash = _interopDefault(require('rethinkdbdash'));
 var underscore = _interopDefault(require('mout/string/underscore'));
+var unique = _interopDefault(require('mout/array/unique'));
 
 var babelHelpers = {};
 babelHelpers.typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
@@ -45,19 +46,6 @@ var resolve = jsData.utils.resolve;
 
 var reserved = ['orderBy', 'sort', 'limit', 'offset', 'skip', 'where'];
 
-var unique = function unique(array) {
-  var seen = {};
-  var final = [];
-  array.forEach(function (item) {
-    if (item in seen) {
-      return;
-    }
-    final.push(item);
-    seen[item] = 0;
-  });
-  return final;
-};
-
 var noop = function noop() {
   var self = this;
 
@@ -80,6 +68,19 @@ var noop2 = function noop2() {
   var opts = args[args.length - 2];
   self.dbg.apply(self, [opts.op].concat(args));
   return resolve();
+};
+
+var withoutRelations = function withoutRelations(mapper, props) {
+  var relationFields = mapper.relationFields || [];
+
+  // Remove relations
+  var _props = {};
+  forOwn(props, function (value, key) {
+    if (relationFields.indexOf(key) === -1) {
+      _props[key] = value;
+    }
+  });
+  return _props;
 };
 
 var DEFAULTS = {
@@ -182,9 +183,7 @@ var notEqual = function notEqual(r, row, field, value) {
  *
  * @name RethinkDBAdapter.OPERATORS
  * @property {Function} == Equality operator.
- * @property {Function} === Same as `==`.
  * @property {Function} != Inequality operator.
- * @property {Function} !== Same as `!=`.
  * @property {Function} > "Greater than" operator.
  * @property {Function} >= "Greater than or equal to" operator.
  * @property {Function} < "Less than" operator.
@@ -617,26 +616,27 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
       return resolve(self[op](mapper, props, opts));
     }).then(function (_props) {
       // Allow for re-assignment from lifecycle hook
-      _props = isUndefined(_props) ? props : _props;
+      props = isUndefined(_props) ? props : _props;
       var insertOpts = self.getOpt('insertOpts', opts);
       insertOpts.returnChanges = true;
-      return self.selectTable(mapper, opts).insert(_props, insertOpts).run(self.getOpt('runOpts', opts));
+      return self.selectTable(mapper, opts).insert(props, insertOpts).run(self.getOpt('runOpts', opts));
     }).then(function (cursor) {
       self._handleErrors(cursor);
       var record = undefined;
       if (cursor && cursor.changes && cursor.changes.length && cursor.changes[0].new_val) {
         record = cursor.changes[0].new_val;
       }
+      var result = {};
+      fillIn(result, cursor);
+      result.data = record;
+      result.created = record ? 1 : 0;
+      result = self.getOpt('raw', opts) ? result : result.data;
+
       // afterCreate lifecycle hook
       op = opts.op = 'afterCreate';
-      return self[op](mapper, props, opts, record).then(function (_record) {
+      return resolve(self[op](mapper, props, opts, result)).then(function (_result) {
         // Allow for re-assignment from lifecycle hook
-        record = isUndefined(_record) ? record : _record;
-        var result = {};
-        fillIn(result, cursor);
-        result.data = record;
-        result.created = record ? 1 : 0;
-        return self.getOpt('raw', opts) ? result : result.data;
+        return isUndefined(_result) ? result : _result;
       });
     });
   },
@@ -668,9 +668,12 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
       return resolve(self[op](mapper, props, opts));
     }).then(function (_props) {
       // Allow for re-assignment from lifecycle hook
-      _props = isUndefined(_props) ? props : _props;
+      props = isUndefined(_props) ? props : _props;
       var insertOpts = self.getOpt('insertOpts', opts);
       insertOpts.returnChanges = true;
+      _props = props.map(function (record) {
+        return withoutRelations(mapper, record);
+      });
       return self.selectTable(mapper, opts).insert(_props, insertOpts).run(self.getOpt('runOpts', opts));
     }).then(function (cursor) {
       self._handleErrors(cursor);
@@ -680,16 +683,17 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
           return change.new_val;
         });
       }
+      var result = {};
+      fillIn(result, cursor);
+      result.data = records;
+      result.created = records.length;
+      result = self.getOpt('raw', opts) ? result : result.data;
+
       // afterCreateMany lifecycle hook
       op = opts.op = 'afterCreateMany';
-      return self[op](mapper, props, opts, records).then(function (_records) {
+      return resolve(self[op](mapper, props, opts, result)).then(function (_result) {
         // Allow for re-assignment from lifecycle hook
-        records = isUndefined(_records) ? records : _records;
-        var result = {};
-        fillIn(result, cursor);
-        result.data = records;
-        result.created = records.length;
-        return self.getOpt('raw', opts) ? result : result.data;
+        return isUndefined(_result) ? result : _result;
       });
     });
   },
@@ -723,14 +727,16 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
       self.dbg(op, id, opts);
       return self.selectTable(mapper, opts).get(id).delete(self.getOpt('deleteOpts', opts)).run(self.getOpt('runOpts', opts));
     }).then(function (cursor) {
+      var result = {};
+      fillIn(result, cursor);
+      result = self.getOpt('raw', opts) ? result : undefined;
+
       // afterDestroy lifecycle hook
       op = opts.op = 'afterDestroy';
-      return resolve(self[op](mapper, id, opts, cursor)).then(function (_cursor) {
+      return resolve(self[op](mapper, id, opts, result)).then(function (_result) {
         // Allow for re-assignment from lifecycle hook
-        return isUndefined(_cursor) ? cursor : _cursor;
+        return isUndefined(_result) ? result : _result;
       });
-    }).then(function (cursor) {
-      return self.getOpt('raw', opts) ? cursor : undefined;
     });
   },
 
@@ -772,14 +778,16 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
       self.dbg(op, query, opts);
       return self.filterSequence(self.selectTable(mapper, opts), query).delete(self.getOpt('deleteOpts', opts)).run(self.getOpt('runOpts', opts));
     }).then(function (cursor) {
+      var result = {};
+      fillIn(result, cursor);
+      result = self.getOpt('raw', opts) ? result : undefined;
+
       // afterDestroyAll lifecycle hook
       op = opts.op = 'afterDestroyAll';
-      return resolve(self[op](mapper, query, opts, cursor)).then(function (_cursor) {
+      return resolve(self[op](mapper, query, opts, result)).then(function (_result) {
         // Allow for re-assignment from lifecycle hook
-        return isUndefined(_cursor) ? cursor : _cursor;
+        return isUndefined(_result) ? result : _result;
       });
-    }).then(function (cursor) {
-      return self.getOpt('raw', opts) ? cursor : undefined;
     });
   },
 
@@ -1020,15 +1028,17 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
 
       return Promise.all(tasks);
     }).then(function () {
+      var result = {
+        data: record,
+        found: record ? 1 : 0
+      };
+      result = self.getOpt('raw', opts) ? result : result.data;
+
       // afterFind lifecycle hook
       op = opts.op = 'afterFind';
-      return resolve(self[op](mapper, id, opts, record)).then(function (_record) {
+      return resolve(self[op](mapper, id, opts, result)).then(function (_result) {
         // Allow for re-assignment from lifecycle hook
-        record = isUndefined(_record) ? record : _record;
-        return self.getOpt('raw', opts) ? {
-          data: record,
-          found: record ? 1 : 0
-        } : record;
+        return isUndefined(_result) ? result : _result;
       });
     });
   },
@@ -1160,15 +1170,18 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
       });
       return Promise.all(tasks);
     }).then(function () {
+      records || (records = []);
+      var result = {
+        data: records,
+        found: records.length
+      };
+      result = self.getOpt('raw', opts) ? result : result.data;
+
       // afterFindAll lifecycle hook
       op = opts.op = 'afterFindAll';
-      return resolve(self[op](mapper, query, opts, records)).then(function (_records) {
+      return resolve(self[op](mapper, query, opts, result)).then(function (_result) {
         // Allow for re-assignment from lifecycle hook
-        records = isUndefined(_records) ? records : _records;
-        return self.getOpt('raw', opts) ? {
-          data: records,
-          found: records.length
-        } : records;
+        return isUndefined(_result) ? result : _result;
       });
     });
   },
@@ -1268,10 +1281,10 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
       return resolve(self[op](mapper, id, props, opts));
     }).then(function (_props) {
       // Allow for re-assignment from lifecycle hook
-      _props = isUndefined(_props) ? props : _props;
+      props = isUndefined(_props) ? props : _props;
       var updateOpts = self.getOpt('updateOpts', opts);
       updateOpts.returnChanges = true;
-      return self.selectTable(mapper, opts).get(id).update(_props, updateOpts).run(self.getOpt('runOpts', opts));
+      return self.selectTable(mapper, opts).get(id).update(withoutRelations(mapper, props), updateOpts).run(self.getOpt('runOpts', opts));
     }).then(function (cursor) {
       var record = undefined;
       self._handleErrors(cursor);
@@ -1280,17 +1293,17 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
       } else {
         throw new Error('Not Found');
       }
+      var result = {};
+      fillIn(result, cursor);
+      result.data = record;
+      result.updated = 1;
+      result = self.getOpt('raw', opts) ? result : result.data;
 
       // afterUpdate lifecycle hook
       op = opts.op = 'afterUpdate';
-      return resolve(self[op](mapper, id, props, opts, record)).then(function (_record) {
+      return resolve(self[op](mapper, id, props, opts, result)).then(function (_result) {
         // Allow for re-assignment from lifecycle hook
-        record = isUndefined(_record) ? record : _record;
-        var result = {};
-        fillIn(result, cursor);
-        result.data = record;
-        result.updated = record ? 1 : 0;
-        return self.getOpt('raw', opts) ? result : result.data;
+        return isUndefined(_result) ? result : _result;
       });
     });
   },
@@ -1332,10 +1345,10 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
       return resolve(self[op](mapper, props, query, opts));
     }).then(function (_props) {
       // Allow for re-assignment from lifecycle hook
-      _props = isUndefined(_props) ? props : _props;
+      props = isUndefined(_props) ? props : _props;
       var updateOpts = self.getOpt('updateOpts', opts);
       updateOpts.returnChanges = true;
-      return self.filterSequence(self.selectTable(mapper, opts), query).update(_props, updateOpts).run(self.getOpt('runOpts', opts));
+      return self.filterSequence(self.selectTable(mapper, opts), query).update(withoutRelations(mapper, props), updateOpts).run(self.getOpt('runOpts', opts));
     }).then(function (cursor) {
       var records = [];
       self._handleErrors(cursor);
@@ -1344,16 +1357,17 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
           return change.new_val;
         });
       }
+      var result = {};
+      fillIn(result, cursor);
+      result.data = records;
+      result.updated = records.length;
+      result = self.getOpt('raw', opts) ? result : result.data;
+
       // afterUpdateAll lifecycle hook
       op = opts.op = 'afterUpdateAll';
-      return self[op](mapper, props, query, opts, records).then(function (_records) {
+      return resolve(self[op](mapper, props, query, opts, result)).then(function (_result) {
         // Allow for re-assignment from lifecycle hook
-        records = isUndefined(_records) ? records : _records;
-        var result = {};
-        fillIn(result, cursor);
-        result.data = records;
-        result.updated = records.length;
-        return self.getOpt('raw', opts) ? result : result.data;
+        return isUndefined(_result) ? result : _result;
       });
     });
   },
@@ -1394,6 +1408,9 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
       var insertOpts = self.getOpt('insertOpts', opts);
       insertOpts.returnChanges = true;
       insertOpts.conflict = 'update';
+      _records = _records.map(function (record) {
+        return withoutRelations(mapper, record);
+      });
       return self.selectTable(mapper, opts).insert(_records, insertOpts).run(self.getOpt('runOpts', opts));
     }).then(function (cursor) {
       var updatedRecords = undefined;
@@ -1403,17 +1420,17 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
           return change.new_val;
         });
       }
+      var result = {};
+      fillIn(result, cursor);
+      result.data = updatedRecords || [];
+      result.updated = result.data.length;
+      result = self.getOpt('raw', opts) ? result : result.data;
 
       // afterUpdateMany lifecycle hook
       op = opts.op = 'afterUpdateMany';
-      return resolve(self[op](mapper, records, opts, updatedRecords)).then(function (_records) {
+      return resolve(self[op](mapper, records, opts, result)).then(function (_result) {
         // Allow for re-assignment from lifecycle hook
-        records = isUndefined(_records) ? updatedRecords : _records;
-        var result = {};
-        fillIn(result, cursor);
-        result.data = records;
-        result.updated = records.length;
-        return self.getOpt('raw', opts) ? result : result.data;
+        return isUndefined(_result) ? result : _result;
       });
     });
   },
