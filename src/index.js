@@ -5,6 +5,7 @@ import unique from 'mout/array/unique'
 
 const {
   addHiddenPropsToTarget,
+  extend,
   fillIn,
   forEachRelation,
   forOwn,
@@ -309,6 +310,19 @@ export default function RethinkDBAdapter (opts) {
   self.tables = {}
   self.indices = {}
 }
+
+/**
+ * Alternative to ES6 class syntax for extending `RethinkDBAdapter`.
+ *
+ * @name RethinkDBAdapter.extend
+ * @method
+ * @param {Object} [instanceProps] Properties that will be added to the
+ * prototype of the subclass.
+ * @param {Object} [classProps] Properties that will be added as static
+ * properties to the subclass itself.
+ * @return {Object} Subclass of `RethinkDBAdapter`.
+ */
+RethinkDBAdapter.extend = extend
 
 addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
   _handleErrors (cursor) {

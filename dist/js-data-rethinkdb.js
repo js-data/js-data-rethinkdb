@@ -32,6 +32,7 @@ babelHelpers.defineProperty = function (obj, key, value) {
 babelHelpers;
 
 var addHiddenPropsToTarget = jsData.utils.addHiddenPropsToTarget;
+var extend = jsData.utils.extend;
 var fillIn = jsData.utils.fillIn;
 var forEachRelation = jsData.utils.forEachRelation;
 var forOwn = jsData.utils.forOwn;
@@ -339,6 +340,19 @@ function RethinkDBAdapter(opts) {
   self.tables = {};
   self.indices = {};
 }
+
+/**
+ * Alternative to ES6 class syntax for extending `RethinkDBAdapter`.
+ *
+ * @name RethinkDBAdapter.extend
+ * @method
+ * @param {Object} [instanceProps] Properties that will be added to the
+ * prototype of the subclass.
+ * @param {Object} [classProps] Properties that will be added as static
+ * properties to the subclass itself.
+ * @return {Object} Subclass of `RethinkDBAdapter`.
+ */
+RethinkDBAdapter.extend = extend;
 
 addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
   _handleErrors: function _handleErrors(cursor) {

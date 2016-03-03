@@ -1,3 +1,8 @@
+##### 3.0.0-alpha.7 - 03 March 2016
+
+###### Backwards compatible API changes
+- Added RethinkDBAdapter.extend
+
 ##### 3.0.0-alpha.6 - 01 March 2016
 
 ###### Backwards compatible bug fixes
