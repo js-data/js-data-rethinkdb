@@ -1,3 +1,8 @@
+##### 3.0.0-alpha.9 - 06 March 2016
+
+###### Other
+- Upgraded js-data-adapter
+
 ##### 3.0.0-alpha.8 - 06 March 2016
 
 ###### Other

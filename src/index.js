@@ -57,15 +57,6 @@ const DEFAULTS = {
   db: 'test',
 
   /**
-   * Whether to log debugging information.
-   *
-   * @name RethinkDBAdapter#debug
-   * @type {boolean}
-   * @default false
-   */
-  debug: false,
-
-  /**
    * RethinkDB host.
    *
    * @name RethinkDBAdapter#host
@@ -99,16 +90,7 @@ const DEFAULTS = {
    * @type {number}
    * @default 10
    */
-  port: 28015,
-
-  /**
-   * Whether to return a more detailed response object.
-   *
-   * @name RethinkDBAdapter#raw
-   * @type {boolean}
-   * @default false
-   */
-  raw: false
+  port: 28015
 }
 
 const INSERT_OPTS_DEFAULTS = {}
@@ -224,7 +206,7 @@ export default function RethinkDBAdapter (opts) {
   classCallCheck(self, RethinkDBAdapter)
   opts || (opts = {})
   fillIn(opts, DEFAULTS)
-  Adapter.call(this, opts)
+  Adapter.call(self, opts)
 
   /**
    * Default options to pass to r#insert.
