@@ -1,10 +1,16 @@
 import {utils} from 'js-data'
+import Adapter from 'js-data-adapter'
+import {
+  reserved,
+  Response
+} from 'js-data-adapter'
 import rethinkdbdash from 'rethinkdbdash'
 import underscore from 'mout/string/underscore'
 import unique from 'mout/array/unique'
 
 const {
   addHiddenPropsToTarget,
+  classCallCheck,
   extend,
   fillIn,
   forEachRelation,
@@ -14,44 +20,13 @@ const {
   isObject,
   isString,
   isUndefined,
+  omit,
   plainCopy,
   resolve
 } = utils
 
-const reserved = [
-  'orderBy',
-  'sort',
-  'limit',
-  'offset',
-  'skip',
-  'where'
-]
-
-const noop = function (...args) {
-  const self = this
-  const opts = args[args.length - 1]
-  self.dbg(opts.op, ...args)
-  return resolve()
-}
-
-const noop2 = function (...args) {
-  const self = this
-  const opts = args[args.length - 2]
-  self.dbg(opts.op, ...args)
-  return resolve()
-}
-
 const withoutRelations = function (mapper, props) {
-  const relationFields = mapper.relationFields || []
-
-  // Remove relations
-  const _props = {}
-  forOwn(props, function (value, key) {
-    if (relationFields.indexOf(key) === -1) {
-      _props[key] = value
-    }
-  })
-  return _props
+  return omit(props, mapper.relationFields || [])
 }
 
 const DEFAULTS = {
@@ -230,6 +205,7 @@ const OPERATORS = {
  * store.defineMapper('user')
  *
  * @class RethinkDBAdapter
+ * @extends Adapter
  * @param {Object} [opts] Configuration opts.
  * @param {string} [opts.authKey=""] RethinkDB authorization key.
  * @param {number} [opts.bufferSize=10] Buffer size for connection pool.
@@ -245,9 +221,10 @@ const OPERATORS = {
  */
 export default function RethinkDBAdapter (opts) {
   const self = this
+  classCallCheck(self, RethinkDBAdapter)
   opts || (opts = {})
   fillIn(opts, DEFAULTS)
-  fillIn(self, opts)
+  Adapter.call(this, opts)
 
   /**
    * Default options to pass to r#insert.
@@ -311,16 +288,31 @@ export default function RethinkDBAdapter (opts) {
   self.indices = {}
 }
 
+// Setup prototype inheritance from Adapter
+RethinkDBAdapter.prototype = Object.create(Adapter.prototype, {
+  constructor: {
+    value: RethinkDBAdapter,
+    enumerable: false,
+    writable: true,
+    configurable: true
+  }
+})
+
+Object.defineProperty(RethinkDBAdapter, '__super__', {
+  configurable: true,
+  value: Adapter
+})
+
 /**
  * Alternative to ES6 class syntax for extending `RethinkDBAdapter`.
  *
  * @name RethinkDBAdapter.extend
  * @method
  * @param {Object} [instanceProps] Properties that will be added to the
- * prototype of the subclass.
+ * prototype of the RethinkDBAdapter.
  * @param {Object} [classProps] Properties that will be added as static
- * properties to the subclass itself.
- * @return {Object} Subclass of `RethinkDBAdapter`.
+ * properties to the RethinkDBAdapter itself.
+ * @return {Object} RethinkDBAdapter of `RethinkDBAdapter`.
  */
 RethinkDBAdapter.extend = extend
 
@@ -332,121 +324,6 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
       }
       throw new Error('Unknown RethinkDB Error')
     }
-  },
-  /**
-   * @name RethinkDBAdapter#afterCreate
-   * @method
-   */
-  afterCreate: noop2,
-
-  /**
-   * @name RethinkDBAdapter#afterCreateMany
-   * @method
-   */
-  afterCreateMany: noop2,
-
-  /**
-   * @name RethinkDBAdapter#afterDestroy
-   * @method
-   */
-  afterDestroy: noop2,
-
-  /**
-   * @name RethinkDBAdapter#afterDestroyAll
-   * @method
-   */
-  afterDestroyAll: noop2,
-
-  /**
-   * @name RethinkDBAdapter#afterFind
-   * @method
-   */
-  afterFind: noop2,
-
-  /**
-   * @name RethinkDBAdapter#afterFindAll
-   * @method
-   */
-  afterFindAll: noop2,
-
-  /**
-   * @name RethinkDBAdapter#afterUpdate
-   * @method
-   */
-  afterUpdate: noop2,
-
-  /**
-   * @name RethinkDBAdapter#afterUpdateAll
-   * @method
-   */
-  afterUpdateAll: noop2,
-
-  /**
-   * @name RethinkDBAdapter#afterUpdateMany
-   * @method
-   */
-  afterUpdateMany: noop2,
-
-  /**
-   * @name RethinkDBAdapter#beforeCreate
-   * @method
-   */
-  beforeCreate: noop,
-
-  /**
-   * @name RethinkDBAdapter#beforeCreateMany
-   * @method
-   */
-  beforeCreateMany: noop,
-
-  /**
-   * @name RethinkDBAdapter#beforeDestroy
-   * @method
-   */
-  beforeDestroy: noop,
-
-  /**
-   * @name RethinkDBAdapter#beforeDestroyAll
-   * @method
-   */
-  beforeDestroyAll: noop,
-
-  /**
-   * @name RethinkDBAdapter#beforeFind
-   * @method
-   */
-  beforeFind: noop,
-
-  /**
-   * @name RethinkDBAdapter#beforeFindAll
-   * @method
-   */
-  beforeFindAll: noop,
-
-  /**
-   * @name RethinkDBAdapter#beforeUpdate
-   * @method
-   */
-  beforeUpdate: noop,
-
-  /**
-   * @name RethinkDBAdapter#beforeUpdateAll
-   * @method
-   */
-  beforeUpdateAll: noop,
-
-  /**
-   * @name RethinkDBAdapter#beforeUpdateMany
-   * @method
-   */
-  beforeUpdateMany: noop,
-
-  /**
-   * @name RethinkDBAdapter#dbg
-   * @method
-   */
-  dbg (...args) {
-    this.log('debug', ...args)
   },
 
   selectDb (opts) {
@@ -612,17 +489,15 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
       if (cursor && cursor.changes && cursor.changes.length && cursor.changes[0].new_val) {
         record = cursor.changes[0].new_val
       }
-      let result = {}
-      fillIn(result, cursor)
-      result.data = record
-      result.created = record ? 1 : 0
-      result = self.getOpt('raw', opts) ? result : result.data
+      let response = new Response(record, cursor, 'create')
+      response.created = record ? 1 : 0
+      response = self.respond(response, opts)
 
       // afterCreate lifecycle hook
       op = opts.op = 'afterCreate'
-      return resolve(self[op](mapper, props, opts, result)).then(function (_result) {
+      return resolve(self[op](mapper, props, opts, response)).then(function (_response) {
         // Allow for re-assignment from lifecycle hook
-        return isUndefined(_result) ? result : _result
+        return isUndefined(_response) ? response : _response
       })
     })
   },
@@ -668,9 +543,7 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
           return change.new_val
         })
       }
-      let result = {}
-      fillIn(result, cursor)
-      result.data = records
+      let result = new Response(records, cursor, 'createMany')
       result.created = records.length
       result = self.getOpt('raw', opts) ? result : result.data
 
@@ -711,8 +584,7 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
       self.dbg(op, id, opts)
       return self.selectTable(mapper, opts).get(id).delete(self.getOpt('deleteOpts', opts)).run(self.getOpt('runOpts', opts))
     }).then(function (cursor) {
-      let result = {}
-      fillIn(result, cursor)
+      let result = new Response(undefined, cursor, 'destroy')
       result = self.getOpt('raw', opts) ? result : undefined
 
       // afterDestroy lifecycle hook
@@ -764,8 +636,7 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
         .delete(self.getOpt('deleteOpts', opts))
         .run(self.getOpt('runOpts', opts))
     }).then(function (cursor) {
-      let result = {}
-      fillIn(result, cursor)
+      let result = new Response(undefined, cursor, 'destroyAll')
       result = self.getOpt('raw', opts) ? result : undefined
 
       // afterDestroyAll lifecycle hook
@@ -775,138 +646,6 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
         return isUndefined(_result) ? result : _result
       })
     })
-  },
-
-  /**
-   * Return the foreignKey from the given record for the provided relationship.
-   *
-   * There may be reasons why you may want to override this method, like when
-   * the id of the parent doesn't exactly match up to the key on the child.
-   *
-   * @name RethinkDBAdapter#makeHasManyForeignKey
-   * @method
-   * @return {*}
-   */
-  makeHasManyForeignKey (mapper, def, record) {
-    return def.getForeignKey(record)
-  },
-
-  /**
-   * Load a hasMany relationship.
-   *
-   * @name RethinkDBAdapter#loadHasMany
-   * @method
-   * @return {Promise}
-   */
-  loadHasMany (mapper, def, records, __opts) {
-    const self = this
-    let singular = false
-
-    if (isObject(records) && !isArray(records)) {
-      singular = true
-      records = [records]
-    }
-    const IDs = records.map(function (record) {
-      return self.makeHasManyForeignKey(mapper, def, record)
-    })
-    const query = {}
-    const criteria = query[def.foreignKey] = {}
-    if (singular) {
-      // more efficient query when we only have one record
-      criteria['=='] = IDs[0]
-    } else {
-      criteria['in'] = IDs.filter(function (id) {
-        return id
-      })
-    }
-    return self.findAll(def.getRelation(), query, __opts).then(function (relatedItems) {
-      records.forEach(function (record) {
-        let attached = []
-        // avoid unneccesary iteration when we only have one record
-        if (singular) {
-          attached = relatedItems
-        } else {
-          relatedItems.forEach(function (relatedItem) {
-            if (get(relatedItem, def.foreignKey) === record[mapper.idAttribute]) {
-              attached.push(relatedItem)
-            }
-          })
-        }
-        def.setLocalField(record, attached)
-      })
-    })
-  },
-
-  /**
-   * Load a hasOne relationship.
-   *
-   * @name RethinkDBAdapter#loadHasOne
-   * @method
-   * @return {Promise}
-   */
-  loadHasOne (mapper, def, records, __opts) {
-    if (isObject(records) && !isArray(records)) {
-      records = [records]
-    }
-    return this.loadHasMany(mapper, def, records, __opts).then(function () {
-      records.forEach(function (record) {
-        const relatedData = def.getLocalField(record)
-        if (isArray(relatedData) && relatedData.length) {
-          def.setLocalField(record, relatedData[0])
-        }
-      })
-    })
-  },
-
-  /**
-   * Return the foreignKey from the given record for the provided relationship.
-   *
-   * @name RethinkDBAdapter#makeBelongsToForeignKey
-   * @method
-   * @return {*}
-   */
-  makeBelongsToForeignKey (mapper, def, record) {
-    return def.getForeignKey(record)
-  },
-
-  /**
-   * Load a belongsTo relationship.
-   *
-   * @name RethinkDBAdapter#loadBelongsTo
-   * @method
-   * @return {Promise}
-   */
-  loadBelongsTo (mapper, def, records, __opts) {
-    const self = this
-    const relationDef = def.getRelation()
-
-    if (isObject(records) && !isArray(records)) {
-      const record = records
-      return self.find(relationDef, self.makeBelongsToForeignKey(mapper, def, record), __opts).then(function (relatedItem) {
-        def.setLocalField(record, relatedItem)
-      })
-    } else {
-      const keys = records.map(function (record) {
-        return self.makeBelongsToForeignKey(mapper, def, record)
-      }).filter(function (key) {
-        return key
-      })
-      return self.findAll(relationDef, {
-        where: {
-          [relationDef.idAttribute]: {
-            'in': keys
-          }
-        }
-      }, __opts).then(function (relatedItems) {
-        records.forEach(function (record) {
-          relatedItems.forEach(function (relatedItem) {
-            if (relatedItem[relationDef.idAttribute] === record[def.foreignKey]) {
-              def.setLocalField(record, relatedItem)
-            }
-          })
-        })
-      })
-    }
   },
 
   /**
@@ -1005,10 +744,8 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
 
       return Promise.all(tasks)
     }).then(function () {
-      let result = {
-        data: record,
-        found: record ? 1 : 0
-      }
+      let result = new Response(record, {}, 'find')
+      result.found = record ? 1 : 0
       result = self.getOpt('raw', opts) ? result : result.data
 
       // afterFind lifecycle hook
@@ -1147,10 +884,8 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
       return Promise.all(tasks)
     }).then(function () {
       records || (records = [])
-      let result = {
-        data: records,
-        found: records.length
-      }
+      let result = new Response(records, {}, 'findAll')
+      result.found = records.length
       result = self.getOpt('raw', opts) ? result : result.data
 
       // afterFindAll lifecycle hook
@@ -1179,43 +914,6 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
     opts.operators || (opts.operators = {})
     let ownOps = this.operators || {}
     return isUndefined(opts.operators[operator]) ? ownOps[operator] || OPERATORS[operator] : opts.operators[operator]
-  },
-
-  /**
-   * Resolve the value of the specified option based on the given options and
-   * this adapter's settings.
-   *
-   * @name RethinkDBAdapter#getOpt
-   * @method
-   * @param {string} opt The name of the option.
-   * @param {Object} [opts] Configuration options.
-   * @return {*} The value of the specified option.
-   */
-  getOpt (opt, opts) {
-    opts || (opts = {})
-    return isUndefined(opts[opt]) ? plainCopy(this[opt]) : plainCopy(opts[opt])
-  },
-
-  /**
-   * Logging utility method.
-   *
-   * @name RethinkDBAdapter#log
-   * @method
-   */
-  log (level, ...args) {
-    if (level && !args.length) {
-      args.push(level)
-      level = 'debug'
-    }
-    if (level === 'debug' && !this.debug) {
-      return
-    }
-    const prefix = `${level.toUpperCase()}: (RethinkDBAdapter)`
-    if (console[level]) {
-      console[level](prefix, ...args)
-    } else {
-      console.log(prefix, ...args)
-    }
   },
 
   /**
@@ -1257,9 +955,7 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
       } else {
         throw new Error('Not Found')
       }
-      let result = {}
-      fillIn(result, cursor)
-      result.data = record
+      let result = new Response(record, cursor, 'update')
       result.updated = 1
       result = self.getOpt('raw', opts) ? result : result.data
 
@@ -1318,9 +1014,7 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
       if (cursor && cursor.changes && cursor.changes.length) {
         records = cursor.changes.map(function (change) { return change.new_val })
       }
-      let result = {}
-      fillIn(result, cursor)
-      result.data = records
+      let result = new Response(records, cursor, 'update')
       result.updated = records.length
       result = self.getOpt('raw', opts) ? result : result.data
 
@@ -1378,9 +1072,7 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
       if (cursor && cursor.changes && cursor.changes.length) {
         updatedRecords = cursor.changes.map(function (change) { return change.new_val })
       }
-      let result = {}
-      fillIn(result, cursor)
-      result.data = updatedRecords || []
+      let result = new Response(updatedRecords || [], cursor, 'update')
       result.updated = result.data.length
       result = self.getOpt('raw', opts) ? result : result.data
 

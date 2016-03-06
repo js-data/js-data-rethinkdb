@@ -1,3 +1,9 @@
+##### 3.0.0-alpha.8 - 06 March 2016
+
+###### Other
+- Extracted common adapter functionality into js-data-adapter
+- Extracted common js-data repo utility scripts into js-data-repo-tools
+
 ##### 3.0.0-alpha.7 - 03 March 2016
 
 ###### Backwards compatible API changes
