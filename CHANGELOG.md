@@ -1,3 +1,9 @@
+##### 3.0.0-alpha.11 - 06 March 2016
+
+###### Backwards compatible bug fixes
+- create() now makes us of withoutRelations()
+- More use of Adapter#respond() more consistent
+
 ##### 3.0.0-alpha.10 - 06 March 2016
 
 ###### Backwards compatible API changes

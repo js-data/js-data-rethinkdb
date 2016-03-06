@@ -464,7 +464,8 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
       props = isUndefined(_props) ? props : _props
       const insertOpts = self.getOpt('insertOpts', opts)
       insertOpts.returnChanges = true
-      return self.selectTable(mapper, opts).insert(props, insertOpts).run(self.getOpt('runOpts', opts))
+      _props = withoutRelations(mapper, props)
+      return self.selectTable(mapper, opts).insert(_props, insertOpts).run(self.getOpt('runOpts', opts))
     }).then(function (cursor) {
       self._handleErrors(cursor)
       let record
@@ -525,15 +526,15 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
           return change.new_val
         })
       }
-      let result = new Response(records, cursor, 'createMany')
-      result.created = records.length
-      result = self.getOpt('raw', opts) ? result : result.data
+      let response = new Response(records, cursor, 'createMany')
+      response.created = records.length
+      response = self.respond(response, opts)
 
       // afterCreateMany lifecycle hook
       op = opts.op = 'afterCreateMany'
-      return resolve(self[op](mapper, props, opts, result)).then(function (_result) {
+      return resolve(self[op](mapper, props, opts, response)).then(function (_response) {
         // Allow for re-assignment from lifecycle hook
-        return isUndefined(_result) ? result : _result
+        return isUndefined(_response) ? response : _response
       })
     })
   },
@@ -566,14 +567,14 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
       self.dbg(op, id, opts)
       return self.selectTable(mapper, opts).get(id).delete(self.getOpt('deleteOpts', opts)).run(self.getOpt('runOpts', opts))
     }).then(function (cursor) {
-      let result = new Response(undefined, cursor, 'destroy')
-      result = self.getOpt('raw', opts) ? result : undefined
+      let response = new Response(undefined, cursor, 'destroy')
+      response = self.respond(response, opts)
 
       // afterDestroy lifecycle hook
       op = opts.op = 'afterDestroy'
-      return resolve(self[op](mapper, id, opts, result)).then(function (_result) {
+      return resolve(self[op](mapper, id, opts, response)).then(function (_response) {
         // Allow for re-assignment from lifecycle hook
-        return isUndefined(_result) ? result : _result
+        return isUndefined(_response) ? response : _response
       })
     })
   },
@@ -618,14 +619,14 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
         .delete(self.getOpt('deleteOpts', opts))
         .run(self.getOpt('runOpts', opts))
     }).then(function (cursor) {
-      let result = new Response(undefined, cursor, 'destroyAll')
-      result = self.getOpt('raw', opts) ? result : undefined
+      let response = new Response(undefined, cursor, 'destroyAll')
+      response = self.respond(response, opts)
 
       // afterDestroyAll lifecycle hook
       op = opts.op = 'afterDestroyAll'
-      return resolve(self[op](mapper, query, opts, result)).then(function (_result) {
+      return resolve(self[op](mapper, query, opts, response)).then(function (_response) {
         // Allow for re-assignment from lifecycle hook
-        return isUndefined(_result) ? result : _result
+        return isUndefined(_response) ? response : _response
       })
     })
   },
@@ -726,15 +727,15 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
 
       return Promise.all(tasks)
     }).then(function () {
-      let result = new Response(record, {}, 'find')
-      result.found = record ? 1 : 0
-      result = self.getOpt('raw', opts) ? result : result.data
+      let response = new Response(record, {}, 'find')
+      response.found = record ? 1 : 0
+      response = self.respond(response, opts)
 
       // afterFind lifecycle hook
       op = opts.op = 'afterFind'
-      return resolve(self[op](mapper, id, opts, result)).then(function (_result) {
+      return resolve(self[op](mapper, id, opts, response)).then(function (_response) {
         // Allow for re-assignment from lifecycle hook
-        return isUndefined(_result) ? result : _result
+        return isUndefined(_response) ? response : _response
       })
     })
   },
@@ -866,15 +867,15 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
       return Promise.all(tasks)
     }).then(function () {
       records || (records = [])
-      let result = new Response(records, {}, 'findAll')
-      result.found = records.length
-      result = self.getOpt('raw', opts) ? result : result.data
+      let response = new Response(records, {}, 'findAll')
+      response.found = records.length
+      response = self.respond(response, opts)
 
       // afterFindAll lifecycle hook
       op = opts.op = 'afterFindAll'
-      return resolve(self[op](mapper, query, opts, result)).then(function (_result) {
+      return resolve(self[op](mapper, query, opts, response)).then(function (_response) {
         // Allow for re-assignment from lifecycle hook
-        return isUndefined(_result) ? result : _result
+        return isUndefined(_response) ? response : _response
       })
     })
   },
@@ -937,15 +938,15 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
       } else {
         throw new Error('Not Found')
       }
-      let result = new Response(record, cursor, 'update')
-      result.updated = 1
-      result = self.getOpt('raw', opts) ? result : result.data
+      let response = new Response(record, cursor, 'update')
+      response.updated = 1
+      response = self.respond(response, opts)
 
       // afterUpdate lifecycle hook
       op = opts.op = 'afterUpdate'
-      return resolve(self[op](mapper, id, props, opts, result)).then(function (_result) {
+      return resolve(self[op](mapper, id, props, opts, response)).then(function (_response) {
         // Allow for re-assignment from lifecycle hook
-        return isUndefined(_result) ? result : _result
+        return isUndefined(_response) ? response : _response
       })
     })
   },
@@ -996,15 +997,15 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
       if (cursor && cursor.changes && cursor.changes.length) {
         records = cursor.changes.map(function (change) { return change.new_val })
       }
-      let result = new Response(records, cursor, 'update')
-      result.updated = records.length
-      result = self.getOpt('raw', opts) ? result : result.data
+      let response = new Response(records, cursor, 'update')
+      response.updated = records.length
+      response = self.respond(response, opts)
 
       // afterUpdateAll lifecycle hook
       op = opts.op = 'afterUpdateAll'
-      return resolve(self[op](mapper, props, query, opts, result)).then(function (_result) {
+      return resolve(self[op](mapper, props, query, opts, response)).then(function (_response) {
         // Allow for re-assignment from lifecycle hook
-        return isUndefined(_result) ? result : _result
+        return isUndefined(_response) ? response : _response
       })
     })
   },
@@ -1054,15 +1055,15 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
       if (cursor && cursor.changes && cursor.changes.length) {
         updatedRecords = cursor.changes.map(function (change) { return change.new_val })
       }
-      let result = new Response(updatedRecords || [], cursor, 'update')
-      result.updated = result.data.length
-      result = self.getOpt('raw', opts) ? result : result.data
+      let response = new Response(updatedRecords || [], cursor, 'update')
+      response.updated = response.data.length
+      response = self.respond(response, opts)
 
       // afterUpdateMany lifecycle hook
       op = opts.op = 'afterUpdateMany'
-      return resolve(self[op](mapper, records, opts, result)).then(function (_result) {
+      return resolve(self[op](mapper, records, opts, response)).then(function (_response) {
         // Allow for re-assignment from lifecycle hook
-        return isUndefined(_result) ? result : _result
+        return isUndefined(_response) ? response : _response
       })
     })
   },
