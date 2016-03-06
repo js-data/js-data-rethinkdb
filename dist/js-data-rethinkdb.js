@@ -723,7 +723,7 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
         } else if (def.type === 'hasMany' && def.foreignKeys) {
           task = self.findAll(relatedMapper, {
             where: babelHelpers.defineProperty({}, def.foreignKeys, {
-              'contains': get(record, mapper.idAttribute)
+              'contains': self.makeHasManyForeignKeys(mapper, def, record)
             })
           }, __opts).then(function (relatedItems) {
             def.setLocalField(record, relatedItems);
@@ -852,7 +852,7 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
           task = self.findAll(relatedMapper, {
             where: babelHelpers.defineProperty({}, def.foreignKeys, {
               'isectNotEmpty': records.map(function (record) {
-                return get(record, idAttribute);
+                return self.makeHasManyForeignKeys(mapper, def, record);
               })
             })
           }, __opts).then(function (relatedItems) {

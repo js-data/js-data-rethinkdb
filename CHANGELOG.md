@@ -1,3 +1,8 @@
+##### 3.0.0-alpha.10 - 06 March 2016
+
+###### Backwards compatible API changes
+- Now making use of makeHasManyForeignKeys
+
 ##### 3.0.0-alpha.9 - 06 March 2016
 
 ###### Other

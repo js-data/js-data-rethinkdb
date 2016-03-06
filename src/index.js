@@ -710,7 +710,7 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
           task = self.findAll(relatedMapper, {
             where: {
               [def.foreignKeys]: {
-                'contains': get(record, mapper.idAttribute)
+                'contains': self.makeHasManyForeignKeys(mapper, def, record)
               }
             }
           }, __opts).then(function (relatedItems) {
@@ -838,7 +838,7 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
             where: {
               [def.foreignKeys]: {
                 'isectNotEmpty': records.map(function (record) {
-                  return get(record, idAttribute)
+                  return self.makeHasManyForeignKeys(mapper, def, record)
                 })
               }
             }
