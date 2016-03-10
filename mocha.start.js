@@ -20,16 +20,10 @@ JSDataAdapterTests.init({
     max: 5,
     bufferSize: 5
   },
-  storeConfig: {
-    bypassCache: true,
-    linkRelations: false,
-    cacheResponse: false,
-    log: false,
-    debug: false
-  },
-  features: [
-    'findHasManyLocalKeys',
-    'findHasManyForeignKeys'
+  // js-data-rethinkdb does NOT support these features
+  xfeatures: [
+    'findAllLikeOp',
+    'filterOnRelations'
   ]
 })
 

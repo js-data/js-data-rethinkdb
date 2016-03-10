@@ -33,7 +33,7 @@
     ]
   },
   "scripts": {
-    "lint": "repo-tools lint src/index.js mocha.start.js test/**/*.js scripts/**.js",
+    "lint": "repo-tools lint src/index.js mocha.start.js test/**/*.js scripts/**.js rollup.config.js",
     "bundle": "rollup -c rollup.config.js -f cjs -o dist/js-data-rethinkdb.js -m dist/js-data-rethinkdb.js.map src/index.js",
     "doc": "jsdoc -c conf.json src node_modules/js-data-adapter/src && node scripts/cleanup.js",
     "watch": "watch \"npm run bundle\" src/",
@@ -43,10 +43,10 @@
     "test": "npm run build && npm run cover",
     "repo-tools": "repo-tools updates && repo-tools changelog && repo-tools authors",
     "release": "npm test && npm run doc && npm run repo-tools",
-    "ci": "npm run test && cat coverage/lcov.info | coveralls || true && cat ./coverage/lcov.info | codacy-coverage || true"
+    "ci": "npm run test && cat coverage/lcov.info | coveralls || true"
   },
   "dependencies": {
-    "js-data-adapter": "0.1.2",
+    "js-data-adapter": "0.2.0",
     "mout": "0.12.0"
   },
   "peerDependencies": {
@@ -54,15 +54,14 @@
     "rethinkdbdash": ">=1.15.0"
   },
   "devDependencies": {
-    "babel-core": "6.6.5",
+    "babel-core": "6.7.0",
     "babel-polyfill": "6.6.1",
     "babel-preset-es2015-rollup": "1.1.1",
     "chai": "3.5.0",
-    "codacy-coverage": "1.1.3",
     "coveralls": "2.11.8",
     "ink-docstrap": "1.1.4",
     "istanbul": "0.4.2",
-    "js-data-adapter-tests": "^2.0.0-alpha.13",
+    "js-data-adapter-tests": "^2.0.0-alpha.14",
     "js-data-repo-tools": "0.2.0",
     "jsdoc": "3.4.0",
     "mocha": "2.4.5",
