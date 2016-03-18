@@ -6,21 +6,8 @@ import {
 import rethinkdbdash from 'rethinkdbdash'
 import underscore from 'mout/string/underscore'
 
-const {
-  addHiddenPropsToTarget,
-  classCallCheck,
-  extend,
-  fillIn,
-  forOwn,
-  isObject,
-  isString,
-  isUndefined,
-  omit,
-  plainCopy
-} = utils
-
 const withoutRelations = function (mapper, props) {
-  return omit(props, mapper.relationFields || [])
+  return utils.omit(props, mapper.relationFields || [])
 }
 
 const __super__ = Adapter.prototype
@@ -199,9 +186,9 @@ const OPERATORS = {
  */
 function RethinkDBAdapter (opts) {
   const self = this
-  classCallCheck(self, RethinkDBAdapter)
+  utils.classCallCheck(self, RethinkDBAdapter)
   opts || (opts = {})
-  fillIn(opts, DEFAULTS)
+  utils.fillIn(opts, DEFAULTS)
   Adapter.call(self, opts)
 
   /**
@@ -212,7 +199,7 @@ function RethinkDBAdapter (opts) {
    * @default {}
    */
   self.insertOpts || (self.insertOpts = {})
-  fillIn(self.insertOpts, INSERT_OPTS_DEFAULTS)
+  utils.fillIn(self.insertOpts, INSERT_OPTS_DEFAULTS)
 
   /**
    * Default options to pass to r#update.
@@ -222,7 +209,7 @@ function RethinkDBAdapter (opts) {
    * @default {}
    */
   self.updateOpts || (self.updateOpts = {})
-  fillIn(self.updateOpts, UPDATE_OPTS_DEFAULTS)
+  utils.fillIn(self.updateOpts, UPDATE_OPTS_DEFAULTS)
 
   /**
    * Default options to pass to r#delete.
@@ -232,7 +219,7 @@ function RethinkDBAdapter (opts) {
    * @default {}
    */
   self.deleteOpts || (self.deleteOpts = {})
-  fillIn(self.deleteOpts, DELETE_OPTS_DEFAULTS)
+  utils.fillIn(self.deleteOpts, DELETE_OPTS_DEFAULTS)
 
   /**
    * Default options to pass to r#run.
@@ -242,7 +229,7 @@ function RethinkDBAdapter (opts) {
    * @default {}
    */
   self.runOpts || (self.runOpts = {})
-  fillIn(self.runOpts, RUN_OPTS_DEFAULTS)
+  utils.fillIn(self.runOpts, RUN_OPTS_DEFAULTS)
 
   /**
    * Override the default predicate functions for specified operators.
@@ -292,11 +279,11 @@ Object.defineProperty(RethinkDBAdapter, '__super__', {
  * properties to the RethinkDBAdapter itself.
  * @return {Object} RethinkDBAdapter of `RethinkDBAdapter`.
  */
-RethinkDBAdapter.extend = extend
+RethinkDBAdapter.extend = utils.extend
 
 RethinkDBAdapter.OPERATORS = OPERATORS
 
-addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
+utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
   _handleErrors (cursor) {
     if (cursor && cursor.errors > 0) {
       if (cursor.first_error) {
@@ -304,6 +291,18 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
       }
       throw new Error('Unknown RethinkDB Error')
     }
+  },
+
+  _count (mapper, query, opts) {
+    const self = this
+    opts || (opts = {})
+    query || (query = {})
+
+    return self.filterSequence(self.selectTable(mapper, opts), query)
+      .count()
+      .run(self.getOpt('runOpts', opts)).then(function (count) {
+        return [count, {}]
+      })
   },
 
   _create (mapper, props, opts) {
@@ -397,6 +396,21 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
       })
   },
 
+  _sum (mapper, field, query, opts) {
+    const self = this
+    if (!utils.isString(field)) {
+      throw new Error('field must be a string!')
+    }
+    opts || (opts = {})
+    query || (query = {})
+
+    return self.filterSequence(self.selectTable(mapper, opts), query)
+      .sum(field)
+      .run(self.getOpt('runOpts', opts)).then(function (sum) {
+        return [sum, {}]
+      })
+  },
+
   _update (mapper, id, props, opts) {
     const self = this
     props || (props = {})
@@ -463,7 +477,7 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
   },
 
   selectDb (opts) {
-    return this.r.db(isUndefined(opts.db) ? this.db : opts.db)
+    return this.r.db(utils.isUndefined(opts.db) ? this.db : opts.db)
   },
 
   selectTable (mapper, opts) {
@@ -491,7 +505,7 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
     const self = this
     const r = self.r
 
-    query = plainCopy(query || {})
+    query = utils.plainCopy(query || {})
     opts || (opts = {})
     opts.operators || (opts.operators = {})
     query.where || (query.where = {})
@@ -500,9 +514,9 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
     query.skip || (query.skip = query.offset)
 
     // Transform non-keyword properties to "where" clause configuration
-    forOwn(query, function (config, keyword) {
+    utils.forOwn(query, function (config, keyword) {
       if (reserved.indexOf(keyword) === -1) {
-        if (isObject(config)) {
+        if (utils.isObject(config)) {
           query.where[keyword] = config
         } else {
           query.where[keyword] = {
@@ -521,12 +535,12 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
       rql = rql.filter(function (row) {
         let subQuery
         // Apply filter for each field
-        forOwn(query.where, function (criteria, field) {
-          if (!isObject(criteria)) {
+        utils.forOwn(query.where, function (criteria, field) {
+          if (!utils.isObject(criteria)) {
             criteria = { '==': criteria }
           }
           // Apply filter for each operator
-          forOwn(criteria, function (value, operator) {
+          utils.forOwn(criteria, function (value, operator) {
             let isOr = false
             if (operator && operator[0] === '|') {
               operator = operator.substr(1)
@@ -551,13 +565,13 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
 
     // Sort
     if (query.orderBy) {
-      if (isString(query.orderBy)) {
+      if (utils.isString(query.orderBy)) {
         query.orderBy = [
           [query.orderBy, 'asc']
         ]
       }
       for (var i = 0; i < query.orderBy.length; i++) {
-        if (isString(query.orderBy[i])) {
+        if (utils.isString(query.orderBy[i])) {
           query.orderBy[i] = [query.orderBy[i], 'asc']
         }
         rql = (query.orderBy[i][1] || '').toUpperCase() === 'DESC' ? rql.orderBy(r.desc(query.orderBy[i][0])) : rql.orderBy(query.orderBy[i][0])
@@ -580,7 +594,7 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
   waitForDb (opts) {
     const self = this
     opts || (opts = {})
-    const db = isUndefined(opts.db) ? self.db : opts.db
+    const db = utils.isUndefined(opts.db) ? self.db : opts.db
     if (!self.databases[db]) {
       self.databases[db] = self.r.branch(
         self.r.dbList().contains(db),
@@ -592,9 +606,9 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
   },
 
   waitForTable (mapper, options) {
-    const table = isString(mapper) ? mapper : (mapper.table || underscore(mapper.name))
+    const table = utils.isString(mapper) ? mapper : (mapper.table || underscore(mapper.name))
     options = options || {}
-    let db = isUndefined(options.db) ? this.db : options.db
+    let db = utils.isUndefined(options.db) ? this.db : options.db
     return this.waitForDb(options).then(() => {
       this.tables[db] = this.tables[db] || {}
       if (!this.tables[db][table]) {
@@ -606,7 +620,7 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
 
   waitForIndex (table, index, options) {
     options = options || {}
-    let db = isUndefined(options.db) ? this.db : options.db
+    let db = utils.isUndefined(options.db) ? this.db : options.db
     return this.waitForDb(options).then(() => this.waitForTable(table, options)).then(() => {
       this.indices[db] = this.indices[db] || {}
       this.indices[db][table] = this.indices[db][table] || {}
@@ -616,6 +630,37 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
         })
       }
       return this.tables[db][table][index]
+    })
+  },
+
+  /**
+   * Return the number of records that match the selection query.
+   *
+   * @name RethinkDBAdapter#count
+   * @method
+   * @param {Object} mapper the mapper.
+   * @param {Object} [query] Selection query.
+   * @param {Object} [query.where] Filtering criteria.
+   * @param {string|Array} [query.orderBy] Sorting criteria.
+   * @param {string|Array} [query.sort] Same as `query.sort`.
+   * @param {number} [query.limit] Limit results.
+   * @param {number} [query.skip] Offset results.
+   * @param {number} [query.offset] Same as `query.skip`.
+   * @param {Object} [opts] Configuration options.
+   * @param {Object} [opts.operators] Override the default predicate functions
+   * for specified operators.
+   * @param {boolean} [opts.raw=false] Whether to return a more detailed
+   * response object.
+   * @param {Object} [opts.runOpts] Options to pass to r#run.
+   * @return {Promise}
+   */
+  count (mapper, query, opts) {
+    const self = this
+    opts || (opts = {})
+    query || (query = {})
+
+    return self.waitForTable(mapper, opts).then(function () {
+      return __super__.count.call(self, mapper, query, opts)
     })
   },
 
@@ -829,7 +874,40 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
     opts || (opts = {})
     opts.operators || (opts.operators = {})
     let ownOps = this.operators || {}
-    return isUndefined(opts.operators[operator]) ? ownOps[operator] || OPERATORS[operator] : opts.operators[operator]
+    return utils.isUndefined(opts.operators[operator]) ? ownOps[operator] || OPERATORS[operator] : opts.operators[operator]
+  },
+
+  /**
+   * Return the sum of the specified field of records that match the selection
+   * query.
+   *
+   * @name RethinkDBAdapter#sum
+   * @method
+   * @param {Object} mapper The mapper.
+   * @param {string} field The field to sum.
+   * @param {Object} [query] Selection query.
+   * @param {Object} [query.where] Filtering criteria.
+   * @param {string|Array} [query.orderBy] Sorting criteria.
+   * @param {string|Array} [query.sort] Same as `query.sort`.
+   * @param {number} [query.limit] Limit results.
+   * @param {number} [query.skip] Offset results.
+   * @param {number} [query.offset] Same as `query.skip`.
+   * @param {Object} [opts] Configuration options.
+   * @param {Object} [opts.operators] Override the default predicate functions
+   * for specified operators.
+   * @param {boolean} [opts.raw=false] Whether to return a more detailed
+   * response object.
+   * @param {Object} [opts.runOpts] Options to pass to r#run.
+   * @return {Promise}
+   */
+  sum (mapper, field, query, opts) {
+    const self = this
+    opts || (opts = {})
+    query || (query = {})
+
+    return self.waitForTable(mapper, opts).then(function () {
+      return __super__.sum.call(self, mapper, field, query, opts)
+    })
   },
 
   /**

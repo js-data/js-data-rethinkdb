@@ -1,3 +1,8 @@
+##### 3.0.0-alpha.13 - 17 March 2016
+
+###### Backwards incompatible API changes
+- Added sum and count methods
+
 ##### 3.0.0-alpha.12 - 10 March 2016
 
 ###### Other

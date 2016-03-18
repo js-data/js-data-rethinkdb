@@ -8,20 +8,8 @@ var Adapter__default = _interopDefault(Adapter);
 var rethinkdbdash = _interopDefault(require('rethinkdbdash'));
 var underscore = _interopDefault(require('mout/string/underscore'));
 
-var addHiddenPropsToTarget = jsData.utils.addHiddenPropsToTarget;
-var classCallCheck = jsData.utils.classCallCheck;
-var extend = jsData.utils.extend;
-var fillIn = jsData.utils.fillIn;
-var forOwn = jsData.utils.forOwn;
-var isObject = jsData.utils.isObject;
-var isString = jsData.utils.isString;
-var isUndefined = jsData.utils.isUndefined;
-var omit = jsData.utils.omit;
-var plainCopy = jsData.utils.plainCopy;
-
-
 var withoutRelations = function withoutRelations(mapper, props) {
-  return omit(props, mapper.relationFields || []);
+  return jsData.utils.omit(props, mapper.relationFields || []);
 };
 
 var __super__ = Adapter__default.prototype;
@@ -200,9 +188,9 @@ var OPERATORS = {
  */
 function RethinkDBAdapter(opts) {
   var self = this;
-  classCallCheck(self, RethinkDBAdapter);
+  jsData.utils.classCallCheck(self, RethinkDBAdapter);
   opts || (opts = {});
-  fillIn(opts, DEFAULTS);
+  jsData.utils.fillIn(opts, DEFAULTS);
   Adapter__default.call(self, opts);
 
   /**
@@ -213,7 +201,7 @@ function RethinkDBAdapter(opts) {
    * @default {}
    */
   self.insertOpts || (self.insertOpts = {});
-  fillIn(self.insertOpts, INSERT_OPTS_DEFAULTS);
+  jsData.utils.fillIn(self.insertOpts, INSERT_OPTS_DEFAULTS);
 
   /**
    * Default options to pass to r#update.
@@ -223,7 +211,7 @@ function RethinkDBAdapter(opts) {
    * @default {}
    */
   self.updateOpts || (self.updateOpts = {});
-  fillIn(self.updateOpts, UPDATE_OPTS_DEFAULTS);
+  jsData.utils.fillIn(self.updateOpts, UPDATE_OPTS_DEFAULTS);
 
   /**
    * Default options to pass to r#delete.
@@ -233,7 +221,7 @@ function RethinkDBAdapter(opts) {
    * @default {}
    */
   self.deleteOpts || (self.deleteOpts = {});
-  fillIn(self.deleteOpts, DELETE_OPTS_DEFAULTS);
+  jsData.utils.fillIn(self.deleteOpts, DELETE_OPTS_DEFAULTS);
 
   /**
    * Default options to pass to r#run.
@@ -243,7 +231,7 @@ function RethinkDBAdapter(opts) {
    * @default {}
    */
   self.runOpts || (self.runOpts = {});
-  fillIn(self.runOpts, RUN_OPTS_DEFAULTS);
+  jsData.utils.fillIn(self.runOpts, RUN_OPTS_DEFAULTS);
 
   /**
    * Override the default predicate functions for specified operators.
@@ -293,11 +281,11 @@ Object.defineProperty(RethinkDBAdapter, '__super__', {
  * properties to the RethinkDBAdapter itself.
  * @return {Object} RethinkDBAdapter of `RethinkDBAdapter`.
  */
-RethinkDBAdapter.extend = extend;
+RethinkDBAdapter.extend = jsData.utils.extend;
 
 RethinkDBAdapter.OPERATORS = OPERATORS;
 
-addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
+jsData.utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
   _handleErrors: function _handleErrors(cursor) {
     if (cursor && cursor.errors > 0) {
       if (cursor.first_error) {
@@ -305,6 +293,15 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
       }
       throw new Error('Unknown RethinkDB Error');
     }
+  },
+  _count: function _count(mapper, query, opts) {
+    var self = this;
+    opts || (opts = {});
+    query || (query = {});
+
+    return self.filterSequence(self.selectTable(mapper, opts), query).count().run(self.getOpt('runOpts', opts)).then(function (count) {
+      return [count, {}];
+    });
   },
   _create: function _create(mapper, props, opts) {
     var self = this;
@@ -378,6 +375,18 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
       return [records, {}];
     });
   },
+  _sum: function _sum(mapper, field, query, opts) {
+    var self = this;
+    if (!jsData.utils.isString(field)) {
+      throw new Error('field must be a string!');
+    }
+    opts || (opts = {});
+    query || (query = {});
+
+    return self.filterSequence(self.selectTable(mapper, opts), query).sum(field).run(self.getOpt('runOpts', opts)).then(function (sum) {
+      return [sum, {}];
+    });
+  },
   _update: function _update(mapper, id, props, opts) {
     var self = this;
     props || (props = {});
@@ -438,7 +447,7 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
     });
   },
   selectDb: function selectDb(opts) {
-    return this.r.db(isUndefined(opts.db) ? this.db : opts.db);
+    return this.r.db(jsData.utils.isUndefined(opts.db) ? this.db : opts.db);
   },
   selectTable: function selectTable(mapper, opts) {
     return this.selectDb(opts).table(mapper.table || underscore(mapper.name));
@@ -466,7 +475,7 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
     var self = this;
     var r = self.r;
 
-    query = plainCopy(query || {});
+    query = jsData.utils.plainCopy(query || {});
     opts || (opts = {});
     opts.operators || (opts.operators = {});
     query.where || (query.where = {});
@@ -475,9 +484,9 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
     query.skip || (query.skip = query.offset);
 
     // Transform non-keyword properties to "where" clause configuration
-    forOwn(query, function (config, keyword) {
+    jsData.utils.forOwn(query, function (config, keyword) {
       if (Adapter.reserved.indexOf(keyword) === -1) {
-        if (isObject(config)) {
+        if (jsData.utils.isObject(config)) {
           query.where[keyword] = config;
         } else {
           query.where[keyword] = {
@@ -496,12 +505,12 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
       rql = rql.filter(function (row) {
         var subQuery = void 0;
         // Apply filter for each field
-        forOwn(query.where, function (criteria, field) {
-          if (!isObject(criteria)) {
+        jsData.utils.forOwn(query.where, function (criteria, field) {
+          if (!jsData.utils.isObject(criteria)) {
             criteria = { '==': criteria };
           }
           // Apply filter for each operator
-          forOwn(criteria, function (value, operator) {
+          jsData.utils.forOwn(criteria, function (value, operator) {
             var isOr = false;
             if (operator && operator[0] === '|') {
               operator = operator.substr(1);
@@ -526,11 +535,11 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
 
     // Sort
     if (query.orderBy) {
-      if (isString(query.orderBy)) {
+      if (jsData.utils.isString(query.orderBy)) {
         query.orderBy = [[query.orderBy, 'asc']];
       }
       for (var i = 0; i < query.orderBy.length; i++) {
-        if (isString(query.orderBy[i])) {
+        if (jsData.utils.isString(query.orderBy[i])) {
           query.orderBy[i] = [query.orderBy[i], 'asc'];
         }
         rql = (query.orderBy[i][1] || '').toUpperCase() === 'DESC' ? rql.orderBy(r.desc(query.orderBy[i][0])) : rql.orderBy(query.orderBy[i][0]);
@@ -552,7 +561,7 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
   waitForDb: function waitForDb(opts) {
     var self = this;
     opts || (opts = {});
-    var db = isUndefined(opts.db) ? self.db : opts.db;
+    var db = jsData.utils.isUndefined(opts.db) ? self.db : opts.db;
     if (!self.databases[db]) {
       self.databases[db] = self.r.branch(self.r.dbList().contains(db), true, self.r.dbCreate(db)).run();
     }
@@ -561,9 +570,9 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
   waitForTable: function waitForTable(mapper, options) {
     var _this = this;
 
-    var table = isString(mapper) ? mapper : mapper.table || underscore(mapper.name);
+    var table = jsData.utils.isString(mapper) ? mapper : mapper.table || underscore(mapper.name);
     options = options || {};
-    var db = isUndefined(options.db) ? this.db : options.db;
+    var db = jsData.utils.isUndefined(options.db) ? this.db : options.db;
     return this.waitForDb(options).then(function () {
       _this.tables[db] = _this.tables[db] || {};
       if (!_this.tables[db][table]) {
@@ -576,7 +585,7 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
     var _this2 = this;
 
     options = options || {};
-    var db = isUndefined(options.db) ? this.db : options.db;
+    var db = jsData.utils.isUndefined(options.db) ? this.db : options.db;
     return this.waitForDb(options).then(function () {
       return _this2.waitForTable(table, options);
     }).then(function () {
@@ -588,6 +597,38 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
         });
       }
       return _this2.tables[db][table][index];
+    });
+  },
+
+
+  /**
+   * Return the number of records that match the selection query.
+   *
+   * @name RethinkDBAdapter#count
+   * @method
+   * @param {Object} mapper the mapper.
+   * @param {Object} [query] Selection query.
+   * @param {Object} [query.where] Filtering criteria.
+   * @param {string|Array} [query.orderBy] Sorting criteria.
+   * @param {string|Array} [query.sort] Same as `query.sort`.
+   * @param {number} [query.limit] Limit results.
+   * @param {number} [query.skip] Offset results.
+   * @param {number} [query.offset] Same as `query.skip`.
+   * @param {Object} [opts] Configuration options.
+   * @param {Object} [opts.operators] Override the default predicate functions
+   * for specified operators.
+   * @param {boolean} [opts.raw=false] Whether to return a more detailed
+   * response object.
+   * @param {Object} [opts.runOpts] Options to pass to r#run.
+   * @return {Promise}
+   */
+  count: function count(mapper, query, opts) {
+    var self = this;
+    opts || (opts = {});
+    query || (query = {});
+
+    return self.waitForTable(mapper, opts).then(function () {
+      return __super__.count.call(self, mapper, query, opts);
     });
   },
 
@@ -808,7 +849,41 @@ addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
     opts || (opts = {});
     opts.operators || (opts.operators = {});
     var ownOps = this.operators || {};
-    return isUndefined(opts.operators[operator]) ? ownOps[operator] || OPERATORS[operator] : opts.operators[operator];
+    return jsData.utils.isUndefined(opts.operators[operator]) ? ownOps[operator] || OPERATORS[operator] : opts.operators[operator];
+  },
+
+
+  /**
+   * Return the sum of the specified field of records that match the selection
+   * query.
+   *
+   * @name RethinkDBAdapter#sum
+   * @method
+   * @param {Object} mapper The mapper.
+   * @param {string} field The field to sum.
+   * @param {Object} [query] Selection query.
+   * @param {Object} [query.where] Filtering criteria.
+   * @param {string|Array} [query.orderBy] Sorting criteria.
+   * @param {string|Array} [query.sort] Same as `query.sort`.
+   * @param {number} [query.limit] Limit results.
+   * @param {number} [query.skip] Offset results.
+   * @param {number} [query.offset] Same as `query.skip`.
+   * @param {Object} [opts] Configuration options.
+   * @param {Object} [opts.operators] Override the default predicate functions
+   * for specified operators.
+   * @param {boolean} [opts.raw=false] Whether to return a more detailed
+   * response object.
+   * @param {Object} [opts.runOpts] Options to pass to r#run.
+   * @return {Promise}
+   */
+  sum: function sum(mapper, field, query, opts) {
+    var self = this;
+    opts || (opts = {});
+    query || (query = {});
+
+    return self.waitForTable(mapper, opts).then(function () {
+      return __super__.sum.call(self, mapper, field, query, opts);
+    });
   },
 
 
