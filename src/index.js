@@ -281,6 +281,22 @@ Object.defineProperty(RethinkDBAdapter, '__super__', {
  */
 RethinkDBAdapter.extend = utils.extend
 
+/**
+ * Details of the current version of the `js-data-rethinkdb` module.
+ *
+ * @name RethinkDBAdapter.version
+ * @type {Object}
+ * @property {string} full The full semver value.
+ * @property {number} major The major version number.
+ * @property {number} minor The minor version number.
+ * @property {number} patch The patch version number.
+ * @property {(string|boolean)} alpha The alpha version value, otherwise `false`
+ * if the current version is not alpha.
+ * @property {(string|boolean)} beta The beta version value, otherwise `false`
+ * if the current version is not beta.
+ */
+RethinkDBAdapter.version = '<%= version %>'
+
 RethinkDBAdapter.OPERATORS = OPERATORS
 
 utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {

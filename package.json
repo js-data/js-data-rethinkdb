@@ -1,7 +1,7 @@
 {
   "name": "js-data-rethinkdb",
   "description": "RethinkDB adapter for js-data.",
-  "version": "3.0.0-alpha.13",
+  "version": "3.0.0-beta.1",
   "homepage": "https://github.com/js-data/js-data-rethinkdb",
   "repository": {
     "type": "git",
@@ -34,7 +34,7 @@
   },
   "scripts": {
     "lint": "repo-tools lint src/index.js mocha.start.js test/**/*.js scripts/**.js rollup.config.js",
-    "bundle": "rollup -c rollup.config.js -f cjs -o dist/js-data-rethinkdb.js -m dist/js-data-rethinkdb.js.map src/index.js",
+    "bundle": "rollup -c rollup.config.js -f cjs -o dist/js-data-rethinkdb.js -m dist/js-data-rethinkdb.js.map src/index.js && repo-tools write-version dist/js-data-rethinkdb.js",
     "doc": "jsdoc -c conf.json src node_modules/js-data-adapter/src && node scripts/cleanup.js",
     "watch": "watch \"npm run bundle\" src/",
     "build": "npm run lint && npm run bundle",
@@ -43,29 +43,28 @@
     "test": "npm run build && npm run cover",
     "repo-tools": "repo-tools updates && repo-tools changelog && repo-tools authors",
     "release": "npm test && npm run doc && npm run repo-tools",
-    "ci": "npm run test && cat coverage/lcov.info | coveralls || true"
+    "ci": "npm run test && cat coverage/lcov.info | codecov || true"
   },
   "dependencies": {
-    "js-data-adapter": "0.2.3",
-    "mout": "0.12.0"
+    "js-data-adapter": "~0.3.0",
+    "mout": "1.0.0"
   },
   "peerDependencies": {
-    "js-data": "^3.0.0-alpha.19",
+    "js-data": "^3.0.0-beta.1",
     "rethinkdbdash": ">=1.15.0"
   },
   "devDependencies": {
-    "babel-core": "6.7.2",
-    "babel-polyfill": "6.7.2",
+    "babel-core": "6.7.6",
+    "babel-polyfill": "6.7.4",
     "babel-preset-es2015-rollup": "1.1.1",
     "chai": "3.5.0",
-    "coveralls": "2.11.8",
     "ink-docstrap": "1.1.4",
-    "istanbul": "0.4.2",
+    "istanbul": "0.4.3",
     "js-data-adapter-tests": "^2.0.0-alpha.15",
-    "js-data-repo-tools": "0.2.0",
+    "js-data-repo-tools": "0.3.0",
     "jsdoc": "3.4.0",
     "mocha": "2.4.5",
-    "rollup": "0.25.4",
+    "rollup": "0.25.8",
     "rollup-plugin-babel": "2.4.0",
     "sinon": "1.17.3",
     "source-map-support": "0.4.0",
