@@ -11,72 +11,16 @@
 
 RethinkDB adapter for [js-data](http://www.js-data.io/).
 
-To get started, visit __[http://js-data.io](http://www.js-data.io)__.
+To get started, visit __[http://js-data.io](http://www.js-data.io/v3.0/docs/js-data-rethinkdb)__.
 
-## Table of contents
+## Links
 
-* [Quick start](#quick-start)
-* [Example App](#example-app)
-* [Guides and Tutorials](#guides-and-tutorials)
-* [API Reference Docs](#api-reference-docs)
-* [Community](#community)
-* [Support](#support)
-* [Contributing](#contributing)
-* [License](#license)
-
-## Quick Start
-`npm install --save js-data js-data-rethinkdb rethinkdbdash`.
-
-```js
-// Use Container instead of DataStore on the server
-import {Container} from 'js-data'
-import RethinkDBAdapter from 'js-data-rethinkdb'
-
-// Create a store to hold your Mappers
-const store = new Container()
-
-// Create an instance of RethinkDBAdapter with default settings
-const adapter = new RethinkDBAdapter()
-
-// Mappers in "store" will use the RethinkDB adapter by default
-store.registerAdapter('rethinkdb', adapter, { default: true })
-
-// Create a Mapper that maps to a "user" table
-store.defineMapper('user')
-```
-
-```js
-async function findAllAdminUsers () {
-  // Find all users where "user.role" == "admin"
-  return await store.findAll('user', {
-    role: 'admin'
-  })
-}
-```
-
-## Example App
-
-[js-data-examples/server/rethinkdb](https://github.com/js-data/js-data-examples/tree/master/server/rethinkdb)
-
-## Guides and Tutorials
-
-[Get started at http://js-data.io](http://js-data.io)
-
-## API Reference Docs
-
-[Visit http://api.js-data.io](http://api.js-data.io).
-
-## Community
-
-[Explore the Community](http://js-data.io/docs/community).
-
-## Support
-
-[Find out how to Get Support](http://js-data.io/docs/support).
-
-## Contributing
-
-[Read the Contributing Guide](http://js-data.io/docs/contributing).
+* [Quick start](http://www.js-data.io/v3.0/docs/js-data-rethinkdb)
+* [Guides and Tutorials](http://www.js-data.io/v3.0/docs/home)
+* [API Reference Docs](http://api.js-data.io/js-data-rethinkdb)
+* [Community](http://js-data.io/docs/community)
+* [Support](http://js-data.io/docs/support)
+* [Contributing](http://js-data.io/docs/contributing)
 
 ## License
 
@@ -96,7 +40,7 @@ Copyright (c) 2014-2016 js-data-rethinkdb project authors
 [circle_l]: https://circleci.com/gh/js-data/js-data-rethinkdb/tree/master
 [dn_b]: https://img.shields.io/npm/dm/js-data-rethinkdb.svg?style=flat
 [dn_l]: https://www.npmjs.org/package/js-data-rethinkdb
-[cov_b]: https://img.shields.io/coveralls/js-data/js-data-rethinkdb/master.svg?style=flat
-[cov_l]: https://coveralls.io/github/js-data/js-data-rethinkdb?branch=master
+[cov_b]: https://img.shields.io/codecov/c/github/js-data/js-data-rethinkdb/v3.svg?style=flat
+[cov_l]: https://codecov.io/github/js-data/js-data-rethinkdb
 [cod_b]: https://img.shields.io/codacy/69206fcb0df6462ca559610af32fd1fb.svg
 [cod_l]: https://www.codacy.com/app/jasondobry/js-data-rethinkdb/dashboard
