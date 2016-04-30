@@ -3,34 +3,38 @@
 
 // prepare environment for js-data-adapter-tests
 require('babel-polyfill')
-global.assert = require('chai').assert
 
 var JSData = require('js-data')
-var TestRunner = require('js-data-adapter-tests')
-var RethinkDBAdapter = require('./')
+var JSDataAdapterTests = require('js-data-adapter-tests')
+var JSDataRethinkDB = require('./')
+var version = JSDataRethinkDB.version
+var OPERATORS = JSDataRethinkDB.OPERATORS
+var RethinkDBAdapter = JSDataRethinkDB.RethinkDBAdapter
 
-TestRunner.init({
+var assert = global.assert = JSDataAdapterTests.assert
+global.sinon = JSDataAdapterTests.sinon
+
+JSDataAdapterTests.init({
   debug: false,
-  DS: JSData.DS,
+  JSData: JSData,
   Adapter: RethinkDBAdapter,
-  adapterConfig: {},
-  storeConfig: {
-    bypassCache: true,
-    linkRelations: false,
-    cacheResponse: false,
-    log: false,
-    debug: false
+  adapterConfig: {
+    min: 1,
+    max: 5,
+    bufferSize: 5
   },
-  features: [],
-  methods: [
-    'create',
-    'destroy',
-    'destroyAll',
-    'find',
-    'findAll',
-    'update',
-    'updateAll'
+  // js-data-rethinkdb does NOT support these features
+  xfeatures: [
+    'findAllLikeOp',
+    'filterOnRelations'
   ]
 })
 
-// require('./test/find.test')
+require('./test/handleErrors.test')
+
+describe('exports', function () {
+  assert(OPERATORS)
+  assert(OPERATORS['=='])
+  assert(version)
+  assert(version.full)
+})

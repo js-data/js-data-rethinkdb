@@ -1,9 +1,8 @@
-# People who have contributed to the js-data-rethinkdb project.
+# This is the official list of js-data-rethinkdb project contributors.
 #
-# This file is controlled by scripts/authors.js
+# Names are formatted as:
+#   Name <email address>
 #
-# Names should be added to this file as:
-#   [commit count] Name <email address>
-     1	InternalFX <bryan@internalfx.com>
-    39	Jason Dobry <jason.dobry@gmail.com>
-     2	Ollie Relph <ollie@relph.me>
+InternalFX <bryan@internalfx.com>
+Jason Dobry <jason.dobry@gmail.com>
+Ollie Relph <ollie@relph.me>

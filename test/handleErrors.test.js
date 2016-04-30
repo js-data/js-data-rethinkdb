@@ -1,3 +1,4 @@
+'use strict'
 describe('RethinkDBAdapter#handleErrors(err)', function () {
   it('should do nothing when passed a falsy value', function () {
     var Test = this
