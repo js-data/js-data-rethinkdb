@@ -40,6 +40,9 @@
     ],
     "ignore": ["dist/"]
   },
+  "babel": {
+    "presets": ["es2015-rollup"]
+  },
   "scripts": {
     "lint": "repo-tools lint \"**/*.js\"",
     "bundle": "rollup -c rollup.config.js -f cjs -o dist/js-data-rethinkdb.js -m dist/js-data-rethinkdb.js.map src/index.js && repo-tools write-version dist/js-data-rethinkdb.js",
