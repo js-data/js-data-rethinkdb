@@ -1,3 +1,5 @@
+dist/*.js
+dist/*.map
 # Logs
 logs
 *.log

@@ -1,0 +1,8 @@
+{
+  "name": "js-data-rethinkdb",
+  "version": false,
+  "main": "./dist/js-data-rethinkdb.d.ts",
+  "ambientDependencies": {
+    "es6-shim": "registry:dt/es6-shim"
+  }
+}

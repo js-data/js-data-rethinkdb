@@ -23,6 +23,7 @@
     ```
 
 - `OPERATORS` is now an export, not a static property of the `RethinkDBAdapter` class.
+- Moved some `dist` files to `release` to reduce noise
 
 ###### Other
 - Upgraded dependencies
