@@ -406,7 +406,7 @@ jsData.utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
     var updateOpts = self.getOpt('updateOpts', opts);
     updateOpts.returnChanges = true;
 
-    return self.selectTable(mapper, opts).get(id).update(jsDataAdapter.withoutRelations(mapper, props), updateOpts).run(self.getOpt('runOpts', opts)).then(function (cursor) {
+    return self.selectTable(mapper, opts).get(id).update(props, updateOpts).run(self.getOpt('runOpts', opts)).then(function (cursor) {
       var record = void 0;
       self._handleErrors(cursor);
       if (cursor && cursor.changes && cursor.changes.length && cursor.changes[0].new_val) {
@@ -426,7 +426,7 @@ jsData.utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
     var updateOpts = self.getOpt('updateOpts', opts);
     updateOpts.returnChanges = true;
 
-    return self.filterSequence(self.selectTable(mapper, opts), query).update(jsDataAdapter.withoutRelations(mapper, props), updateOpts).run(self.getOpt('runOpts', opts)).then(function (cursor) {
+    return self.filterSequence(self.selectTable(mapper, opts), query).update(props, updateOpts).run(self.getOpt('runOpts', opts)).then(function (cursor) {
       var records = [];
       self._handleErrors(cursor);
       if (cursor && cursor.changes && cursor.changes.length) {
@@ -999,8 +999,8 @@ jsData.utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
  * otherwise `false` if the current version is not beta.
  */
 var version = {
-  beta: 2,
-  full: '3.0.0-beta.2',
+  beta: 3,
+  full: '3.0.0-beta.3',
   major: 3,
   minor: 0,
   patch: 0
