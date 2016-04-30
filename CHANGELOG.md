@@ -1,3 +1,34 @@
+##### 3.0.0-beta.2 - 29 April 2016
+
+###### Breaking changes
+- How you must now import in ES2015:
+
+    ```js
+    import RethinkDBAdapter from 'js-data-rethinkdb'
+    const adapter = new RethinkDBAdapter()
+    ```
+    or
+    ```js
+    import {RethinkDBAdapter, version} from 'js-data-rethinkdb'
+    console.log(version)
+    const adapter = new RethinkDBAdapter()
+    ```
+
+- How you must now import in ES5:
+
+    ```js
+    var JSDataRethinkDB = require('js-data-rethinkdb')
+    var RethinkDBAdapter = JSDataRethinkDB.RethinkDBAdapter
+    var adapter = new RethinkDBAdapter()
+    ```
+
+- `OPERATORS` is now an export, not a static property of the `RethinkDBAdapter` class.
+
+###### Other
+- Upgraded dependencies
+- Improved JSDoc comments
+- Now using js-data JSDoc template
+
 ##### 3.0.0-beta.1 - 17 April 2016
 
 Official v3 beta release

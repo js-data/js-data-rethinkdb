@@ -1,14 +1,11 @@
 import {utils} from 'js-data'
-import Adapter from 'js-data-adapter'
 import {
-  reserved
+  Adapter,
+  reserved,
+  withoutRelations
 } from 'js-data-adapter'
 import rethinkdbdash from 'rethinkdbdash'
 import underscore from 'mout/string/underscore'
-
-const withoutRelations = function (mapper, props) {
-  return utils.omit(props, mapper.relationFields || [])
-}
 
 const __super__ = Adapter.prototype
 
@@ -92,7 +89,7 @@ const notEqual = function (r, row, field, value) {
 /**
  * Default predicate functions for the filtering operators.
  *
- * @name RethinkDBAdapter.OPERATORS
+ * @name module:js-data-rethinkdb.OPERATORS
  * @property {Function} == Equality operator.
  * @property {Function} != Inequality operator.
  * @property {Function} > "Greater than" operator.
@@ -112,7 +109,7 @@ const notEqual = function (r, row, field, value) {
  * @property {Function} notContains Operator to test whether an array does NOT
  * contain the provided value.
  */
-const OPERATORS = {
+export const OPERATORS = {
   '==': equal,
   '===': equal,
   '!=': notEqual,
@@ -149,6 +146,8 @@ const OPERATORS = {
   }
 }
 
+Object.freeze(OPERATORS)
+
 /**
  * RethinkDBAdapter class.
  *
@@ -171,20 +170,23 @@ const OPERATORS = {
  *
  * @class RethinkDBAdapter
  * @extends Adapter
- * @param {Object} [opts] Configuration opts.
- * @param {string} [opts.authKey=""] RethinkDB authorization key.
- * @param {number} [opts.bufferSize=10] Buffer size for connection pool.
+ * @param {Object} [opts] Configuration options.
+ * @param {string} [opts.authKey=""] See {@link RethinkDBAdapter#authKey}.
+ * @param {number} [opts.bufferSize=10] See {@link RethinkDBAdapter#bufferSize}.
  * @param {string} [opts.db="test"] Default database.
- * @param {boolean} [opts.debug=false] Whether to log debugging information.
- * @param {string} [opts.host="localhost"] RethinkDB host.
- * @param {number} [opts.max=50] Maximum connections in pool.
- * @param {number} [opts.min=10] Minimum connections in pool.
- * @param {Object} [opts.operators] Override the default predicate functions for
- * specified operators.
- * @param {number} [opts.port=28015] RethinkDB port.
- * @param {boolean} [opts.raw=false] Whether to return a more detailed response object.
+ * @param {boolean} [opts.debug=false] See {@link Adapter#debug}.
+ * @param {Object} [opts.deleteOpts={}] See {@link RethinkDBAdapter#deleteOpts}.
+ * @param {string} [opts.host="localhost"] See {@link RethinkDBAdapter#host}.
+ * @param {Object} [opts.insertOpts={}] See {@link RethinkDBAdapter#insertOpts}.
+ * @param {number} [opts.max=50] See {@link RethinkDBAdapter#max}.
+ * @param {number} [opts.min=10] See {@link RethinkDBAdapter#min}.
+ * @param {Object} [opts.operators] See {@link RethinkDBAdapter#operators}.
+ * @param {number} [opts.port=28015] See {@link RethinkDBAdapter#port}.
+ * @param {boolean} [opts.raw=false] See {@link Adapter#raw}.
+ * @param {Object} [opts.runOpts={}] See {@link RethinkDBAdapter#runOpts}.
+ * @param {Object} [opts.updateOpts={}] See {@link RethinkDBAdapter#updateOpts}.
  */
-function RethinkDBAdapter (opts) {
+export function RethinkDBAdapter (opts) {
   const self = this
   utils.classCallCheck(self, RethinkDBAdapter)
   opts || (opts = {})
@@ -240,6 +242,8 @@ function RethinkDBAdapter (opts) {
    */
   self.operators || (self.operators = {})
 
+  utils.fillIn(self.operators, OPERATORS)
+
   /**
    * The rethinkdbdash instance used by this adapter. Use this directly when you
    * need to write custom queries.
@@ -271,33 +275,26 @@ Object.defineProperty(RethinkDBAdapter, '__super__', {
 /**
  * Alternative to ES6 class syntax for extending `RethinkDBAdapter`.
  *
+ * @example <caption>Using the ES2015 class syntax.</caption>
+ * class MyRethinkDBAdapter extends RethinkDBAdapter {...}
+ * const adapter = new MyRethinkDBAdapter()
+ *
+ * @example <caption>Using {@link RethinkDBAdapter.extend}.</caption>
+ * var instanceProps = {...}
+ * var classProps = {...}
+ *
+ * var MyRethinkDBAdapter = RethinkDBAdapter.extend(instanceProps, classProps)
+ * var adapter = new MyRethinkDBAdapter()
+ *
  * @name RethinkDBAdapter.extend
  * @method
  * @param {Object} [instanceProps] Properties that will be added to the
- * prototype of the RethinkDBAdapter.
+ * prototype of the Subclass.
  * @param {Object} [classProps] Properties that will be added as static
- * properties to the RethinkDBAdapter itself.
- * @return {Object} RethinkDBAdapter of `RethinkDBAdapter`.
+ * properties to the Subclass itself.
+ * @return {Constructor} Subclass of `RethinkDBAdapter`.
  */
 RethinkDBAdapter.extend = utils.extend
-
-/**
- * Details of the current version of the `js-data-rethinkdb` module.
- *
- * @name RethinkDBAdapter.version
- * @type {Object}
- * @property {string} full The full semver value.
- * @property {number} major The major version number.
- * @property {number} minor The minor version number.
- * @property {number} patch The patch version number.
- * @property {(string|boolean)} alpha The alpha version value, otherwise `false`
- * if the current version is not alpha.
- * @property {(string|boolean)} beta The beta version value, otherwise `false`
- * if the current version is not beta.
- */
-RethinkDBAdapter.version = '<%= version %>'
-
-RethinkDBAdapter.OPERATORS = OPERATORS
 
 utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
   _handleErrors (cursor) {
@@ -890,7 +887,7 @@ utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
     opts || (opts = {})
     opts.operators || (opts.operators = {})
     let ownOps = this.operators || {}
-    return utils.isUndefined(opts.operators[operator]) ? ownOps[operator] || OPERATORS[operator] : opts.operators[operator]
+    return utils.isUndefined(opts.operators[operator]) ? ownOps[operator] : opts.operators[operator]
   },
 
   /**
@@ -1010,4 +1007,20 @@ utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
   }
 })
 
-module.exports = RethinkDBAdapter
+/**
+ * Details of the current version of the `js-data-rethinkdb` module.
+ *
+ * @name module:js-data-rethinkdb.version
+ * @type {Object}
+ * @property {string} version.full The full semver value.
+ * @property {number} version.major The major version number.
+ * @property {number} version.minor The minor version number.
+ * @property {number} version.patch The patch version number.
+ * @property {(string|boolean)} version.alpha The alpha version value,
+ * otherwise `false` if the current version is not alpha.
+ * @property {(string|boolean)} version.beta The beta version value,
+ * otherwise `false` if the current version is not beta.
+ */
+export const version = '<%= version %>'
+
+export default RethinkDBAdapter

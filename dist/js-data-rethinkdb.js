@@ -3,16 +3,11 @@
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
 var jsData = require('js-data');
-var Adapter = require('js-data-adapter');
-var Adapter__default = _interopDefault(Adapter);
+var jsDataAdapter = require('js-data-adapter');
 var rethinkdbdash = _interopDefault(require('rethinkdbdash'));
 var underscore = _interopDefault(require('mout/string/underscore'));
 
-var withoutRelations = function withoutRelations(mapper, props) {
-  return jsData.utils.omit(props, mapper.relationFields || []);
-};
-
-var __super__ = Adapter__default.prototype;
+var __super__ = jsDataAdapter.Adapter.prototype;
 
 var DEFAULTS = {
   /**
@@ -94,7 +89,7 @@ var notEqual = function notEqual(r, row, field, value) {
 /**
  * Default predicate functions for the filtering operators.
  *
- * @name RethinkDBAdapter.OPERATORS
+ * @name module:js-data-rethinkdb.OPERATORS
  * @property {Function} == Equality operator.
  * @property {Function} != Inequality operator.
  * @property {Function} > "Greater than" operator.
@@ -151,6 +146,8 @@ var OPERATORS = {
   }
 };
 
+Object.freeze(OPERATORS);
+
 /**
  * RethinkDBAdapter class.
  *
@@ -173,25 +170,28 @@ var OPERATORS = {
  *
  * @class RethinkDBAdapter
  * @extends Adapter
- * @param {Object} [opts] Configuration opts.
- * @param {string} [opts.authKey=""] RethinkDB authorization key.
- * @param {number} [opts.bufferSize=10] Buffer size for connection pool.
+ * @param {Object} [opts] Configuration options.
+ * @param {string} [opts.authKey=""] See {@link RethinkDBAdapter#authKey}.
+ * @param {number} [opts.bufferSize=10] See {@link RethinkDBAdapter#bufferSize}.
  * @param {string} [opts.db="test"] Default database.
- * @param {boolean} [opts.debug=false] Whether to log debugging information.
- * @param {string} [opts.host="localhost"] RethinkDB host.
- * @param {number} [opts.max=50] Maximum connections in pool.
- * @param {number} [opts.min=10] Minimum connections in pool.
- * @param {Object} [opts.operators] Override the default predicate functions for
- * specified operators.
- * @param {number} [opts.port=28015] RethinkDB port.
- * @param {boolean} [opts.raw=false] Whether to return a more detailed response object.
+ * @param {boolean} [opts.debug=false] See {@link Adapter#debug}.
+ * @param {Object} [opts.deleteOpts={}] See {@link RethinkDBAdapter#deleteOpts}.
+ * @param {string} [opts.host="localhost"] See {@link RethinkDBAdapter#host}.
+ * @param {Object} [opts.insertOpts={}] See {@link RethinkDBAdapter#insertOpts}.
+ * @param {number} [opts.max=50] See {@link RethinkDBAdapter#max}.
+ * @param {number} [opts.min=10] See {@link RethinkDBAdapter#min}.
+ * @param {Object} [opts.operators] See {@link RethinkDBAdapter#operators}.
+ * @param {number} [opts.port=28015] See {@link RethinkDBAdapter#port}.
+ * @param {boolean} [opts.raw=false] See {@link Adapter#raw}.
+ * @param {Object} [opts.runOpts={}] See {@link RethinkDBAdapter#runOpts}.
+ * @param {Object} [opts.updateOpts={}] See {@link RethinkDBAdapter#updateOpts}.
  */
 function RethinkDBAdapter(opts) {
   var self = this;
   jsData.utils.classCallCheck(self, RethinkDBAdapter);
   opts || (opts = {});
   jsData.utils.fillIn(opts, DEFAULTS);
-  Adapter__default.call(self, opts);
+  jsDataAdapter.Adapter.call(self, opts);
 
   /**
    * Default options to pass to r#insert.
@@ -242,6 +242,8 @@ function RethinkDBAdapter(opts) {
    */
   self.operators || (self.operators = {});
 
+  jsData.utils.fillIn(self.operators, OPERATORS);
+
   /**
    * The rethinkdbdash instance used by this adapter. Use this directly when you
    * need to write custom queries.
@@ -256,7 +258,7 @@ function RethinkDBAdapter(opts) {
 }
 
 // Setup prototype inheritance from Adapter
-RethinkDBAdapter.prototype = Object.create(Adapter__default.prototype, {
+RethinkDBAdapter.prototype = Object.create(jsDataAdapter.Adapter.prototype, {
   constructor: {
     value: RethinkDBAdapter,
     enumerable: false,
@@ -267,45 +269,32 @@ RethinkDBAdapter.prototype = Object.create(Adapter__default.prototype, {
 
 Object.defineProperty(RethinkDBAdapter, '__super__', {
   configurable: true,
-  value: Adapter__default
+  value: jsDataAdapter.Adapter
 });
 
 /**
  * Alternative to ES6 class syntax for extending `RethinkDBAdapter`.
  *
+ * @example <caption>Using the ES2015 class syntax.</caption>
+ * class MyRethinkDBAdapter extends RethinkDBAdapter {...}
+ * const adapter = new MyRethinkDBAdapter()
+ *
+ * @example <caption>Using {@link RethinkDBAdapter.extend}.</caption>
+ * var instanceProps = {...}
+ * var classProps = {...}
+ *
+ * var MyRethinkDBAdapter = RethinkDBAdapter.extend(instanceProps, classProps)
+ * var adapter = new MyRethinkDBAdapter()
+ *
  * @name RethinkDBAdapter.extend
  * @method
  * @param {Object} [instanceProps] Properties that will be added to the
- * prototype of the RethinkDBAdapter.
+ * prototype of the Subclass.
  * @param {Object} [classProps] Properties that will be added as static
- * properties to the RethinkDBAdapter itself.
- * @return {Object} RethinkDBAdapter of `RethinkDBAdapter`.
+ * properties to the Subclass itself.
+ * @return {Constructor} Subclass of `RethinkDBAdapter`.
  */
 RethinkDBAdapter.extend = jsData.utils.extend;
-
-/**
- * Details of the current version of the `js-data-rethinkdb` module.
- *
- * @name RethinkDBAdapter.version
- * @type {Object}
- * @property {string} full The full semver value.
- * @property {number} major The major version number.
- * @property {number} minor The minor version number.
- * @property {number} patch The patch version number.
- * @property {(string|boolean)} alpha The alpha version value, otherwise `false`
- * if the current version is not alpha.
- * @property {(string|boolean)} beta The beta version value, otherwise `false`
- * if the current version is not beta.
- */
-RethinkDBAdapter.version = {
-  beta: 1,
-  full: '3.0.0-beta.1',
-  major: 3,
-  minor: 0,
-  patch: 0
-};
-
-RethinkDBAdapter.OPERATORS = OPERATORS;
 
 jsData.utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
   _handleErrors: function _handleErrors(cursor) {
@@ -417,7 +406,7 @@ jsData.utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
     var updateOpts = self.getOpt('updateOpts', opts);
     updateOpts.returnChanges = true;
 
-    return self.selectTable(mapper, opts).get(id).update(withoutRelations(mapper, props), updateOpts).run(self.getOpt('runOpts', opts)).then(function (cursor) {
+    return self.selectTable(mapper, opts).get(id).update(jsDataAdapter.withoutRelations(mapper, props), updateOpts).run(self.getOpt('runOpts', opts)).then(function (cursor) {
       var record = void 0;
       self._handleErrors(cursor);
       if (cursor && cursor.changes && cursor.changes.length && cursor.changes[0].new_val) {
@@ -437,7 +426,7 @@ jsData.utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
     var updateOpts = self.getOpt('updateOpts', opts);
     updateOpts.returnChanges = true;
 
-    return self.filterSequence(self.selectTable(mapper, opts), query).update(withoutRelations(mapper, props), updateOpts).run(self.getOpt('runOpts', opts)).then(function (cursor) {
+    return self.filterSequence(self.selectTable(mapper, opts), query).update(jsDataAdapter.withoutRelations(mapper, props), updateOpts).run(self.getOpt('runOpts', opts)).then(function (cursor) {
       var records = [];
       self._handleErrors(cursor);
       if (cursor && cursor.changes && cursor.changes.length) {
@@ -507,7 +496,7 @@ jsData.utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
 
     // Transform non-keyword properties to "where" clause configuration
     jsData.utils.forOwn(query, function (config, keyword) {
-      if (Adapter.reserved.indexOf(keyword) === -1) {
+      if (jsDataAdapter.reserved.indexOf(keyword) === -1) {
         if (jsData.utils.isObject(config)) {
           query.where[keyword] = config;
         } else {
@@ -871,7 +860,7 @@ jsData.utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
     opts || (opts = {});
     opts.operators || (opts.operators = {});
     var ownOps = this.operators || {};
-    return jsData.utils.isUndefined(opts.operators[operator]) ? ownOps[operator] || OPERATORS[operator] : opts.operators[operator];
+    return jsData.utils.isUndefined(opts.operators[operator]) ? ownOps[operator] : opts.operators[operator];
   },
 
 
@@ -995,5 +984,30 @@ jsData.utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
   }
 });
 
-module.exports = RethinkDBAdapter;
+/**
+ * Details of the current version of the `js-data-rethinkdb` module.
+ *
+ * @name module:js-data-rethinkdb.version
+ * @type {Object}
+ * @property {string} version.full The full semver value.
+ * @property {number} version.major The major version number.
+ * @property {number} version.minor The minor version number.
+ * @property {number} version.patch The patch version number.
+ * @property {(string|boolean)} version.alpha The alpha version value,
+ * otherwise `false` if the current version is not alpha.
+ * @property {(string|boolean)} version.beta The beta version value,
+ * otherwise `false` if the current version is not beta.
+ */
+var version = {
+  beta: 2,
+  full: '3.0.0-beta.2',
+  major: 3,
+  minor: 0,
+  patch: 0
+};
+
+exports.OPERATORS = OPERATORS;
+exports.RethinkDBAdapter = RethinkDBAdapter;
+exports.version = version;
+exports['default'] = RethinkDBAdapter;
 //# sourceMappingURL=js-data-rethinkdb.js.map

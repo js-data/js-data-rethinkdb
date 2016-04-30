@@ -1,7 +1,7 @@
 {
   "name": "js-data-rethinkdb",
   "description": "RethinkDB adapter for js-data.",
-  "version": "3.0.0-beta.1",
+  "version": "3.0.0-beta.2",
   "homepage": "https://github.com/js-data/js-data-rethinkdb",
   "repository": {
     "type": "git",
@@ -10,6 +10,12 @@
   "author": "js-data-rethinkdb project authors",
   "license": "MIT",
   "main": "./dist/js-data-rethinkdb.js",
+  "files": [
+    "dist/",
+    "src/",
+    "AUTHORS",
+    "CONTRIBUTORS"
+  ],
   "keywords": [
     "data",
     "datastore",
@@ -30,45 +36,38 @@
       "after",
       "beforeEach",
       "afterEach"
-    ]
+    ],
+    "ignore": ["dist/"]
   },
   "scripts": {
-    "lint": "repo-tools lint src/index.js mocha.start.js test/**/*.js scripts/**.js rollup.config.js",
+    "lint": "repo-tools lint \"**/*.js\"",
     "bundle": "rollup -c rollup.config.js -f cjs -o dist/js-data-rethinkdb.js -m dist/js-data-rethinkdb.js.map src/index.js && repo-tools write-version dist/js-data-rethinkdb.js",
-    "doc": "jsdoc -c conf.json src node_modules/js-data-adapter/src && node scripts/cleanup.js",
+    "doc": "jsdoc -c conf.json src node_modules/js-data-adapter/src",
     "watch": "watch \"npm run bundle\" src/",
     "build": "npm run lint && npm run bundle",
     "mocha": "mocha -t 30000 -R dot -r source-map-support/register mocha.start.js",
     "cover": "istanbul cover --hook-run-in-context node_modules/mocha/bin/_mocha -- -t 30000 -R dot -r source-map-support/register mocha.start.js",
     "test": "npm run build && npm run cover",
-    "repo-tools": "repo-tools updates && repo-tools changelog && repo-tools authors",
-    "release": "npm test && npm run doc && npm run repo-tools",
+    "release": "npm test && npm run doc && repo-tools updates && repo-tools changelog && repo-tools authors",
     "ci": "npm run test && cat coverage/lcov.info | codecov"
   },
   "dependencies": {
-    "js-data-adapter": "~0.3.0",
+    "js-data-adapter": "~0.6.0",
     "mout": "1.0.0"
   },
   "peerDependencies": {
-    "js-data": "^3.0.0-beta.1",
+    "js-data": "^3.0.0-beta.3",
     "rethinkdbdash": ">=1.15.0"
   },
   "devDependencies": {
-    "babel-core": "6.7.6",
     "babel-polyfill": "6.7.4",
     "babel-preset-es2015-rollup": "1.1.1",
-    "chai": "3.5.0",
-    "codecov": "1.0.1",
-    "ink-docstrap": "1.1.4",
     "istanbul": "0.4.3",
     "js-data-adapter-tests": "^2.0.0-alpha.15",
-    "js-data-repo-tools": "0.3.0",
-    "jsdoc": "3.4.0",
-    "mocha": "2.4.5",
-    "rollup": "0.25.8",
+    "js-data-repo-tools": "0.5.0",
+    "rollup": "0.26.1",
     "rollup-plugin-babel": "2.4.0",
-    "sinon": "1.17.3",
     "source-map-support": "0.4.0",
-    "watch": "0.17.1"
+    "watch": "0.18.0"
   }
 }

@@ -6,9 +6,12 @@ require('babel-polyfill')
 
 var JSData = require('js-data')
 var JSDataAdapterTests = require('js-data-adapter-tests')
-var RethinkDBAdapter = require('./')
+var JSDataRethinkDB = require('./')
+var version = JSDataRethinkDB.version
+var OPERATORS = JSDataRethinkDB.OPERATORS
+var RethinkDBAdapter = JSDataRethinkDB.RethinkDBAdapter
 
-global.assert = JSDataAdapterTests.assert
+var assert = global.assert = JSDataAdapterTests.assert
 global.sinon = JSDataAdapterTests.sinon
 
 JSDataAdapterTests.init({
@@ -28,3 +31,10 @@ JSDataAdapterTests.init({
 })
 
 require('./test/handleErrors.test')
+
+describe('exports', function () {
+  assert(OPERATORS)
+  assert(OPERATORS['=='])
+  assert(version)
+  assert(version.full)
+})
