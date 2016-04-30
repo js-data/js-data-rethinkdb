@@ -1,3 +1,7 @@
+##### 3.0.0-beta.3 - 30 April 2016
+
+- Upgraded to `js-data-adapter` v0.6.1
+
 ##### 3.0.0-beta.2 - 29 April 2016
 
 ###### Breaking changes

@@ -1,8 +1,7 @@
 import {utils} from 'js-data'
 import {
   Adapter,
-  reserved,
-  withoutRelations
+  reserved
 } from 'js-data-adapter'
 import rethinkdbdash from 'rethinkdbdash'
 import underscore from 'mout/string/underscore'
@@ -434,7 +433,7 @@ utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
 
     return self.selectTable(mapper, opts)
       .get(id)
-      .update(withoutRelations(mapper, props), updateOpts)
+      .update(props, updateOpts)
       .run(self.getOpt('runOpts', opts)).then(function (cursor) {
         let record
         self._handleErrors(cursor)
@@ -457,7 +456,7 @@ utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
     updateOpts.returnChanges = true
 
     return self.filterSequence(self.selectTable(mapper, opts), query)
-      .update(withoutRelations(mapper, props), updateOpts)
+      .update(props, updateOpts)
       .run(self.getOpt('runOpts', opts)).then(function (cursor) {
         let records = []
         self._handleErrors(cursor)
