@@ -3,13 +3,6 @@ import {Adapter} from 'js-data-adapter'
 interface IDict {
   [key: string]: any;
 }
-interface IActionOpts {
-  adapter?: string,
-  pathname?: string,
-  request?: Function,
-  response?: Function,
-  responseError?: Function
-}
 interface IBaseAdapter extends IDict {
   debug?: boolean,
   raw?: boolean
@@ -20,19 +13,19 @@ interface IBaseRethinkDBAdapter extends IBaseAdapter {
   db?: string
   deleteOpts?: IDict
   host?: string
-  insertOpts?: IDICT
+  insertOpts?: IDict
   max?: number
   min?: number
-  operators?: IDICT
+  operators?: IDict
   port?: number
-  runOpts?: IDICT
-  updateOpts?: IDICT
+  runOpts?: IDict
+  updateOpts?: IDict
 }
 export class RethinkDBAdapter extends Adapter {
   static extend(instanceProps?: IDict, classProps?: IDict): typeof RethinkDBAdapter
   constructor(opts?: IBaseRethinkDBAdapter)
 }
-export const OPERATORS = {
+export interface OPERATORS {
   '==': Function
   '===': Function
   '!=': Function
@@ -48,11 +41,11 @@ export const OPERATORS = {
   'contains': Function
   'notContains': Function
 }
-export const version = {
-  full?: string
-  minor?: string
-  major?: string
-  patch?: string
-  alpha?: string | boolean
-  beta?: string | boolean
+export interface version {
+  full: string
+  minor: string
+  major: string
+  patch: string
+  alpha: string | boolean
+  beta: string | boolean
 }
