@@ -285,12 +285,12 @@ Object.defineProperty(RethinkDBAdapter, '__super__', {
  * var MyRethinkDBAdapter = RethinkDBAdapter.extend(instanceProps, classProps)
  * var adapter = new MyRethinkDBAdapter()
  *
- * @name RethinkDBAdapter.extend
- * @method
+ * @method RethinkDBAdapter.extend
+ * @static
  * @param {Object} [instanceProps] Properties that will be added to the
- * prototype of the Subclass.
+ * prototype of the subclass.
  * @param {Object} [classProps] Properties that will be added as static
- * properties to the Subclass itself.
+ * properties to the subclass itself.
  * @return {Constructor} Subclass of `RethinkDBAdapter`.
  */
 RethinkDBAdapter.extend = utils.extend
@@ -1009,6 +1009,10 @@ utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
 /**
  * Details of the current version of the `js-data-rethinkdb` module.
  *
+ * @example
+ * import {version} from 'js-data-rethinkdb'
+ * console.log(version.full)
+ *
  * @name module:js-data-rethinkdb.version
  * @type {Object}
  * @property {string} version.full The full semver value.
@@ -1021,5 +1025,34 @@ utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
  * otherwise `false` if the current version is not beta.
  */
 export const version = '<%= version %>'
+
+/**
+ * {@link RethinkDBAdapter} class.
+ *
+ * @example
+ * import {RethinkDBAdapter} from 'js-data-rethinkdb'
+ * const adapter = new RethinkDBAdapter()
+ *
+ * @name module:js-data-rethinkdb.RethinkDBAdapter
+ * @see RethinkDBAdapter
+ * @type {Constructor}
+ */
+
+/**
+ * Registered as `js-data-rethinkdb` in NPM.
+ *
+ * @example <caption>Install from NPM</caption>
+ * npm i --save js-data-rethinkdb@beta js-data@beta rethinkdbdash
+ *
+ * @example <caption>Load via CommonJS</caption>
+ * var RethinkDBAdapter = require('js-data-rethinkdb').RethinkDBAdapter
+ * var adapter = new RethinkDBAdapter()
+ *
+ * @example <caption>Load via ES2015 Modules</caption>
+ * import {RethinkDBAdapter} from 'js-data-rethinkdb'
+ * const adapter = new RethinkDBAdapter()
+ *
+ * @module js-data-rethinkdb
+ */
 
 export default RethinkDBAdapter
