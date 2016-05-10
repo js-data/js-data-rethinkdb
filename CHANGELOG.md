@@ -1,3 +1,8 @@
+##### 3.0.0-beta.4 - 10 May 2016
+
+###### Breaking changes
+- Moved `rethinkdbdash` options to `RethinkDBAdapter#rOpts`.
+
 ##### 3.0.0-beta.3 - 30 April 2016
 
 - Upgraded to `js-data-adapter` v0.6.1

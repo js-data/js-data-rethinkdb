@@ -8,16 +8,10 @@ interface IBaseAdapter extends IDict {
   raw?: boolean
 }
 interface IBaseRethinkDBAdapter extends IBaseAdapter {
-  authKey?: string
-  bufferSize?: number
-  db?: string
   deleteOpts?: IDict
-  host?: string
   insertOpts?: IDict
-  max?: number
-  min?: number
   operators?: IDict
-  port?: number
+  rOpts?: IDict
   runOpts?: IDict
   updateOpts?: IDict
 }

@@ -8,70 +8,9 @@ import underscore from 'mout/string/underscore'
 
 const __super__ = Adapter.prototype
 
-const DEFAULTS = {
-  /**
-   * RethinkDB authorization key.
-   *
-   * @name RethinkDBAdapter#authKey
-   * @type {string}
-   */
-  authKey: '',
-
-  /**
-   * Buffer size for connection pool.
-   *
-   * @name RethinkDBAdapter#bufferSize
-   * @type {number}
-   * @default 10
-   */
-  bufferSize: 10,
-
-  /**
-   * Default database.
-   *
-   * @name RethinkDBAdapter#db
-   * @type {string}
-   * @default "test"
-   */
-  db: 'test',
-
-  /**
-   * RethinkDB host.
-   *
-   * @name RethinkDBAdapter#host
-   * @type {string}
-   * @default "localhost"
-   */
-  host: 'localhost',
-
-  /**
-   * Minimum connections in pool.
-   *
-   * @name RethinkDBAdapter#min
-   * @type {number}
-   * @default 10
-   */
-  min: 10,
-
-  /**
-   * Maximum connections in pool.
-   *
-   * @name RethinkDBAdapter#max
-   * @type {number}
-   * @default 50
-   */
-  max: 50,
-
-  /**
-   * RethinkDB port.
-   *
-   * @name RethinkDBAdapter#port
-   * @type {number}
-   * @default 28015
-   */
-  port: 28015
+const R_OPTS_DEFAULTS = {
+  db: 'test'
 }
-
 const INSERT_OPTS_DEFAULTS = {}
 const UPDATE_OPTS_DEFAULTS = {}
 const DELETE_OPTS_DEFAULTS = {}
@@ -153,7 +92,7 @@ Object.freeze(OPERATORS)
  * @example
  * // Use Container instead of DataStore on the server
  * import {Container} from 'js-data'
- * import RethinkDBAdapter from 'js-data-rethinkdb'
+ * import {RethinkDBAdapter} from 'js-data-rethinkdb'
  *
  * // Create a store to hold your Mappers
  * const store = new Container()
@@ -170,27 +109,69 @@ Object.freeze(OPERATORS)
  * @class RethinkDBAdapter
  * @extends Adapter
  * @param {Object} [opts] Configuration options.
- * @param {string} [opts.authKey=""] See {@link RethinkDBAdapter#authKey}.
- * @param {number} [opts.bufferSize=10] See {@link RethinkDBAdapter#bufferSize}.
- * @param {string} [opts.db="test"] Default database.
  * @param {boolean} [opts.debug=false] See {@link Adapter#debug}.
  * @param {Object} [opts.deleteOpts={}] See {@link RethinkDBAdapter#deleteOpts}.
- * @param {string} [opts.host="localhost"] See {@link RethinkDBAdapter#host}.
  * @param {Object} [opts.insertOpts={}] See {@link RethinkDBAdapter#insertOpts}.
- * @param {number} [opts.max=50] See {@link RethinkDBAdapter#max}.
- * @param {number} [opts.min=10] See {@link RethinkDBAdapter#min}.
- * @param {Object} [opts.operators] See {@link RethinkDBAdapter#operators}.
- * @param {number} [opts.port=28015] See {@link RethinkDBAdapter#port}.
+ * @param {Object} [opts.operators={@link module:js-data-rethinkdb.OPERATORS}] See {@link RethinkDBAdapter#operators}.
+ * @param {Object} [opts.r] See {@link RethinkDBAdapter#r}.
  * @param {boolean} [opts.raw=false] See {@link Adapter#raw}.
+ * @param {Object} [opts.rOpts={}] See {@link RethinkDBAdapter#rOpts}.
  * @param {Object} [opts.runOpts={}] See {@link RethinkDBAdapter#runOpts}.
  * @param {Object} [opts.updateOpts={}] See {@link RethinkDBAdapter#updateOpts}.
  */
 export function RethinkDBAdapter (opts) {
-  const self = this
-  utils.classCallCheck(self, RethinkDBAdapter)
+  utils.classCallCheck(this, RethinkDBAdapter)
   opts || (opts = {})
-  utils.fillIn(opts, DEFAULTS)
-  Adapter.call(self, opts)
+
+  // Setup non-enumerable properties
+  Object.defineProperties(this, {
+    /**
+     * The rethinkdbdash instance used by this adapter. Use this directly when
+     * you need to write custom queries.
+     *
+     * @example <caption>Use default instance.</caption>
+     * import {RethinkDBAdapter} from 'js-data-rethinkdb'
+     * const adapter = new RethinkDBAdapter()
+     * adapter.r.dbDrop('foo').then(...)
+     *
+     * @example <caption>Configure default instance.</caption>
+     * import {RethinkDBAdapter} from 'js-data-rethinkdb'
+     * const adapter = new RethinkDBAdapter({
+     *   rOpts: {
+     *     user: 'myUser',
+     *     password: 'myPassword'
+     *   }
+     * })
+     * adapter.r.dbDrop('foo').then(...)
+     *
+     * @example <caption>Provide a custom instance.</caption>
+     * import rethinkdbdash from 'rethinkdbdash'
+     * import {RethinkDBAdapter} from 'js-data-rethinkdb'
+     * const r = rethinkdbdash()
+     * const adapter = new RethinkDBAdapter({
+     *   r: r
+     * })
+     * adapter.r.dbDrop('foo').then(...)
+     *
+     * @name RethinkDBAdapter#r
+     * @type {Object}
+     */
+    r: {
+      writable: true,
+      value: undefined
+    },
+    databases: {
+      value: {}
+    },
+    indices: {
+      value: {}
+    },
+    tables: {
+      value: {}
+    }
+  })
+
+  Adapter.call(this, opts)
 
   /**
    * Default options to pass to r#insert.
@@ -199,8 +180,8 @@ export function RethinkDBAdapter (opts) {
    * @type {Object}
    * @default {}
    */
-  self.insertOpts || (self.insertOpts = {})
-  utils.fillIn(self.insertOpts, INSERT_OPTS_DEFAULTS)
+  this.insertOpts || (this.insertOpts = {})
+  utils.fillIn(this.insertOpts, INSERT_OPTS_DEFAULTS)
 
   /**
    * Default options to pass to r#update.
@@ -209,8 +190,8 @@ export function RethinkDBAdapter (opts) {
    * @type {Object}
    * @default {}
    */
-  self.updateOpts || (self.updateOpts = {})
-  utils.fillIn(self.updateOpts, UPDATE_OPTS_DEFAULTS)
+  this.updateOpts || (this.updateOpts = {})
+  utils.fillIn(this.updateOpts, UPDATE_OPTS_DEFAULTS)
 
   /**
    * Default options to pass to r#delete.
@@ -219,8 +200,8 @@ export function RethinkDBAdapter (opts) {
    * @type {Object}
    * @default {}
    */
-  self.deleteOpts || (self.deleteOpts = {})
-  utils.fillIn(self.deleteOpts, DELETE_OPTS_DEFAULTS)
+  this.deleteOpts || (this.deleteOpts = {})
+  utils.fillIn(this.deleteOpts, DELETE_OPTS_DEFAULTS)
 
   /**
    * Default options to pass to r#run.
@@ -229,31 +210,66 @@ export function RethinkDBAdapter (opts) {
    * @type {Object}
    * @default {}
    */
-  self.runOpts || (self.runOpts = {})
-  utils.fillIn(self.runOpts, RUN_OPTS_DEFAULTS)
+  this.runOpts || (this.runOpts = {})
+  utils.fillIn(this.runOpts, RUN_OPTS_DEFAULTS)
 
   /**
-   * Override the default predicate functions for specified operators.
+   * Override the default predicate functions for the specified operators.
    *
    * @name RethinkDBAdapter#operators
    * @type {Object}
    * @default {}
    */
-  self.operators || (self.operators = {})
-
-  utils.fillIn(self.operators, OPERATORS)
+  this.operators || (this.operators = {})
+  utils.fillIn(this.operators, OPERATORS)
 
   /**
-   * The rethinkdbdash instance used by this adapter. Use this directly when you
-   * need to write custom queries.
+   * Options to pass to a new `rethinkdbdash` instance, if one was not provided
+   * at {@link RethinkDBAdapter#r}. See the [rethinkdbdash README][readme] for
+   * instance options.
    *
-   * @name RethinkDBAdapter#r
+   * [readme]: https://github.com/neumino/rethinkdbdash#importing-the-driver
+   *
+   * @example <caption>Connect to localhost:8080, and let the driver find other instances.</caption>
+   * import {RethinkDBAdapter} from 'js-data-rethinkdb'
+   * const adapter = new RethinkDBAdapter({
+   *   rOpts: {
+   *     discovery: true
+   *   }
+   * })
+   *
+   * @example <caption>Connect to and only to localhost:8080.</caption>
+   * import {RethinkDBAdapter} from 'js-data-rethinkdb'
+   * const adapter = new RethinkDBAdapter()
+   *
+   * @example <caption>Do not create a connection pool.</caption>
+   * import {RethinkDBAdapter} from 'js-data-rethinkdb'
+   * const adapter = new RethinkDBAdapter({
+   *   rOpts: {
+   *     pool: false
+   *   }
+   * })
+   *
+   * @example <caption>Connect to a cluster seeding from `192.168.0.100`, `192.168.0.101`, `192.168.0.102`.</caption>
+   * import {RethinkDBAdapter} from 'js-data-rethinkdb'
+   * const adapter = new RethinkDBAdapter({
+   *   rOpts: {
+   *     servers: [
+   *       { host: '192.168.0.100', port: 28015 },
+   *       { host: '192.168.0.101', port: 28015 },
+   *       { host: '192.168.0.102', port: 28015 }
+   *     ]
+   *   }
+   * })
+   *
+   * @name RethinkDBAdapter#rOpts
+   * @see https://github.com/neumino/rethinkdbdash#importing-the-driver
    * @type {Object}
    */
-  self.r = rethinkdbdash(opts)
-  self.databases = {}
-  self.tables = {}
-  self.indices = {}
+  this.rOpts || (this.rOpts = {})
+  utils.fillIn(this.rOpts, R_OPTS_DEFAULTS)
+
+  this.r || (this.r = rethinkdbdash(this.rOpts))
 }
 
 // Setup prototype inheritance from Adapter
@@ -489,7 +505,7 @@ utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
   },
 
   selectDb (opts) {
-    return this.r.db(utils.isUndefined(opts.db) ? this.db : opts.db)
+    return this.r.db(utils.isUndefined(opts.db) ? this.rOpts.db : opts.db)
   },
 
   selectTable (mapper, opts) {
@@ -514,8 +530,7 @@ utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
    * for specified operators.
    */
   filterSequence (sequence, query, opts) {
-    const self = this
-    const r = self.r
+    const r = this.r
 
     query = utils.plainCopy(query || {})
     opts || (opts = {})
@@ -526,7 +541,7 @@ utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
     query.skip || (query.skip = query.offset)
 
     // Transform non-keyword properties to "where" clause configuration
-    utils.forOwn(query, function (config, keyword) {
+    utils.forOwn(query, (config, keyword) => {
       if (reserved.indexOf(keyword) === -1) {
         if (utils.isObject(config)) {
           query.where[keyword] = config
@@ -544,21 +559,21 @@ utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
     // Filter
     if (Object.keys(query.where).length !== 0) {
       // Filter sequence using filter function
-      rql = rql.filter(function (row) {
+      rql = rql.filter((row) => {
         let subQuery
         // Apply filter for each field
-        utils.forOwn(query.where, function (criteria, field) {
+        utils.forOwn(query.where, (criteria, field) => {
           if (!utils.isObject(criteria)) {
             criteria = { '==': criteria }
           }
           // Apply filter for each operator
-          utils.forOwn(criteria, function (value, operator) {
+          utils.forOwn(criteria, (value, operator) => {
             let isOr = false
             if (operator && operator[0] === '|') {
               operator = operator.substr(1)
               isOr = true
             }
-            let predicateFn = self.getOperator(operator, opts)
+            let predicateFn = this.getOperator(operator, opts)
             if (predicateFn) {
               const predicateResult = predicateFn(r, row, field, value)
               if (isOr) {
@@ -604,24 +619,23 @@ utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
   },
 
   waitForDb (opts) {
-    const self = this
     opts || (opts = {})
-    const db = utils.isUndefined(opts.db) ? self.db : opts.db
-    if (!self.databases[db]) {
-      self.databases[db] = self.r.branch(
-        self.r.dbList().contains(db),
+    const db = utils.isUndefined(opts.db) ? this.rOpts.db : opts.db
+    if (!this.databases[db]) {
+      this.databases[db] = this.r.branch(
+        this.r.dbList().contains(db),
         true,
-        self.r.dbCreate(db)
+        this.r.dbCreate(db)
       ).run()
     }
-    return self.databases[db]
+    return this.databases[db]
   },
 
-  waitForTable (mapper, options) {
+  waitForTable (mapper, opts) {
+    opts || (opts = {})
     const table = utils.isString(mapper) ? mapper : (mapper.table || underscore(mapper.name))
-    options = options || {}
-    let db = utils.isUndefined(options.db) ? this.db : options.db
-    return this.waitForDb(options).then(() => {
+    let db = utils.isUndefined(opts.db) ? this.rOpts.db : opts.db
+    return this.waitForDb(opts).then(() => {
       this.tables[db] = this.tables[db] || {}
       if (!this.tables[db][table]) {
         this.tables[db][table] = this.r.branch(this.r.db(db).tableList().contains(table), true, this.r.db(db).tableCreate(table)).run()
@@ -630,10 +644,10 @@ utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
     })
   },
 
-  waitForIndex (table, index, options) {
-    options = options || {}
-    let db = utils.isUndefined(options.db) ? this.db : options.db
-    return this.waitForDb(options).then(() => this.waitForTable(table, options)).then(() => {
+  waitForIndex (table, index, opts) {
+    opts || (opts = {})
+    let db = utils.isUndefined(opts.db) ? this.rOpts.db : opts.db
+    return this.waitForDb(opts).then(() => this.waitForTable(table, opts)).then(() => {
       this.indices[db] = this.indices[db] || {}
       this.indices[db][table] = this.indices[db][table] || {}
       if (!this.tables[db][table][index]) {
@@ -667,13 +681,11 @@ utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
    * @return {Promise}
    */
   count (mapper, query, opts) {
-    const self = this
     opts || (opts = {})
     query || (query = {})
 
-    return self.waitForTable(mapper, opts).then(function () {
-      return __super__.count.call(self, mapper, query, opts)
-    })
+    return this.waitForTable(mapper, opts)
+      .then(() => __super__.count.call(this, mapper, query, opts))
   },
 
   /**
@@ -691,13 +703,11 @@ utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
    * @return {Promise}
    */
   create (mapper, props, opts) {
-    const self = this
     props || (props = {})
     opts || (opts = {})
 
-    return self.waitForTable(mapper, opts).then(function () {
-      return __super__.create.call(self, mapper, props, opts)
-    })
+    return this.waitForTable(mapper, opts)
+      .then(() => __super__.create.call(this, mapper, props, opts))
   },
 
   /**
@@ -715,13 +725,11 @@ utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
    * @return {Promise}
    */
   createMany (mapper, props, opts) {
-    const self = this
     props || (props = {})
     opts || (opts = {})
 
-    return self.waitForTable(mapper, opts).then(function () {
-      return __super__.createMany.call(self, mapper, props, opts)
-    })
+    return this.waitForTable(mapper, opts)
+      .then(() => __super__.createMany.call(this, mapper, props, opts))
   },
 
   /**
@@ -739,12 +747,10 @@ utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
    * @return {Promise}
    */
   destroy (mapper, id, opts) {
-    const self = this
     opts || (opts = {})
 
-    return self.waitForTable(mapper, opts).then(function () {
-      return __super__.destroy.call(self, mapper, id, opts)
-    })
+    return this.waitForTable(mapper, opts)
+      .then(() => __super__.destroy.call(this, mapper, id, opts))
   },
 
   /**
@@ -770,13 +776,11 @@ utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
    * @return {Promise}
    */
   destroyAll (mapper, query, opts) {
-    const self = this
     opts || (opts = {})
     query || (query = {})
 
-    return self.waitForTable(mapper, opts).then(function () {
-      return __super__.destroyAll.call(self, mapper, query, opts)
-    })
+    return this.waitForTable(mapper, opts)
+      .then(() => __super__.destroyAll.call(this, mapper, query, opts))
   },
 
   /**
@@ -794,14 +798,13 @@ utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
    * @return {Promise}
    */
   find (mapper, id, opts) {
-    const self = this
     opts || (opts = {})
     opts.with || (opts.with = [])
 
     const relationList = mapper.relationList || []
-    let tasks = [self.waitForTable(mapper, opts)]
+    let tasks = [this.waitForTable(mapper, opts)]
 
-    relationList.forEach(function (def) {
+    relationList.forEach((def) => {
       const relationName = def.relation
       const relationDef = def.getRelation()
       if (!opts.with || opts.with.indexOf(relationName) === -1) {
@@ -809,15 +812,13 @@ utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
       }
       if (def.foreignKey && def.type !== 'belongsTo') {
         if (def.type === 'belongsTo') {
-          tasks.push(self.waitForIndex(mapper.table || underscore(mapper.name), def.foreignKey, opts))
+          tasks.push(this.waitForIndex(mapper.table || underscore(mapper.name), def.foreignKey, opts))
         } else {
-          tasks.push(self.waitForIndex(relationDef.table || underscore(relationDef.name), def.foreignKey, opts))
+          tasks.push(this.waitForIndex(relationDef.table || underscore(relationDef.name), def.foreignKey, opts))
         }
       }
     })
-    return Promise.all(tasks).then(function () {
-      return __super__.find.call(self, mapper, id, opts)
-    })
+    return Promise.all(tasks).then(() => __super__.find.call(this, mapper, id, opts))
   },
 
   /**
@@ -843,15 +844,14 @@ utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
    * @return {Promise}
    */
   findAll (mapper, query, opts) {
-    const self = this
     opts || (opts = {})
     opts.with || (opts.with = [])
     query || (query = {})
 
     const relationList = mapper.relationList || []
-    let tasks = [self.waitForTable(mapper, opts)]
+    let tasks = [this.waitForTable(mapper, opts)]
 
-    relationList.forEach(function (def) {
+    relationList.forEach((def) => {
       const relationName = def.relation
       const relationDef = def.getRelation()
       if (!opts.with || opts.with.indexOf(relationName) === -1) {
@@ -859,15 +859,13 @@ utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
       }
       if (def.foreignKey && def.type !== 'belongsTo') {
         if (def.type === 'belongsTo') {
-          tasks.push(self.waitForIndex(mapper.table || underscore(mapper.name), def.foreignKey, opts))
+          tasks.push(this.waitForIndex(mapper.table || underscore(mapper.name), def.foreignKey, opts))
         } else {
-          tasks.push(self.waitForIndex(relationDef.table || underscore(relationDef.name), def.foreignKey, opts))
+          tasks.push(this.waitForIndex(relationDef.table || underscore(relationDef.name), def.foreignKey, opts))
         }
       }
     })
-    return Promise.all(tasks).then(function () {
-      return __super__.findAll.call(self, mapper, query, opts)
-    })
+    return Promise.all(tasks).then(() => __super__.findAll.call(this, mapper, query, opts))
   },
 
   /**
@@ -913,13 +911,11 @@ utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
    * @return {Promise}
    */
   sum (mapper, field, query, opts) {
-    const self = this
     opts || (opts = {})
     query || (query = {})
 
-    return self.waitForTable(mapper, opts).then(function () {
-      return __super__.sum.call(self, mapper, field, query, opts)
-    })
+    return this.waitForTable(mapper, opts)
+      .then(() => __super__.sum.call(this, mapper, field, query, opts))
   },
 
   /**
@@ -938,13 +934,11 @@ utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
    * @return {Promise}
    */
   update (mapper, id, props, opts) {
-    const self = this
     props || (props = {})
     opts || (opts = {})
 
-    return self.waitForTable(mapper, opts).then(function () {
-      return __super__.update.call(self, mapper, id, props, opts)
-    })
+    return this.waitForTable(mapper, opts)
+      .then(() => __super__.update.call(this, mapper, id, props, opts))
   },
 
   /**
@@ -971,14 +965,12 @@ utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
    * @return {Promise}
    */
   updateAll (mapper, props, query, opts) {
-    const self = this
     props || (props = {})
     query || (query = {})
     opts || (opts = {})
 
-    return self.waitForTable(mapper, opts).then(function () {
-      return __super__.updateAll.call(self, mapper, props, query, opts)
-    })
+    return this.waitForTable(mapper, opts)
+      .then(() => __super__.updateAll.call(this, mapper, props, query, opts))
   },
 
   /**
@@ -996,21 +988,23 @@ utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
    * @return {Promise}
    */
   updateMany (mapper, records, opts) {
-    const self = this
     records || (records = [])
     opts || (opts = {})
 
-    return self.waitForTable(mapper, opts).then(function () {
-      return __super__.updateMany.call(self, mapper, records, opts)
-    })
+    return this.waitForTable(mapper, opts)
+      .then(() => __super__.updateMany.call(this, mapper, records, opts))
   }
 })
 
 /**
  * Details of the current version of the `js-data-rethinkdb` module.
  *
- * @example
+ * @example <caption>ES2015 modules import</caption>
  * import {version} from 'js-data-rethinkdb'
+ * console.log(version.full)
+ *
+ * @example <caption>CommonJS import</caption>
+ * var version = require('js-data-rethinkdb').version
  * console.log(version.full)
  *
  * @name module:js-data-rethinkdb.version
@@ -1029,11 +1023,27 @@ export const version = '<%= version %>'
 /**
  * {@link RethinkDBAdapter} class.
  *
- * @example
+ * @example <caption>ES2015 modules import</caption>
  * import {RethinkDBAdapter} from 'js-data-rethinkdb'
  * const adapter = new RethinkDBAdapter()
  *
+ * @example <caption>CommonJS import</caption>
+ * var RethinkDBAdapter = require('js-data-rethinkdb').RethinkDBAdapter
+ * var adapter = new RethinkDBAdapter()
+ *
  * @name module:js-data-rethinkdb.RethinkDBAdapter
+ * @see RethinkDBAdapter
+ * @type {Constructor}
+ */
+
+/**
+ * {@link RethinkDBAdapter} class.
+ *
+ * @example <caption>ES2015 modules "default" import</caption>
+ * import RethinkDBAdapter from 'js-data-rethinkdb'
+ * const adapter = new RethinkDBAdapter()
+ *
+ * @name module:js-data-rethinkdb.default
  * @see RethinkDBAdapter
  * @type {Constructor}
  */
@@ -1044,13 +1054,13 @@ export const version = '<%= version %>'
  * @example <caption>Install from NPM</caption>
  * npm i --save js-data-rethinkdb@beta js-data@beta rethinkdbdash
  *
- * @example <caption>Load via CommonJS</caption>
- * var RethinkDBAdapter = require('js-data-rethinkdb').RethinkDBAdapter
- * var adapter = new RethinkDBAdapter()
- *
- * @example <caption>Load via ES2015 Modules</caption>
+ * @example <caption>ES2015 modules import</caption>
  * import {RethinkDBAdapter} from 'js-data-rethinkdb'
  * const adapter = new RethinkDBAdapter()
+ *
+ * @example <caption>CommonJS import</caption>
+ * var RethinkDBAdapter = require('js-data-rethinkdb').RethinkDBAdapter
+ * var adapter = new RethinkDBAdapter()
  *
  * @module js-data-rethinkdb
  */

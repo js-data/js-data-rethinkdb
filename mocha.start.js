@@ -16,9 +16,10 @@ JSDataAdapterTests.init({
   JSData: JSData,
   Adapter: JSDataRethinkDB.RethinkDBAdapter,
   adapterConfig: {
-    min: 1,
-    max: 5,
-    bufferSize: 5
+    rOpts: {
+      buffer: 1,
+      max: 5
+    }
   },
   // js-data-rethinkdb does NOT support these features
   xfeatures: [

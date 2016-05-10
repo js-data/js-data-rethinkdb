@@ -1,7 +1,7 @@
 {
   "name": "js-data-rethinkdb",
   "description": "RethinkDB adapter for js-data.",
-  "version": "3.0.0-beta.3",
+  "version": "3.0.0-beta.4",
   "homepage": "https://github.com/js-data/js-data-rethinkdb",
   "repository": {
     "type": "git",
@@ -60,15 +60,15 @@
     "mout": "1.0.0"
   },
   "peerDependencies": {
-    "js-data": "^3.0.0-beta.3",
-    "rethinkdbdash": ">=1.15.0"
+    "js-data": "^3.0.0-beta.5",
+    "rethinkdbdash": ">=2.0.0"
   },
   "devDependencies": {
     "babel-polyfill": "6.8.0",
     "babel-preset-es2015-rollup": "1.1.1",
     "istanbul": "0.4.3",
     "js-data-adapter-tests": "^2.0.0-alpha.20",
-    "js-data-repo-tools": "0.5.0",
+    "js-data-repo-tools": "0.5.1",
     "rollup": "0.26.2",
     "rollup-plugin-babel": "2.4.0",
     "source-map-support": "0.4.0",
