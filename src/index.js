@@ -1026,18 +1026,6 @@ export const version = '<%= version %>'
  */
 
 /**
- * {@link RethinkDBAdapter} class.
- *
- * @example <caption>ES2015 modules "default" import</caption>
- * import RethinkDBAdapter from 'js-data-rethinkdb'
- * const adapter = new RethinkDBAdapter()
- *
- * @name module:js-data-rethinkdb.default
- * @see RethinkDBAdapter
- * @type {Constructor}
- */
-
-/**
  * Registered as `js-data-rethinkdb` in NPM.
  *
  * @example <caption>Install from NPM</caption>
@@ -1053,5 +1041,3 @@ export const version = '<%= version %>'
  *
  * @module js-data-rethinkdb
  */
-
-export default RethinkDBAdapter

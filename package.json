@@ -1,7 +1,7 @@
 {
   "name": "js-data-rethinkdb",
   "description": "RethinkDB adapter for js-data.",
-  "version": "3.0.0-beta.4",
+  "version": "3.0.0-beta.5",
   "homepage": "https://github.com/js-data/js-data-rethinkdb",
   "repository": {
     "type": "git",
@@ -44,7 +44,11 @@
   },
   "babel": {
     "presets": [
-      "es2015-rollup"
+      "es2015"
+    ],
+    "plugins": [
+      "syntax-async-functions",
+      "transform-regenerator"
     ]
   },
   "scripts": {
@@ -53,8 +57,8 @@
     "doc": "jsdoc -c conf.json src node_modules/js-data-adapter/src",
     "watch": "watch \"npm run bundle\" src/",
     "build": "npm run lint && npm run bundle",
-    "mocha": "mocha -t 30000 -R dot -r source-map-support/register mocha.start.js",
-    "cover": "istanbul cover --hook-run-in-context node_modules/mocha/bin/_mocha -- -t 30000 -R dot -r source-map-support/register mocha.start.js",
+    "mocha": "mocha -t 20000 -R dot -r babel-core/register -r babel-polyfill mocha.start.js",
+    "cover": "nyc --require babel-core/register --require babel-polyfill --cache mocha -t 20000 -R dot mocha.start.js && nyc report --reporter=html",
     "test": "npm run build && npm run cover",
     "release": "npm test && npm run doc && repo-tools updates && repo-tools changelog && repo-tools authors"
   },
@@ -69,9 +73,9 @@
   "devDependencies": {
     "babel-polyfill": "6.8.0",
     "babel-preset-es2015-rollup": "1.1.1",
-    "istanbul": "0.4.3",
     "js-data-adapter-tests": "^2.0.0-alpha.20",
     "js-data-repo-tools": "0.5.1",
+    "nyc": "6.4.4",
     "rollup": "0.26.2",
     "rollup-plugin-babel": "2.4.0",
     "source-map-support": "0.4.0",

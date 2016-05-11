@@ -2,13 +2,13 @@
 'use strict'
 
 // prepare environment for js-data-adapter-tests
-require('babel-polyfill')
+import 'babel-polyfill'
 
-var JSData = require('js-data')
-var JSDataAdapterTests = require('js-data-adapter-tests')
-var JSDataRethinkDB = require('./')
+import * as JSData from 'js-data'
+import JSDataAdapterTests from 'js-data-adapter-tests'
+import * as JSDataRethinkDB from './src/index'
 
-var assert = global.assert = JSDataAdapterTests.assert
+const assert = global.assert = JSDataAdapterTests.assert
 global.sinon = JSDataAdapterTests.sinon
 
 JSDataAdapterTests.init({
@@ -28,16 +28,46 @@ JSDataAdapterTests.init({
   ]
 })
 
-require('./test/handleErrors.test')
+describe('RethinkDBAdapter#handleErrors(err)', function () {
+  it('should do nothing when passed a falsy value', function () {
+    var Test = this
+    assert.doesNotThrow(function () {
+      Test.$$adapter._handleErrors(false)
+    })
+  })
+  it('should do nothing when errors is 0', function () {
+    var Test = this
+    assert.doesNotThrow(function () {
+      Test.$$adapter._handleErrors({
+        errors: 0
+      })
+    })
+  })
+  it('should throw an error when errors > 0 && first_error is a string', function () {
+    var Test = this
+    var errorString = 'error string'
+    assert.throws(function () {
+      Test.$$adapter._handleErrors({
+        errors: 1,
+        first_error: errorString
+      })
+    }, Error, errorString)
+  })
+  it('should throw a generic error when errors > 0 && first_error is nothing', function () {
+    var Test = this
+    assert.throws(function () {
+      Test.$$adapter._handleErrors({
+        errors: 1
+      })
+    }, Error, 'Unknown RethinkDB Error')
+  })
+})
 
 describe('exports', function () {
   it('should have correct exports', function () {
-    assert(JSDataRethinkDB.default)
     assert(JSDataRethinkDB.RethinkDBAdapter)
-    assert(JSDataRethinkDB.RethinkDBAdapter === JSDataRethinkDB.default)
     assert(JSDataRethinkDB.OPERATORS)
     assert(JSDataRethinkDB.OPERATORS['=='])
     assert(JSDataRethinkDB.version)
-    assert(JSDataRethinkDB.version.full)
   })
 })
