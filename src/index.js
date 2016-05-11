@@ -322,29 +322,27 @@ utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
   },
 
   _count (mapper, query, opts) {
-    const self = this
     opts || (opts = {})
     query || (query = {})
 
-    return self.filterSequence(self.selectTable(mapper, opts), query)
+    return this.filterSequence(this.selectTable(mapper, opts), query)
       .count()
-      .run(self.getOpt('runOpts', opts)).then(function (count) {
-        return [count, {}]
-      })
+      .run(this.getOpt('runOpts', opts))
+      .then((count) => [count, {}])
   },
 
   _create (mapper, props, opts) {
-    const self = this
     props || (props = {})
     opts || (opts = {})
 
-    const insertOpts = self.getOpt('insertOpts', opts)
+    const insertOpts = this.getOpt('insertOpts', opts)
     insertOpts.returnChanges = true
 
-    return self.selectTable(mapper, opts)
+    return this.selectTable(mapper, opts)
       .insert(props, insertOpts)
-      .run(self.getOpt('runOpts', opts)).then(function (cursor) {
-        self._handleErrors(cursor)
+      .run(this.getOpt('runOpts', opts))
+      .then((cursor) => {
+        this._handleErrors(cursor)
         let record
         if (cursor && cursor.changes && cursor.changes.length && cursor.changes[0].new_val) {
           record = cursor.changes[0].new_val
@@ -354,105 +352,96 @@ utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
   },
 
   _createMany (mapper, props, opts) {
-    const self = this
     props || (props = {})
     opts || (opts = {})
 
-    const insertOpts = self.getOpt('insertOpts', opts)
+    const insertOpts = this.getOpt('insertOpts', opts)
     insertOpts.returnChanges = true
 
-    return self.selectTable(mapper, opts)
+    return this.selectTable(mapper, opts)
       .insert(props, insertOpts)
-      .run(self.getOpt('runOpts', opts)).then(function (cursor) {
-        self._handleErrors(cursor)
+      .run(this.getOpt('runOpts', opts))
+      .then((cursor) => {
+        this._handleErrors(cursor)
         let records = []
         if (cursor && cursor.changes && cursor.changes.length && cursor.changes) {
-          records = cursor.changes.map(function (change) {
-            return change.new_val
-          })
+          records = cursor.changes.map((change) => change.new_val)
         }
         return [records, cursor]
       })
   },
 
   _destroy (mapper, id, opts) {
-    const self = this
     opts || (opts = {})
 
-    return self.selectTable(mapper, opts)
+    return this.selectTable(mapper, opts)
       .get(id)
-      .delete(self.getOpt('deleteOpts', opts))
-      .run(self.getOpt('runOpts', opts)).then(function (cursor) {
-        self._handleErrors(cursor)
+      .delete(this.getOpt('deleteOpts', opts))
+      .run(this.getOpt('runOpts', opts))
+      .then((cursor) => {
+        this._handleErrors(cursor)
         return [undefined, cursor]
       })
   },
 
   _destroyAll (mapper, query, opts) {
-    const self = this
     query || (query = {})
     opts || (opts = {})
 
-    return self
-      .filterSequence(self.selectTable(mapper, opts), query)
-      .delete(self.getOpt('deleteOpts', opts))
-      .run(self.getOpt('runOpts', opts)).then(function (cursor) {
-        self._handleErrors(cursor)
+    return this.filterSequence(this.selectTable(mapper, opts), query)
+      .delete(this.getOpt('deleteOpts', opts))
+      .run(this.getOpt('runOpts', opts))
+      .then((cursor) => {
+        this._handleErrors(cursor)
         return [undefined, cursor]
       })
   },
 
   _find (mapper, id, opts) {
-    const self = this
     opts || (opts = {})
 
-    return self.selectTable(mapper, opts)
+    return this.selectTable(mapper, opts)
       .get(id)
-      .run(self.getOpt('runOpts', opts)).then(function (record) {
-        return [record, {}]
-      })
+      .run(this.getOpt('runOpts', opts))
+      .then((record) => [record, {}])
   },
 
   _findAll (mapper, query, opts) {
-    const self = this
     opts || (opts = {})
     query || (query = {})
 
-    return self.filterSequence(self.selectTable(mapper, opts), query)
-      .run(self.getOpt('runOpts', opts)).then(function (records) {
-        return [records, {}]
-      })
+    return this.filterSequence(this.selectTable(mapper, opts), query)
+      .run(this.getOpt('runOpts', opts))
+      .then((records) => [records, {}])
   },
 
   _sum (mapper, field, query, opts) {
-    const self = this
     if (!utils.isString(field)) {
       throw new Error('field must be a string!')
     }
     opts || (opts = {})
     query || (query = {})
 
-    return self.filterSequence(self.selectTable(mapper, opts), query)
+    return this.filterSequence(this.selectTable(mapper, opts), query)
       .sum(field)
-      .run(self.getOpt('runOpts', opts)).then(function (sum) {
-        return [sum, {}]
-      })
+      .run(this.getOpt('runOpts', opts))
+      .then((sum) => [sum, {}])
   },
 
   _update (mapper, id, props, opts) {
-    const self = this
     props || (props = {})
     opts || (opts = {})
 
-    const updateOpts = self.getOpt('updateOpts', opts)
+    const updateOpts = this.getOpt('updateOpts', opts)
     updateOpts.returnChanges = true
 
-    return self.selectTable(mapper, opts)
+    return this.selectTable(mapper, opts)
       .get(id)
       .update(props, updateOpts)
-      .run(self.getOpt('runOpts', opts)).then(function (cursor) {
+      .run(this.getOpt('runOpts', opts))
+      .then((cursor) => {
         let record
-        self._handleErrors(cursor)
+        this._handleErrors(cursor)
         if (cursor && cursor.changes && cursor.changes.length && cursor.changes[0].new_val) {
           record = cursor.changes[0].new_val
         } else {
@@ -463,42 +452,42 @@ utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
   },
 
   _updateAll (mapper, props, query, opts) {
-    const self = this
     props || (props = {})
     query || (query = {})
     opts || (opts = {})
 
-    const updateOpts = self.getOpt('updateOpts', opts)
+    const updateOpts = this.getOpt('updateOpts', opts)
     updateOpts.returnChanges = true
 
-    return self.filterSequence(self.selectTable(mapper, opts), query)
+    return this.filterSequence(this.selectTable(mapper, opts), query)
       .update(props, updateOpts)
-      .run(self.getOpt('runOpts', opts)).then(function (cursor) {
+      .run(this.getOpt('runOpts', opts))
+      .then((cursor) => {
         let records = []
-        self._handleErrors(cursor)
+        this._handleErrors(cursor)
         if (cursor && cursor.changes && cursor.changes.length) {
-          records = cursor.changes.map(function (change) { return change.new_val })
+          records = cursor.changes.map((change) => change.new_val)
         }
         return [records, cursor]
       })
   },
 
   _updateMany (mapper, records, opts) {
-    const self = this
     records || (records = [])
     opts || (opts = {})
 
-    const insertOpts = self.getOpt('insertOpts', opts)
+    const insertOpts = this.getOpt('insertOpts', opts)
     insertOpts.returnChanges = true
     insertOpts.conflict = 'update'
 
-    return self.selectTable(mapper, opts)
+    return this.selectTable(mapper, opts)
       .insert(records, insertOpts)
-      .run(self.getOpt('runOpts', opts)).then(function (cursor) {
+      .run(this.getOpt('runOpts', opts))
+      .then((cursor) => {
         records = []
-        self._handleErrors(cursor)
+        this._handleErrors(cursor)
         if (cursor && cursor.changes && cursor.changes.length) {
-          records = cursor.changes.map(function (change) { return change.new_val })
+          records = cursor.changes.map((change) => change.new_val)
         }
         return [records, cursor]
       })
@@ -1037,18 +1026,6 @@ export const version = '<%= version %>'
  */
 
 /**
- * {@link RethinkDBAdapter} class.
- *
- * @example <caption>ES2015 modules "default" import</caption>
- * import RethinkDBAdapter from 'js-data-rethinkdb'
- * const adapter = new RethinkDBAdapter()
- *
- * @name module:js-data-rethinkdb.default
- * @see RethinkDBAdapter
- * @type {Constructor}
- */
-
-/**
  * Registered as `js-data-rethinkdb` in NPM.
  *
  * @example <caption>Install from NPM</caption>
@@ -1064,5 +1041,3 @@ export const version = '<%= version %>'
  *
  * @module js-data-rethinkdb
  */
-
-export default RethinkDBAdapter

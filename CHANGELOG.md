@@ -1,3 +1,8 @@
+##### 3.0.0-beta.5 - 10 May 2016
+
+###### Breaking changes
+- Removed default import, which wasn't working
+
 ##### 3.0.0-beta.4 - 10 May 2016
 
 ###### Breaking changes
