@@ -322,24 +322,24 @@ jsData.utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
     }
   },
   _count: function _count(mapper, query, opts) {
-    var self = this;
     opts || (opts = {});
     query || (query = {});
 
-    return self.filterSequence(self.selectTable(mapper, opts), query).count().run(self.getOpt('runOpts', opts)).then(function (count) {
+    return this.filterSequence(this.selectTable(mapper, opts), query).count().run(this.getOpt('runOpts', opts)).then(function (count) {
       return [count, {}];
     });
   },
   _create: function _create(mapper, props, opts) {
-    var self = this;
+    var _this = this;
+
     props || (props = {});
     opts || (opts = {});
 
-    var insertOpts = self.getOpt('insertOpts', opts);
+    var insertOpts = this.getOpt('insertOpts', opts);
     insertOpts.returnChanges = true;
 
-    return self.selectTable(mapper, opts).insert(props, insertOpts).run(self.getOpt('runOpts', opts)).then(function (cursor) {
-      self._handleErrors(cursor);
+    return this.selectTable(mapper, opts).insert(props, insertOpts).run(this.getOpt('runOpts', opts)).then(function (cursor) {
+      _this._handleErrors(cursor);
       var record = void 0;
       if (cursor && cursor.changes && cursor.changes.length && cursor.changes[0].new_val) {
         record = cursor.changes[0].new_val;
@@ -348,15 +348,16 @@ jsData.utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
     });
   },
   _createMany: function _createMany(mapper, props, opts) {
-    var self = this;
+    var _this2 = this;
+
     props || (props = {});
     opts || (opts = {});
 
-    var insertOpts = self.getOpt('insertOpts', opts);
+    var insertOpts = this.getOpt('insertOpts', opts);
     insertOpts.returnChanges = true;
 
-    return self.selectTable(mapper, opts).insert(props, insertOpts).run(self.getOpt('runOpts', opts)).then(function (cursor) {
-      self._handleErrors(cursor);
+    return this.selectTable(mapper, opts).insert(props, insertOpts).run(this.getOpt('runOpts', opts)).then(function (cursor) {
+      _this2._handleErrors(cursor);
       var records = [];
       if (cursor && cursor.changes && cursor.changes.length && cursor.changes) {
         records = cursor.changes.map(function (change) {
@@ -367,64 +368,64 @@ jsData.utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
     });
   },
   _destroy: function _destroy(mapper, id, opts) {
-    var self = this;
+    var _this3 = this;
+
     opts || (opts = {});
 
-    return self.selectTable(mapper, opts).get(id).delete(self.getOpt('deleteOpts', opts)).run(self.getOpt('runOpts', opts)).then(function (cursor) {
-      self._handleErrors(cursor);
+    return this.selectTable(mapper, opts).get(id).delete(this.getOpt('deleteOpts', opts)).run(this.getOpt('runOpts', opts)).then(function (cursor) {
+      _this3._handleErrors(cursor);
       return [undefined, cursor];
     });
   },
   _destroyAll: function _destroyAll(mapper, query, opts) {
-    var self = this;
+    var _this4 = this;
+
     query || (query = {});
     opts || (opts = {});
 
-    return self.filterSequence(self.selectTable(mapper, opts), query).delete(self.getOpt('deleteOpts', opts)).run(self.getOpt('runOpts', opts)).then(function (cursor) {
-      self._handleErrors(cursor);
+    return this.filterSequence(this.selectTable(mapper, opts), query).delete(this.getOpt('deleteOpts', opts)).run(this.getOpt('runOpts', opts)).then(function (cursor) {
+      _this4._handleErrors(cursor);
       return [undefined, cursor];
     });
   },
   _find: function _find(mapper, id, opts) {
-    var self = this;
     opts || (opts = {});
 
-    return self.selectTable(mapper, opts).get(id).run(self.getOpt('runOpts', opts)).then(function (record) {
+    return this.selectTable(mapper, opts).get(id).run(this.getOpt('runOpts', opts)).then(function (record) {
       return [record, {}];
     });
   },
   _findAll: function _findAll(mapper, query, opts) {
-    var self = this;
     opts || (opts = {});
     query || (query = {});
 
-    return self.filterSequence(self.selectTable(mapper, opts), query).run(self.getOpt('runOpts', opts)).then(function (records) {
+    return this.filterSequence(this.selectTable(mapper, opts), query).run(this.getOpt('runOpts', opts)).then(function (records) {
       return [records, {}];
     });
   },
   _sum: function _sum(mapper, field, query, opts) {
-    var self = this;
     if (!jsData.utils.isString(field)) {
       throw new Error('field must be a string!');
     }
     opts || (opts = {});
     query || (query = {});
 
-    return self.filterSequence(self.selectTable(mapper, opts), query).sum(field).run(self.getOpt('runOpts', opts)).then(function (sum) {
+    return this.filterSequence(this.selectTable(mapper, opts), query).sum(field).run(this.getOpt('runOpts', opts)).then(function (sum) {
       return [sum, {}];
     });
   },
   _update: function _update(mapper, id, props, opts) {
-    var self = this;
+    var _this5 = this;
+
     props || (props = {});
     opts || (opts = {});
 
-    var updateOpts = self.getOpt('updateOpts', opts);
+    var updateOpts = this.getOpt('updateOpts', opts);
     updateOpts.returnChanges = true;
 
-    return self.selectTable(mapper, opts).get(id).update(props, updateOpts).run(self.getOpt('runOpts', opts)).then(function (cursor) {
+    return this.selectTable(mapper, opts).get(id).update(props, updateOpts).run(this.getOpt('runOpts', opts)).then(function (cursor) {
       var record = void 0;
-      self._handleErrors(cursor);
+      _this5._handleErrors(cursor);
       if (cursor && cursor.changes && cursor.changes.length && cursor.changes[0].new_val) {
         record = cursor.changes[0].new_val;
       } else {
@@ -434,17 +435,18 @@ jsData.utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
     });
   },
   _updateAll: function _updateAll(mapper, props, query, opts) {
-    var self = this;
+    var _this6 = this;
+
     props || (props = {});
     query || (query = {});
     opts || (opts = {});
 
-    var updateOpts = self.getOpt('updateOpts', opts);
+    var updateOpts = this.getOpt('updateOpts', opts);
     updateOpts.returnChanges = true;
 
-    return self.filterSequence(self.selectTable(mapper, opts), query).update(props, updateOpts).run(self.getOpt('runOpts', opts)).then(function (cursor) {
+    return this.filterSequence(this.selectTable(mapper, opts), query).update(props, updateOpts).run(this.getOpt('runOpts', opts)).then(function (cursor) {
       var records = [];
-      self._handleErrors(cursor);
+      _this6._handleErrors(cursor);
       if (cursor && cursor.changes && cursor.changes.length) {
         records = cursor.changes.map(function (change) {
           return change.new_val;
@@ -454,17 +456,18 @@ jsData.utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
     });
   },
   _updateMany: function _updateMany(mapper, records, opts) {
-    var self = this;
+    var _this7 = this;
+
     records || (records = []);
     opts || (opts = {});
 
-    var insertOpts = self.getOpt('insertOpts', opts);
+    var insertOpts = this.getOpt('insertOpts', opts);
     insertOpts.returnChanges = true;
     insertOpts.conflict = 'update';
 
-    return self.selectTable(mapper, opts).insert(records, insertOpts).run(self.getOpt('runOpts', opts)).then(function (cursor) {
+    return this.selectTable(mapper, opts).insert(records, insertOpts).run(this.getOpt('runOpts', opts)).then(function (cursor) {
       records = [];
-      self._handleErrors(cursor);
+      _this7._handleErrors(cursor);
       if (cursor && cursor.changes && cursor.changes.length) {
         records = cursor.changes.map(function (change) {
           return change.new_val;
@@ -499,7 +502,7 @@ jsData.utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
    * for specified operators.
    */
   filterSequence: function filterSequence(sequence, query, opts) {
-    var _this = this;
+    var _this8 = this;
 
     var r = this.r;
 
@@ -544,7 +547,7 @@ jsData.utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
               operator = operator.substr(1);
               isOr = true;
             }
-            var predicateFn = _this.getOperator(operator, opts);
+            var predicateFn = _this8.getOperator(operator, opts);
             if (predicateFn) {
               var predicateResult = predicateFn(r, row, field, value);
               if (isOr) {
@@ -595,35 +598,35 @@ jsData.utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
     return this.databases[db];
   },
   waitForTable: function waitForTable(mapper, opts) {
-    var _this2 = this;
+    var _this9 = this;
 
     opts || (opts = {});
     var table = jsData.utils.isString(mapper) ? mapper : mapper.table || underscore(mapper.name);
     var db = jsData.utils.isUndefined(opts.db) ? this.rOpts.db : opts.db;
     return this.waitForDb(opts).then(function () {
-      _this2.tables[db] = _this2.tables[db] || {};
-      if (!_this2.tables[db][table]) {
-        _this2.tables[db][table] = _this2.r.branch(_this2.r.db(db).tableList().contains(table), true, _this2.r.db(db).tableCreate(table)).run();
+      _this9.tables[db] = _this9.tables[db] || {};
+      if (!_this9.tables[db][table]) {
+        _this9.tables[db][table] = _this9.r.branch(_this9.r.db(db).tableList().contains(table), true, _this9.r.db(db).tableCreate(table)).run();
       }
-      return _this2.tables[db][table];
+      return _this9.tables[db][table];
     });
   },
   waitForIndex: function waitForIndex(table, index, opts) {
-    var _this3 = this;
+    var _this10 = this;
 
     opts || (opts = {});
     var db = jsData.utils.isUndefined(opts.db) ? this.rOpts.db : opts.db;
     return this.waitForDb(opts).then(function () {
-      return _this3.waitForTable(table, opts);
+      return _this10.waitForTable(table, opts);
     }).then(function () {
-      _this3.indices[db] = _this3.indices[db] || {};
-      _this3.indices[db][table] = _this3.indices[db][table] || {};
-      if (!_this3.tables[db][table][index]) {
-        _this3.tables[db][table][index] = _this3.r.branch(_this3.r.db(db).table(table).indexList().contains(index), true, _this3.r.db(db).table(table).indexCreate(index)).run().then(function () {
-          return _this3.r.db(db).table(table).indexWait(index).run();
+      _this10.indices[db] = _this10.indices[db] || {};
+      _this10.indices[db][table] = _this10.indices[db][table] || {};
+      if (!_this10.tables[db][table][index]) {
+        _this10.tables[db][table][index] = _this10.r.branch(_this10.r.db(db).table(table).indexList().contains(index), true, _this10.r.db(db).table(table).indexCreate(index)).run().then(function () {
+          return _this10.r.db(db).table(table).indexWait(index).run();
         });
       }
-      return _this3.tables[db][table][index];
+      return _this10.tables[db][table][index];
     });
   },
 
@@ -650,13 +653,13 @@ jsData.utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
    * @return {Promise}
    */
   count: function count(mapper, query, opts) {
-    var _this4 = this;
+    var _this11 = this;
 
     opts || (opts = {});
     query || (query = {});
 
     return this.waitForTable(mapper, opts).then(function () {
-      return __super__.count.call(_this4, mapper, query, opts);
+      return __super__.count.call(_this11, mapper, query, opts);
     });
   },
 
@@ -676,13 +679,13 @@ jsData.utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
    * @return {Promise}
    */
   create: function create(mapper, props, opts) {
-    var _this5 = this;
+    var _this12 = this;
 
     props || (props = {});
     opts || (opts = {});
 
     return this.waitForTable(mapper, opts).then(function () {
-      return __super__.create.call(_this5, mapper, props, opts);
+      return __super__.create.call(_this12, mapper, props, opts);
     });
   },
 
@@ -702,13 +705,13 @@ jsData.utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
    * @return {Promise}
    */
   createMany: function createMany(mapper, props, opts) {
-    var _this6 = this;
+    var _this13 = this;
 
     props || (props = {});
     opts || (opts = {});
 
     return this.waitForTable(mapper, opts).then(function () {
-      return __super__.createMany.call(_this6, mapper, props, opts);
+      return __super__.createMany.call(_this13, mapper, props, opts);
     });
   },
 
@@ -728,12 +731,12 @@ jsData.utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
    * @return {Promise}
    */
   destroy: function destroy(mapper, id, opts) {
-    var _this7 = this;
+    var _this14 = this;
 
     opts || (opts = {});
 
     return this.waitForTable(mapper, opts).then(function () {
-      return __super__.destroy.call(_this7, mapper, id, opts);
+      return __super__.destroy.call(_this14, mapper, id, opts);
     });
   },
 
@@ -761,13 +764,13 @@ jsData.utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
    * @return {Promise}
    */
   destroyAll: function destroyAll(mapper, query, opts) {
-    var _this8 = this;
+    var _this15 = this;
 
     opts || (opts = {});
     query || (query = {});
 
     return this.waitForTable(mapper, opts).then(function () {
-      return __super__.destroyAll.call(_this8, mapper, query, opts);
+      return __super__.destroyAll.call(_this15, mapper, query, opts);
     });
   },
 
@@ -787,7 +790,7 @@ jsData.utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
    * @return {Promise}
    */
   find: function find(mapper, id, opts) {
-    var _this9 = this;
+    var _this16 = this;
 
     opts || (opts = {});
     opts.with || (opts.with = []);
@@ -803,14 +806,14 @@ jsData.utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
       }
       if (def.foreignKey && def.type !== 'belongsTo') {
         if (def.type === 'belongsTo') {
-          tasks.push(_this9.waitForIndex(mapper.table || underscore(mapper.name), def.foreignKey, opts));
+          tasks.push(_this16.waitForIndex(mapper.table || underscore(mapper.name), def.foreignKey, opts));
         } else {
-          tasks.push(_this9.waitForIndex(relationDef.table || underscore(relationDef.name), def.foreignKey, opts));
+          tasks.push(_this16.waitForIndex(relationDef.table || underscore(relationDef.name), def.foreignKey, opts));
         }
       }
     });
     return Promise.all(tasks).then(function () {
-      return __super__.find.call(_this9, mapper, id, opts);
+      return __super__.find.call(_this16, mapper, id, opts);
     });
   },
 
@@ -838,7 +841,7 @@ jsData.utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
    * @return {Promise}
    */
   findAll: function findAll(mapper, query, opts) {
-    var _this10 = this;
+    var _this17 = this;
 
     opts || (opts = {});
     opts.with || (opts.with = []);
@@ -855,14 +858,14 @@ jsData.utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
       }
       if (def.foreignKey && def.type !== 'belongsTo') {
         if (def.type === 'belongsTo') {
-          tasks.push(_this10.waitForIndex(mapper.table || underscore(mapper.name), def.foreignKey, opts));
+          tasks.push(_this17.waitForIndex(mapper.table || underscore(mapper.name), def.foreignKey, opts));
         } else {
-          tasks.push(_this10.waitForIndex(relationDef.table || underscore(relationDef.name), def.foreignKey, opts));
+          tasks.push(_this17.waitForIndex(relationDef.table || underscore(relationDef.name), def.foreignKey, opts));
         }
       }
     });
     return Promise.all(tasks).then(function () {
-      return __super__.findAll.call(_this10, mapper, query, opts);
+      return __super__.findAll.call(_this17, mapper, query, opts);
     });
   },
 
@@ -911,13 +914,13 @@ jsData.utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
    * @return {Promise}
    */
   sum: function sum(mapper, field, query, opts) {
-    var _this11 = this;
+    var _this18 = this;
 
     opts || (opts = {});
     query || (query = {});
 
     return this.waitForTable(mapper, opts).then(function () {
-      return __super__.sum.call(_this11, mapper, field, query, opts);
+      return __super__.sum.call(_this18, mapper, field, query, opts);
     });
   },
 
@@ -938,13 +941,13 @@ jsData.utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
    * @return {Promise}
    */
   update: function update(mapper, id, props, opts) {
-    var _this12 = this;
+    var _this19 = this;
 
     props || (props = {});
     opts || (opts = {});
 
     return this.waitForTable(mapper, opts).then(function () {
-      return __super__.update.call(_this12, mapper, id, props, opts);
+      return __super__.update.call(_this19, mapper, id, props, opts);
     });
   },
 
@@ -973,14 +976,14 @@ jsData.utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
    * @return {Promise}
    */
   updateAll: function updateAll(mapper, props, query, opts) {
-    var _this13 = this;
+    var _this20 = this;
 
     props || (props = {});
     query || (query = {});
     opts || (opts = {});
 
     return this.waitForTable(mapper, opts).then(function () {
-      return __super__.updateAll.call(_this13, mapper, props, query, opts);
+      return __super__.updateAll.call(_this20, mapper, props, query, opts);
     });
   },
 
@@ -1000,13 +1003,13 @@ jsData.utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
    * @return {Promise}
    */
   updateMany: function updateMany(mapper, records, opts) {
-    var _this14 = this;
+    var _this21 = this;
 
     records || (records = []);
     opts || (opts = {});
 
     return this.waitForTable(mapper, opts).then(function () {
-      return __super__.updateMany.call(_this14, mapper, records, opts);
+      return __super__.updateMany.call(_this21, mapper, records, opts);
     });
   }
 });
@@ -1034,15 +1037,47 @@ jsData.utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
  * otherwise `false` if the current version is not beta.
  */
 var version = {
-  beta: 4,
-  full: '3.0.0-beta.4',
+  beta: 5,
+  full: '3.0.0-beta.5',
   major: 3,
   minor: 0,
   patch: 0
 };
 
+/**
+ * {@link RethinkDBAdapter} class.
+ *
+ * @example <caption>ES2015 modules import</caption>
+ * import {RethinkDBAdapter} from 'js-data-rethinkdb'
+ * const adapter = new RethinkDBAdapter()
+ *
+ * @example <caption>CommonJS import</caption>
+ * var RethinkDBAdapter = require('js-data-rethinkdb').RethinkDBAdapter
+ * var adapter = new RethinkDBAdapter()
+ *
+ * @name module:js-data-rethinkdb.RethinkDBAdapter
+ * @see RethinkDBAdapter
+ * @type {Constructor}
+ */
+
+/**
+ * Registered as `js-data-rethinkdb` in NPM.
+ *
+ * @example <caption>Install from NPM</caption>
+ * npm i --save js-data-rethinkdb@beta js-data@beta rethinkdbdash
+ *
+ * @example <caption>ES2015 modules import</caption>
+ * import {RethinkDBAdapter} from 'js-data-rethinkdb'
+ * const adapter = new RethinkDBAdapter()
+ *
+ * @example <caption>CommonJS import</caption>
+ * var RethinkDBAdapter = require('js-data-rethinkdb').RethinkDBAdapter
+ * var adapter = new RethinkDBAdapter()
+ *
+ * @module js-data-rethinkdb
+ */
+
 exports.OPERATORS = OPERATORS;
 exports.RethinkDBAdapter = RethinkDBAdapter;
 exports.version = version;
-exports['default'] = RethinkDBAdapter;
 //# sourceMappingURL=js-data-rethinkdb.js.map
