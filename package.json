@@ -38,10 +38,14 @@
       "beforeEach",
       "afterEach"
     ],
-    "ignore": ["dist/"]
+    "ignore": [
+      "dist/"
+    ]
   },
   "babel": {
-    "presets": ["es2015-rollup"]
+    "presets": [
+      "es2015-rollup"
+    ]
   },
   "scripts": {
     "lint": "repo-tools lint \"**/*.js\"",
@@ -52,8 +56,7 @@
     "mocha": "mocha -t 30000 -R dot -r source-map-support/register mocha.start.js",
     "cover": "istanbul cover --hook-run-in-context node_modules/mocha/bin/_mocha -- -t 30000 -R dot -r source-map-support/register mocha.start.js",
     "test": "npm run build && npm run cover",
-    "release": "npm test && npm run doc && repo-tools updates && repo-tools changelog && repo-tools authors",
-    "ci": "npm run test && cat coverage/lcov.info | codecov"
+    "release": "npm test && npm run doc && repo-tools updates && repo-tools changelog && repo-tools authors"
   },
   "dependencies": {
     "js-data-adapter": "~0.6.1",
