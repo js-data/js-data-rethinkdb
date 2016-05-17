@@ -29,6 +29,7 @@ var notEqual = function notEqual(r, row, field, value) {
  * Default predicate functions for the filtering operators.
  *
  * @name module:js-data-rethinkdb.OPERATORS
+ * @property {Function} = Equality operator.
  * @property {Function} == Equality operator.
  * @property {Function} != Inequality operator.
  * @property {Function} > "Greater than" operator.
@@ -49,6 +50,7 @@ var notEqual = function notEqual(r, row, field, value) {
  * contain the provided value.
  */
 var OPERATORS = {
+  '=': equal,
   '==': equal,
   '===': equal,
   '!=': notEqual,
@@ -476,11 +478,94 @@ jsData.utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
       return [records, cursor];
     });
   },
-  selectDb: function selectDb(opts) {
-    return this.r.db(jsData.utils.isUndefined(opts.db) ? this.rOpts.db : opts.db);
+  _applyWhereFromObject: function _applyWhereFromObject(where) {
+    var fields = [];
+    var ops = [];
+    var predicates = [];
+    jsData.utils.forOwn(where, function (clause, field) {
+      if (!jsData.utils.isObject(clause)) {
+        clause = {
+          '==': clause
+        };
+      }
+      jsData.utils.forOwn(clause, function (expr, op) {
+        fields.push(field);
+        ops.push(op);
+        predicates.push(expr);
+      });
+    });
+    return {
+      fields: fields,
+      ops: ops,
+      predicates: predicates
+    };
   },
-  selectTable: function selectTable(mapper, opts) {
-    return this.selectDb(opts).table(mapper.table || underscore(mapper.name));
+  _applyWhereFromArray: function _applyWhereFromArray(where) {
+    var _this8 = this;
+
+    var groups = [];
+    where.forEach(function (_where, i) {
+      if (jsData.utils.isString(_where)) {
+        return;
+      }
+      var prev = where[i - 1];
+      var parser = jsData.utils.isArray(_where) ? _this8._applyWhereFromArray : _this8._applyWhereFromObject;
+      var group = parser.call(_this8, _where);
+      if (prev === 'or') {
+        group.isOr = true;
+      }
+      groups.push(group);
+    });
+    groups.isArray = true;
+    return groups;
+  },
+  _testObjectGroup: function _testObjectGroup(rql, group, row, opts) {
+    var i = void 0;
+    var r = this.r;
+    var fields = group.fields;
+    var ops = group.ops;
+    var predicates = group.predicates;
+    var len = ops.length;
+    for (i = 0; i < len; i++) {
+      var op = ops[i];
+      var isOr = op.charAt(0) === '|';
+      op = isOr ? op.substr(1) : op;
+      var predicateFn = this.getOperator(op, opts);
+      if (predicateFn) {
+        var predicateResult = predicateFn(r, row, fields[i], predicates[i]);
+        if (isOr) {
+          rql = rql ? rql.or(predicateResult) : predicateResult;
+        } else {
+          rql = rql ? rql.and(predicateResult) : predicateResult;
+        }
+      } else {
+        throw new Error('Operator ' + op + ' not supported!');
+      }
+    }
+    return rql;
+  },
+  _testArrayGroup: function _testArrayGroup(rql, groups, row, opts) {
+    var i = void 0;
+    var len = groups.length;
+    for (i = 0; i < len; i++) {
+      var group = groups[i];
+      var subQuery = void 0;
+      if (group.isArray) {
+        subQuery = this._testArrayGroup(rql, group, row, opts);
+      } else {
+        subQuery = this._testObjectGroup(null, group, row, opts);
+      }
+      if (groups[i - 1]) {
+        if (group.isOr) {
+          rql = rql.or(subQuery);
+        } else {
+          rql = rql.and(subQuery);
+        }
+      } else {
+        rql = rql ? rql.and(subQuery) : subQuery;
+      }
+    }
+    return rql;
   },
 
 
@@ -502,7 +587,7 @@ jsData.utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
    * for specified operators.
    */
   filterSequence: function filterSequence(sequence, query, opts) {
-    var _this8 = this;
+    var _this9 = this;
 
     var r = this.r;
 
@@ -531,36 +616,17 @@ jsData.utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
     var rql = sequence;
 
     // Filter
-    if (Object.keys(query.where).length !== 0) {
-      // Filter sequence using filter function
+    var groups = void 0;
+
+    if (jsData.utils.isObject(query.where) && Object.keys(query.where).length !== 0) {
+      groups = this._applyWhereFromArray([query.where]);
+    } else if (jsData.utils.isArray(query.where)) {
+      groups = this._applyWhereFromArray(query.where);
+    }
+
+    if (groups) {
       rql = rql.filter(function (row) {
-        var subQuery = void 0;
-        // Apply filter for each field
-        jsData.utils.forOwn(query.where, function (criteria, field) {
-          if (!jsData.utils.isObject(criteria)) {
-            criteria = { '==': criteria };
-          }
-          // Apply filter for each operator
-          jsData.utils.forOwn(criteria, function (value, operator) {
-            var isOr = false;
-            if (operator && operator[0] === '|') {
-              operator = operator.substr(1);
-              isOr = true;
-            }
-            var predicateFn = _this8.getOperator(operator, opts);
-            if (predicateFn) {
-              var predicateResult = predicateFn(r, row, field, value);
-              if (isOr) {
-                subQuery = subQuery ? subQuery.or(predicateResult) : predicateResult;
-              } else {
-                subQuery = subQuery ? subQuery.and(predicateResult) : predicateResult;
-              }
-            } else {
-              throw new Error('Operator ' + operator + ' not supported!');
-            }
-          });
-        });
-        return subQuery || true;
+        return _this9._testArrayGroup(null, groups, row, opts) || true;
       });
     }
 
@@ -589,6 +655,12 @@ jsData.utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
 
     return rql;
   },
+  selectDb: function selectDb(opts) {
+    return this.r.db(jsData.utils.isUndefined(opts.db) ? this.rOpts.db : opts.db);
+  },
+  selectTable: function selectTable(mapper, opts) {
+    return this.selectDb(opts).table(mapper.table || underscore(mapper.name));
+  },
   waitForDb: function waitForDb(opts) {
     opts || (opts = {});
     var db = jsData.utils.isUndefined(opts.db) ? this.rOpts.db : opts.db;
@@ -598,35 +670,35 @@ jsData.utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
     return this.databases[db];
   },
   waitForTable: function waitForTable(mapper, opts) {
-    var _this9 = this;
+    var _this10 = this;
 
     opts || (opts = {});
     var table = jsData.utils.isString(mapper) ? mapper : mapper.table || underscore(mapper.name);
     var db = jsData.utils.isUndefined(opts.db) ? this.rOpts.db : opts.db;
     return this.waitForDb(opts).then(function () {
-      _this9.tables[db] = _this9.tables[db] || {};
-      if (!_this9.tables[db][table]) {
-        _this9.tables[db][table] = _this9.r.branch(_this9.r.db(db).tableList().contains(table), true, _this9.r.db(db).tableCreate(table)).run();
+      _this10.tables[db] = _this10.tables[db] || {};
+      if (!_this10.tables[db][table]) {
+        _this10.tables[db][table] = _this10.r.branch(_this10.r.db(db).tableList().contains(table), true, _this10.r.db(db).tableCreate(table)).run();
       }
-      return _this9.tables[db][table];
+      return _this10.tables[db][table];
     });
   },
   waitForIndex: function waitForIndex(table, index, opts) {
-    var _this10 = this;
+    var _this11 = this;
 
     opts || (opts = {});
     var db = jsData.utils.isUndefined(opts.db) ? this.rOpts.db : opts.db;
     return this.waitForDb(opts).then(function () {
-      return _this10.waitForTable(table, opts);
+      return _this11.waitForTable(table, opts);
     }).then(function () {
-      _this10.indices[db] = _this10.indices[db] || {};
-      _this10.indices[db][table] = _this10.indices[db][table] || {};
-      if (!_this10.tables[db][table][index]) {
-        _this10.tables[db][table][index] = _this10.r.branch(_this10.r.db(db).table(table).indexList().contains(index), true, _this10.r.db(db).table(table).indexCreate(index)).run().then(function () {
-          return _this10.r.db(db).table(table).indexWait(index).run();
+      _this11.indices[db] = _this11.indices[db] || {};
+      _this11.indices[db][table] = _this11.indices[db][table] || {};
+      if (!_this11.tables[db][table][index]) {
+        _this11.tables[db][table][index] = _this11.r.branch(_this11.r.db(db).table(table).indexList().contains(index), true, _this11.r.db(db).table(table).indexCreate(index)).run().then(function () {
+          return _this11.r.db(db).table(table).indexWait(index).run();
         });
       }
-      return _this10.tables[db][table][index];
+      return _this11.tables[db][table][index];
     });
   },
 
@@ -653,13 +725,13 @@ jsData.utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
    * @return {Promise}
    */
   count: function count(mapper, query, opts) {
-    var _this11 = this;
+    var _this12 = this;
 
     opts || (opts = {});
     query || (query = {});
 
     return this.waitForTable(mapper, opts).then(function () {
-      return __super__.count.call(_this11, mapper, query, opts);
+      return __super__.count.call(_this12, mapper, query, opts);
     });
   },
 
@@ -679,13 +751,13 @@ jsData.utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
    * @return {Promise}
    */
   create: function create(mapper, props, opts) {
-    var _this12 = this;
+    var _this13 = this;
 
     props || (props = {});
     opts || (opts = {});
 
     return this.waitForTable(mapper, opts).then(function () {
-      return __super__.create.call(_this12, mapper, props, opts);
+      return __super__.create.call(_this13, mapper, props, opts);
     });
   },
 
@@ -705,13 +777,13 @@ jsData.utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
    * @return {Promise}
    */
   createMany: function createMany(mapper, props, opts) {
-    var _this13 = this;
+    var _this14 = this;
 
     props || (props = {});
     opts || (opts = {});
 
     return this.waitForTable(mapper, opts).then(function () {
-      return __super__.createMany.call(_this13, mapper, props, opts);
+      return __super__.createMany.call(_this14, mapper, props, opts);
     });
   },
 
@@ -731,12 +803,12 @@ jsData.utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
    * @return {Promise}
    */
   destroy: function destroy(mapper, id, opts) {
-    var _this14 = this;
+    var _this15 = this;
 
     opts || (opts = {});
 
     return this.waitForTable(mapper, opts).then(function () {
-      return __super__.destroy.call(_this14, mapper, id, opts);
+      return __super__.destroy.call(_this15, mapper, id, opts);
     });
   },
 
@@ -764,13 +836,13 @@ jsData.utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
    * @return {Promise}
    */
   destroyAll: function destroyAll(mapper, query, opts) {
-    var _this15 = this;
+    var _this16 = this;
 
     opts || (opts = {});
     query || (query = {});
 
     return this.waitForTable(mapper, opts).then(function () {
-      return __super__.destroyAll.call(_this15, mapper, query, opts);
+      return __super__.destroyAll.call(_this16, mapper, query, opts);
     });
   },
 
@@ -790,7 +862,7 @@ jsData.utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
    * @return {Promise}
    */
   find: function find(mapper, id, opts) {
-    var _this16 = this;
+    var _this17 = this;
 
     opts || (opts = {});
     opts.with || (opts.with = []);
@@ -806,14 +878,14 @@ jsData.utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
       }
       if (def.foreignKey && def.type !== 'belongsTo') {
         if (def.type === 'belongsTo') {
-          tasks.push(_this16.waitForIndex(mapper.table || underscore(mapper.name), def.foreignKey, opts));
+          tasks.push(_this17.waitForIndex(mapper.table || underscore(mapper.name), def.foreignKey, opts));
         } else {
-          tasks.push(_this16.waitForIndex(relationDef.table || underscore(relationDef.name), def.foreignKey, opts));
+          tasks.push(_this17.waitForIndex(relationDef.table || underscore(relationDef.name), def.foreignKey, opts));
         }
       }
     });
     return Promise.all(tasks).then(function () {
-      return __super__.find.call(_this16, mapper, id, opts);
+      return __super__.find.call(_this17, mapper, id, opts);
     });
   },
 
@@ -841,7 +913,7 @@ jsData.utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
    * @return {Promise}
    */
   findAll: function findAll(mapper, query, opts) {
-    var _this17 = this;
+    var _this18 = this;
 
     opts || (opts = {});
     opts.with || (opts.with = []);
@@ -858,14 +930,14 @@ jsData.utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
       }
       if (def.foreignKey && def.type !== 'belongsTo') {
         if (def.type === 'belongsTo') {
-          tasks.push(_this17.waitForIndex(mapper.table || underscore(mapper.name), def.foreignKey, opts));
+          tasks.push(_this18.waitForIndex(mapper.table || underscore(mapper.name), def.foreignKey, opts));
         } else {
-          tasks.push(_this17.waitForIndex(relationDef.table || underscore(relationDef.name), def.foreignKey, opts));
+          tasks.push(_this18.waitForIndex(relationDef.table || underscore(relationDef.name), def.foreignKey, opts));
         }
       }
     });
     return Promise.all(tasks).then(function () {
-      return __super__.findAll.call(_this17, mapper, query, opts);
+      return __super__.findAll.call(_this18, mapper, query, opts);
     });
   },
 
@@ -914,13 +986,13 @@ jsData.utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
    * @return {Promise}
    */
   sum: function sum(mapper, field, query, opts) {
-    var _this18 = this;
+    var _this19 = this;
 
     opts || (opts = {});
     query || (query = {});
 
     return this.waitForTable(mapper, opts).then(function () {
-      return __super__.sum.call(_this18, mapper, field, query, opts);
+      return __super__.sum.call(_this19, mapper, field, query, opts);
     });
   },
 
@@ -941,13 +1013,13 @@ jsData.utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
    * @return {Promise}
    */
   update: function update(mapper, id, props, opts) {
-    var _this19 = this;
+    var _this20 = this;
 
     props || (props = {});
     opts || (opts = {});
 
     return this.waitForTable(mapper, opts).then(function () {
-      return __super__.update.call(_this19, mapper, id, props, opts);
+      return __super__.update.call(_this20, mapper, id, props, opts);
     });
   },
 
@@ -976,14 +1048,14 @@ jsData.utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
    * @return {Promise}
    */
   updateAll: function updateAll(mapper, props, query, opts) {
-    var _this20 = this;
+    var _this21 = this;
 
     props || (props = {});
     query || (query = {});
     opts || (opts = {});
 
     return this.waitForTable(mapper, opts).then(function () {
-      return __super__.updateAll.call(_this20, mapper, props, query, opts);
+      return __super__.updateAll.call(_this21, mapper, props, query, opts);
     });
   },
 
@@ -1003,13 +1075,13 @@ jsData.utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
    * @return {Promise}
    */
   updateMany: function updateMany(mapper, records, opts) {
-    var _this21 = this;
+    var _this22 = this;
 
     records || (records = []);
     opts || (opts = {});
 
     return this.waitForTable(mapper, opts).then(function () {
-      return __super__.updateMany.call(_this21, mapper, records, opts);
+      return __super__.updateMany.call(_this22, mapper, records, opts);
     });
   }
 });
@@ -1037,8 +1109,8 @@ jsData.utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
  * otherwise `false` if the current version is not beta.
  */
 var version = {
-  beta: 5,
-  full: '3.0.0-beta.5',
+  beta: 6,
+  full: '3.0.0-beta.6',
   major: 3,
   minor: 0,
   patch: 0
