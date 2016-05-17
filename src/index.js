@@ -28,6 +28,7 @@ const notEqual = function (r, row, field, value) {
  * Default predicate functions for the filtering operators.
  *
  * @name module:js-data-rethinkdb.OPERATORS
+ * @property {Function} = Equality operator.
  * @property {Function} == Equality operator.
  * @property {Function} != Inequality operator.
  * @property {Function} > "Greater than" operator.
@@ -48,6 +49,7 @@ const notEqual = function (r, row, field, value) {
  * contain the provided value.
  */
 export const OPERATORS = {
+  '=': equal,
   '==': equal,
   '===': equal,
   '!=': notEqual,
@@ -493,12 +495,95 @@ utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
       })
   },
 
-  selectDb (opts) {
-    return this.r.db(utils.isUndefined(opts.db) ? this.rOpts.db : opts.db)
+  _applyWhereFromObject (where) {
+    const fields = []
+    const ops = []
+    const predicates = []
+    utils.forOwn(where, (clause, field) => {
+      if (!utils.isObject(clause)) {
+        clause = {
+          '==': clause
+        }
+      }
+      utils.forOwn(clause, (expr, op) => {
+        fields.push(field)
+        ops.push(op)
+        predicates.push(expr)
+      })
+    })
+    return {
+      fields,
+      ops,
+      predicates
+    }
   },
 
-  selectTable (mapper, opts) {
-    return this.selectDb(opts).table(mapper.table || underscore(mapper.name))
+  _applyWhereFromArray (where) {
+    const groups = []
+    where.forEach((_where, i) => {
+      if (utils.isString(_where)) {
+        return
+      }
+      const prev = where[i - 1]
+      const parser = utils.isArray(_where) ? this._applyWhereFromArray : this._applyWhereFromObject
+      const group = parser.call(this, _where)
+      if (prev === 'or') {
+        group.isOr = true
+      }
+      groups.push(group)
+    })
+    groups.isArray = true
+    return groups
+  },
+
+  _testObjectGroup (rql, group, row, opts) {
+    let i
+    const r = this.r
+    const fields = group.fields
+    const ops = group.ops
+    const predicates = group.predicates
+    const len = ops.length
+    for (i = 0; i < len; i++) {
+      let op = ops[i]
+      const isOr = op.charAt(0) === '|'
+      op = isOr ? op.substr(1) : op
+      const predicateFn = this.getOperator(op, opts)
+      if (predicateFn) {
+        const predicateResult = predicateFn(r, row, fields[i], predicates[i])
+        if (isOr) {
+          rql = rql ? rql.or(predicateResult) : predicateResult
+        } else {
+          rql = rql ? rql.and(predicateResult) : predicateResult
+        }
+      } else {
+        throw new Error(`Operator ${op} not supported!`)
+      }
+    }
+    return rql
+  },
+
+  _testArrayGroup (rql, groups, row, opts) {
+    let i
+    const len = groups.length
+    for (i = 0; i < len; i++) {
+      const group = groups[i]
+      let subQuery
+      if (group.isArray) {
+        subQuery = this._testArrayGroup(rql, group, row, opts)
+      } else {
+        subQuery = this._testObjectGroup(null, group, row, opts)
+      }
+      if (groups[i - 1]) {
+        if (group.isOr) {
+          rql = rql.or(subQuery)
+        } else {
+          rql = rql.and(subQuery)
+        }
+      } else {
+        rql = rql ? rql.and(subQuery) : subQuery
+      }
+    }
+    return rql
   },
 
   /**
@@ -546,37 +631,16 @@ utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
     let rql = sequence
 
     // Filter
-    if (Object.keys(query.where).length !== 0) {
-      // Filter sequence using filter function
-      rql = rql.filter((row) => {
-        let subQuery
-        // Apply filter for each field
-        utils.forOwn(query.where, (criteria, field) => {
-          if (!utils.isObject(criteria)) {
-            criteria = { '==': criteria }
-          }
-          // Apply filter for each operator
-          utils.forOwn(criteria, (value, operator) => {
-            let isOr = false
-            if (operator && operator[0] === '|') {
-              operator = operator.substr(1)
-              isOr = true
-            }
-            let predicateFn = this.getOperator(operator, opts)
-            if (predicateFn) {
-              const predicateResult = predicateFn(r, row, field, value)
-              if (isOr) {
-                subQuery = subQuery ? subQuery.or(predicateResult) : predicateResult
-              } else {
-                subQuery = subQuery ? subQuery.and(predicateResult) : predicateResult
-              }
-            } else {
-              throw new Error(`Operator ${operator} not supported!`)
-            }
-          })
-        })
-        return subQuery || true
-      })
+    let groups
+
+    if (utils.isObject(query.where) && Object.keys(query.where).length !== 0) {
+      groups = this._applyWhereFromArray([query.where])
+    } else if (utils.isArray(query.where)) {
+      groups = this._applyWhereFromArray(query.where)
+    }
+
+    if (groups) {
+      rql = rql.filter((row) => this._testArrayGroup(null, groups, row, opts) || true)
     }
 
     // Sort
@@ -605,6 +669,14 @@ utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
     }
 
     return rql
+  },
+
+  selectDb (opts) {
+    return this.r.db(utils.isUndefined(opts.db) ? this.rOpts.db : opts.db)
+  },
+
+  selectTable (mapper, opts) {
+    return this.selectDb(opts).table(mapper.table || underscore(mapper.name))
   },
 
   waitForDb (opts) {

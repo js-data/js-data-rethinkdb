@@ -5,7 +5,7 @@
 import 'babel-polyfill'
 
 import * as JSData from 'js-data'
-import JSDataAdapterTests from 'js-data-adapter-tests'
+import JSDataAdapterTests from './node_modules/js-data-adapter/dist/js-data-adapter-tests'
 import * as JSDataRethinkDB from './src/index'
 
 const assert = global.assert = JSDataAdapterTests.assert

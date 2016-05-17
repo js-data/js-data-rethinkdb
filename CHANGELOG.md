@@ -1,3 +1,8 @@
+##### 3.0.0-beta.6 - 17 May 2016
+
+###### Backwards compatible changes
+- Added support for grouped "where" clauses
+
 ##### 3.0.0-beta.5 - 10 May 2016
 
 ###### Breaking changes
