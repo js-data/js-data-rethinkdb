@@ -1,3 +1,8 @@
+##### 3.0.0-beta.7 - 29 June 2016
+
+###### Backwards compatible changes
+- Upgraded dependencies
+
 ##### 3.0.0-beta.6 - 17 May 2016
 
 ###### Backwards compatible changes
