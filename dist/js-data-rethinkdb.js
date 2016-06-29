@@ -1,5 +1,7 @@
 'use strict';
 
+Object.defineProperty(exports, '__esModule', { value: true });
+
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
 var jsData = require('js-data');
@@ -1109,8 +1111,8 @@ jsData.utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
  * otherwise `false` if the current version is not beta.
  */
 var version = {
-  beta: 6,
-  full: '3.0.0-beta.6',
+  beta: 7,
+  full: '3.0.0-beta.7',
   major: 3,
   minor: 0,
   patch: 0
