@@ -277,46 +277,9 @@ function RethinkDBAdapter(opts) {
   this.r || (this.r = rethinkdbdash(this.rOpts));
 }
 
-// Setup prototype inheritance from Adapter
-RethinkDBAdapter.prototype = Object.create(jsDataAdapter.Adapter.prototype, {
-  constructor: {
-    value: RethinkDBAdapter,
-    enumerable: false,
-    writable: true,
-    configurable: true
-  }
-});
+jsDataAdapter.Adapter.extend({
+  constructor: RethinkDBAdapter,
 
-Object.defineProperty(RethinkDBAdapter, '__super__', {
-  configurable: true,
-  value: jsDataAdapter.Adapter
-});
-
-/**
- * Alternative to ES6 class syntax for extending `RethinkDBAdapter`.
- *
- * @example <caption>Using the ES2015 class syntax.</caption>
- * class MyRethinkDBAdapter extends RethinkDBAdapter {...}
- * const adapter = new MyRethinkDBAdapter()
- *
- * @example <caption>Using {@link RethinkDBAdapter.extend}.</caption>
- * var instanceProps = {...}
- * var classProps = {...}
- *
- * var MyRethinkDBAdapter = RethinkDBAdapter.extend(instanceProps, classProps)
- * var adapter = new MyRethinkDBAdapter()
- *
- * @method RethinkDBAdapter.extend
- * @static
- * @param {Object} [instanceProps] Properties that will be added to the
- * prototype of the subclass.
- * @param {Object} [classProps] Properties that will be added as static
- * properties to the subclass itself.
- * @return {Constructor} Subclass of `RethinkDBAdapter`.
- */
-RethinkDBAdapter.extend = jsData.utils.extend;
-
-jsData.utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
   _handleErrors: function _handleErrors(cursor) {
     if (cursor && cursor.errors > 0) {
       if (cursor.first_error) {
@@ -1111,8 +1074,8 @@ jsData.utils.addHiddenPropsToTarget(RethinkDBAdapter.prototype, {
  * otherwise `false` if the current version is not beta.
  */
 var version = {
-  beta: 7,
-  full: '3.0.0-beta.7',
+  beta: 8,
+  full: '3.0.0-beta.8',
   major: 3,
   minor: 0,
   patch: 0
@@ -1149,6 +1112,59 @@ var version = {
  * var adapter = new RethinkDBAdapter()
  *
  * @module js-data-rethinkdb
+ */
+
+/**
+ * Create a subclass of this RethinkDBAdapter:
+ * @example <caption>RethinkDBAdapter.extend</caption>
+ * // Normally you would do: import {RethinkDBAdapter} from 'js-data-rethinkdb'
+ * const JSDataRethinkDB = require('js-data-rethinkdb@3.0.0-beta.8')
+ * const {RethinkDBAdapter} = JSDataRethinkDB
+ * console.log('Using JSDataRethinkDB v' + JSDataRethinkDB.version.full)
+ *
+ * // Extend the class using ES2015 class syntax.
+ * class CustomRethinkDBAdapterClass extends RethinkDBAdapter {
+ *   foo () { return 'bar' }
+ *   static beep () { return 'boop' }
+ * }
+ * const customRethinkDBAdapter = new CustomRethinkDBAdapterClass()
+ * console.log(customRethinkDBAdapter.foo())
+ * console.log(CustomRethinkDBAdapterClass.beep())
+ *
+ * // Extend the class using alternate method.
+ * const OtherRethinkDBAdapterClass = RethinkDBAdapter.extend({
+ *   foo () { return 'bar' }
+ * }, {
+ *   beep () { return 'boop' }
+ * })
+ * const otherRethinkDBAdapter = new OtherRethinkDBAdapterClass()
+ * console.log(otherRethinkDBAdapter.foo())
+ * console.log(OtherRethinkDBAdapterClass.beep())
+ *
+ * // Extend the class, providing a custom constructor.
+ * function AnotherRethinkDBAdapterClass () {
+ *   RethinkDBAdapter.call(this)
+ *   this.created_at = new Date().getTime()
+ * }
+ * RethinkDBAdapter.extend({
+ *   constructor: AnotherRethinkDBAdapterClass,
+ *   foo () { return 'bar' }
+ * }, {
+ *   beep () { return 'boop' }
+ * })
+ * const anotherRethinkDBAdapter = new AnotherRethinkDBAdapterClass()
+ * console.log(anotherRethinkDBAdapter.created_at)
+ * console.log(anotherRethinkDBAdapter.foo())
+ * console.log(AnotherRethinkDBAdapterClass.beep())
+ *
+ * @method RethinkDBAdapter.extend
+ * @param {Object} [props={}] Properties to add to the prototype of the
+ * subclass.
+ * @param {Object} [props.constructor] Provide a custom constructor function
+ * to be used as the subclass itself.
+ * @param {Object} [classProps={}] Static properties to add to the subclass.
+ * @returns {Constructor} Subclass of this RethinkDBAdapter class.
+ * @since 3.0.0
  */
 
 exports.OPERATORS = OPERATORS;
