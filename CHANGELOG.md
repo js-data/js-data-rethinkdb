@@ -1,3 +1,8 @@
+##### 3.0.0-beta.8 - 08 July 2016
+
+###### Backwards compatible changes
+- RethinkDBAdapter now inherits from Adapter via the `extend` method
+
 ##### 3.0.0-beta.7 - 29 June 2016
 
 ###### Backwards compatible changes
