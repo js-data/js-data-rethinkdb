@@ -1,7 +1,7 @@
 {
   "name": "js-data-rethinkdb",
   "description": "RethinkDB adapter for js-data.",
-  "version": "3.0.0-beta.7",
+  "version": "3.0.0-beta.8",
   "homepage": "https://github.com/js-data/js-data-rethinkdb",
   "repository": {
     "type": "git",
@@ -59,14 +59,14 @@
     "release": "npm test && npm run doc && repo-tools updates && repo-tools changelog && repo-tools authors"
   },
   "dependencies": {
-    "js-data-adapter": "~0.7.3",
+    "js-data-adapter": "~0.7.4",
     "mout": "1.0.0"
   },
   "peerDependencies": {
-    "js-data": "^3.0.0-beta.8",
+    "js-data": "^3.0.0-beta.10",
     "rethinkdbdash": ">=2.0.0"
   },
   "devDependencies": {
-    "js-data-repo-tools": "0.5.4"
+    "js-data-repo-tools": "0.5.5"
   }
 }
