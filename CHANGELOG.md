@@ -1,3 +1,8 @@
+##### 3.0.0-rc.1 - 15 August 2016
+
+###### Backwards compatible changes
+- Upgrade dependencies
+
 ##### 3.0.0-beta.8 - 08 July 2016
 
 ###### Backwards compatible changes
