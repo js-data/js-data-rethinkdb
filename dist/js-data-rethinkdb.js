@@ -1074,8 +1074,7 @@ jsDataAdapter.Adapter.extend({
  * otherwise `false` if the current version is not beta.
  */
 var version = {
-  beta: 8,
-  full: '3.0.0-beta.8',
+  full: '3.0.0-rc.1',
   major: 3,
   minor: 0,
   patch: 0
