@@ -1,3 +1,8 @@
+##### 3.0.0-rc.2 - 23 August 2016
+
+###### Backwards compatible changes
+- Add support for `fields` option to `find` and `findAll`.
+
 ##### 3.0.0-rc.1 - 15 August 2016
 
 ###### Backwards compatible changes
