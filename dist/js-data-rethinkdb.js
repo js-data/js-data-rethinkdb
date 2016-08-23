@@ -9,6 +9,16 @@ var jsDataAdapter = require('js-data-adapter');
 var rethinkdbdash = _interopDefault(require('rethinkdbdash'));
 var underscore = _interopDefault(require('mout/string/underscore'));
 
+var toConsumableArray = function (arr) {
+  if (Array.isArray(arr)) {
+    for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
+
+    return arr2;
+  } else {
+    return Array.from(arr);
+  }
+};
+
 var __super__ = jsDataAdapter.Adapter.prototype;
 
 var R_OPTS_DEFAULTS = {
@@ -31,24 +41,24 @@ var notEqual = function notEqual(r, row, field, value) {
  * Default predicate functions for the filtering operators.
  *
  * @name module:js-data-rethinkdb.OPERATORS
- * @property {Function} = Equality operator.
- * @property {Function} == Equality operator.
- * @property {Function} != Inequality operator.
- * @property {Function} > "Greater than" operator.
- * @property {Function} >= "Greater than or equal to" operator.
- * @property {Function} < "Less than" operator.
- * @property {Function} <= "Less than or equal to" operator.
- * @property {Function} isectEmpty Operator to test that the intersection
+ * @property {function} = Equality operator.
+ * @property {function} == Equality operator.
+ * @property {function} != Inequality operator.
+ * @property {function} > "Greater than" operator.
+ * @property {function} >= "Greater than or equal to" operator.
+ * @property {function} < "Less than" operator.
+ * @property {function} <= "Less than or equal to" operator.
+ * @property {function} isectEmpty Operator to test that the intersection
  * between two arrays is empty.
- * @property {Function} isectNotEmpty Operator to test that the intersection
+ * @property {function} isectNotEmpty Operator to test that the intersection
  * between two arrays is NOT empty.
- * @property {Function} in Operator to test whether a value is found in the
+ * @property {function} in Operator to test whether a value is found in the
  * provided array.
- * @property {Function} notIn Operator to test whether a value is NOT found in
+ * @property {function} notIn Operator to test whether a value is NOT found in
  * the provided array.
- * @property {Function} contains Operator to test whether an array contains the
+ * @property {function} contains Operator to test whether an array contains the
  * provided value.
- * @property {Function} notContains Operator to test whether an array does NOT
+ * @property {function} notContains Operator to test whether an array does NOT
  * contain the provided value.
  */
 var OPERATORS = {
@@ -113,16 +123,16 @@ Object.freeze(OPERATORS);
  *
  * @class RethinkDBAdapter
  * @extends Adapter
- * @param {Object} [opts] Configuration options.
+ * @param {object} [opts] Configuration options.
  * @param {boolean} [opts.debug=false] See {@link Adapter#debug}.
- * @param {Object} [opts.deleteOpts={}] See {@link RethinkDBAdapter#deleteOpts}.
- * @param {Object} [opts.insertOpts={}] See {@link RethinkDBAdapter#insertOpts}.
- * @param {Object} [opts.operators={@link module:js-data-rethinkdb.OPERATORS}] See {@link RethinkDBAdapter#operators}.
- * @param {Object} [opts.r] See {@link RethinkDBAdapter#r}.
+ * @param {object} [opts.deleteOpts={}] See {@link RethinkDBAdapter#deleteOpts}.
+ * @param {object} [opts.insertOpts={}] See {@link RethinkDBAdapter#insertOpts}.
+ * @param {object} [opts.operators={@link module:js-data-rethinkdb.OPERATORS}] See {@link RethinkDBAdapter#operators}.
+ * @param {object} [opts.r] See {@link RethinkDBAdapter#r}.
  * @param {boolean} [opts.raw=false] See {@link Adapter#raw}.
- * @param {Object} [opts.rOpts={}] See {@link RethinkDBAdapter#rOpts}.
- * @param {Object} [opts.runOpts={}] See {@link RethinkDBAdapter#runOpts}.
- * @param {Object} [opts.updateOpts={}] See {@link RethinkDBAdapter#updateOpts}.
+ * @param {object} [opts.rOpts={}] See {@link RethinkDBAdapter#rOpts}.
+ * @param {object} [opts.runOpts={}] See {@link RethinkDBAdapter#runOpts}.
+ * @param {object} [opts.updateOpts={}] See {@link RethinkDBAdapter#updateOpts}.
  */
 function RethinkDBAdapter(opts) {
   jsData.utils.classCallCheck(this, RethinkDBAdapter);
@@ -159,7 +169,7 @@ function RethinkDBAdapter(opts) {
      * adapter.r.dbDrop('foo').then(...)
      *
      * @name RethinkDBAdapter#r
-     * @type {Object}
+     * @type {object}
      */
     r: {
       writable: true,
@@ -182,7 +192,7 @@ function RethinkDBAdapter(opts) {
    * Default options to pass to r#insert.
    *
    * @name RethinkDBAdapter#insertOpts
-   * @type {Object}
+   * @type {object}
    * @default {}
    */
   this.insertOpts || (this.insertOpts = {});
@@ -192,7 +202,7 @@ function RethinkDBAdapter(opts) {
    * Default options to pass to r#update.
    *
    * @name RethinkDBAdapter#updateOpts
-   * @type {Object}
+   * @type {object}
    * @default {}
    */
   this.updateOpts || (this.updateOpts = {});
@@ -202,7 +212,7 @@ function RethinkDBAdapter(opts) {
    * Default options to pass to r#delete.
    *
    * @name RethinkDBAdapter#deleteOpts
-   * @type {Object}
+   * @type {object}
    * @default {}
    */
   this.deleteOpts || (this.deleteOpts = {});
@@ -212,7 +222,7 @@ function RethinkDBAdapter(opts) {
    * Default options to pass to r#run.
    *
    * @name RethinkDBAdapter#runOpts
-   * @type {Object}
+   * @type {object}
    * @default {}
    */
   this.runOpts || (this.runOpts = {});
@@ -222,7 +232,7 @@ function RethinkDBAdapter(opts) {
    * Override the default predicate functions for the specified operators.
    *
    * @name RethinkDBAdapter#operators
-   * @type {Object}
+   * @type {object}
    * @default {}
    */
   this.operators || (this.operators = {});
@@ -269,7 +279,7 @@ function RethinkDBAdapter(opts) {
    *
    * @name RethinkDBAdapter#rOpts
    * @see https://github.com/neumino/rethinkdbdash#importing-the-driver
-   * @type {Object}
+   * @type {object}
    */
   this.rOpts || (this.rOpts = {});
   jsData.utils.fillIn(this.rOpts, R_OPTS_DEFAULTS);
@@ -358,7 +368,7 @@ jsDataAdapter.Adapter.extend({
   _find: function _find(mapper, id, opts) {
     opts || (opts = {});
 
-    return this.selectTable(mapper, opts).get(id).run(this.getOpt('runOpts', opts)).then(function (record) {
+    return this._pluck(mapper, this.selectTable(mapper, opts).get(id), opts).run(this.getOpt('runOpts', opts)).then(function (record) {
       return [record, {}];
     });
   },
@@ -366,9 +376,18 @@ jsDataAdapter.Adapter.extend({
     opts || (opts = {});
     query || (query = {});
 
-    return this.filterSequence(this.selectTable(mapper, opts), query).run(this.getOpt('runOpts', opts)).then(function (records) {
+    return this._pluck(mapper, this.filterSequence(this.selectTable(mapper, opts), query), opts).run(this.getOpt('runOpts', opts)).then(function (records) {
       return [records, {}];
     });
+  },
+  _pluck: function _pluck(mapper, rql, opts) {
+    if (jsData.utils.isString(opts.fields)) {
+      opts.fields = [opts.fields];
+    }
+    if (jsData.utils.isArray(opts.fields)) {
+      return rql.pluck.apply(rql, toConsumableArray(opts.fields));
+    }
+    return rql;
   },
   _sum: function _sum(mapper, field, query, opts) {
     if (!jsData.utils.isString(field)) {
@@ -539,16 +558,16 @@ jsDataAdapter.Adapter.extend({
    *
    * @name RethinkDBAdapter#filterSequence
    * @method
-   * @param {Object} mapper The mapper.
-   * @param {Object} [query] Selection query.
-   * @param {Object} [query.where] Filtering criteria.
+   * @param {object} mapper The mapper.
+   * @param {object} [query] Selection query.
+   * @param {object} [query.where] Filtering criteria.
    * @param {string|Array} [query.orderBy] Sorting criteria.
    * @param {string|Array} [query.sort] Same as `query.sort`.
    * @param {number} [query.limit] Limit results.
    * @param {number} [query.skip] Offset results.
    * @param {number} [query.offset] Same as `query.skip`.
-   * @param {Object} [opts] Configuration options.
-   * @param {Object} [opts.operators] Override the default predicate functions
+   * @param {object} [opts] Configuration options.
+   * @param {object} [opts.operators] Override the default predicate functions
    * for specified operators.
    */
   filterSequence: function filterSequence(sequence, query, opts) {
@@ -673,20 +692,20 @@ jsDataAdapter.Adapter.extend({
    *
    * @name RethinkDBAdapter#count
    * @method
-   * @param {Object} mapper the mapper.
-   * @param {Object} [query] Selection query.
-   * @param {Object} [query.where] Filtering criteria.
+   * @param {object} mapper the mapper.
+   * @param {object} [query] Selection query.
+   * @param {object} [query.where] Filtering criteria.
    * @param {string|Array} [query.orderBy] Sorting criteria.
    * @param {string|Array} [query.sort] Same as `query.sort`.
    * @param {number} [query.limit] Limit results.
    * @param {number} [query.skip] Offset results.
    * @param {number} [query.offset] Same as `query.skip`.
-   * @param {Object} [opts] Configuration options.
-   * @param {Object} [opts.operators] Override the default predicate functions
+   * @param {object} [opts] Configuration options.
+   * @param {object} [opts.operators] Override the default predicate functions
    * for specified operators.
    * @param {boolean} [opts.raw=false] Whether to return a more detailed
    * response object.
-   * @param {Object} [opts.runOpts] Options to pass to r#run.
+   * @param {object} [opts.runOpts] Options to pass to r#run.
    * @return {Promise}
    */
   count: function count(mapper, query, opts) {
@@ -706,13 +725,13 @@ jsDataAdapter.Adapter.extend({
    *
    * @name RethinkDBAdapter#create
    * @method
-   * @param {Object} mapper The mapper.
-   * @param {Object} props The record to be created.
-   * @param {Object} [opts] Configuration options.
-   * @param {Object} [opts.insertOpts] Options to pass to r#insert.
+   * @param {object} mapper The mapper.
+   * @param {object} props The record to be created.
+   * @param {object} [opts] Configuration options.
+   * @param {object} [opts.insertOpts] Options to pass to r#insert.
    * @param {boolean} [opts.raw=false] Whether to return a more detailed
    * response object.
-   * @param {Object} [opts.runOpts] Options to pass to r#run.
+   * @param {object} [opts.runOpts] Options to pass to r#run.
    * @return {Promise}
    */
   create: function create(mapper, props, opts) {
@@ -732,13 +751,13 @@ jsDataAdapter.Adapter.extend({
    *
    * @name RethinkDBAdapter#createMany
    * @method
-   * @param {Object} mapper The mapper.
-   * @param {Object} props The records to be created.
-   * @param {Object} [opts] Configuration options.
-   * @param {Object} [opts.insertOpts] Options to pass to r#insert.
+   * @param {object} mapper The mapper.
+   * @param {object} props The records to be created.
+   * @param {object} [opts] Configuration options.
+   * @param {object} [opts.insertOpts] Options to pass to r#insert.
    * @param {boolean} [opts.raw=false] Whether to return a more detailed
    * response object.
-   * @param {Object} [opts.runOpts] Options to pass to r#run.
+   * @param {object} [opts.runOpts] Options to pass to r#run.
    * @return {Promise}
    */
   createMany: function createMany(mapper, props, opts) {
@@ -758,13 +777,13 @@ jsDataAdapter.Adapter.extend({
    *
    * @name RethinkDBAdapter#destroy
    * @method
-   * @param {Object} mapper The mapper.
+   * @param {object} mapper The mapper.
    * @param {(string|number)} id Primary key of the record to destroy.
-   * @param {Object} [opts] Configuration options.
-   * @param {Object} [opts.deleteOpts] Options to pass to r#delete.
+   * @param {object} [opts] Configuration options.
+   * @param {object} [opts.deleteOpts] Options to pass to r#delete.
    * @param {boolean} [opts.raw=false] Whether to return a more detailed
    * response object.
-   * @param {Object} [opts.runOpts] Options to pass to r#run.
+   * @param {object} [opts.runOpts] Options to pass to r#run.
    * @return {Promise}
    */
   destroy: function destroy(mapper, id, opts) {
@@ -783,21 +802,21 @@ jsDataAdapter.Adapter.extend({
    *
    * @name RethinkDBAdapter#destroyAll
    * @method
-   * @param {Object} mapper the mapper.
-   * @param {Object} [query] Selection query.
-   * @param {Object} [query.where] Filtering criteria.
+   * @param {object} mapper the mapper.
+   * @param {object} [query] Selection query.
+   * @param {object} [query.where] Filtering criteria.
    * @param {string|Array} [query.orderBy] Sorting criteria.
    * @param {string|Array} [query.sort] Same as `query.sort`.
    * @param {number} [query.limit] Limit results.
    * @param {number} [query.skip] Offset results.
    * @param {number} [query.offset] Same as `query.skip`.
-   * @param {Object} [opts] Configuration options.
-   * @param {Object} [opts.deleteOpts] Options to pass to r#delete.
-   * @param {Object} [opts.operators] Override the default predicate functions
+   * @param {object} [opts] Configuration options.
+   * @param {object} [opts.deleteOpts] Options to pass to r#delete.
+   * @param {object} [opts.operators] Override the default predicate functions
    * for specified operators.
    * @param {boolean} [opts.raw=false] Whether to return a more detailed
    * response object.
-   * @param {Object} [opts.runOpts] Options to pass to r#run.
+   * @param {object} [opts.runOpts] Options to pass to r#run.
    * @return {Promise}
    */
   destroyAll: function destroyAll(mapper, query, opts) {
@@ -817,12 +836,13 @@ jsDataAdapter.Adapter.extend({
    *
    * @name RethinkDBAdapter#find
    * @method
-   * @param {Object} mapper The mapper.
+   * @param {object} mapper The mapper.
    * @param {(string|number)} id Primary key of the record to retrieve.
-   * @param {Object} [opts] Configuration options.
+   * @param {object} [opts] Configuration options.
+   * @param {string[]} [opts.fields] Select a subset of fields to be returned.
    * @param {boolean} [opts.raw=false] Whether to return a more detailed
    * response object.
-   * @param {Object} [opts.runOpts] Options to pass to r#run.
+   * @param {object} [opts.runOpts] Options to pass to r#run.
    * @param {string[]} [opts.with=[]] Relations to eager load.
    * @return {Promise}
    */
@@ -860,20 +880,21 @@ jsDataAdapter.Adapter.extend({
    *
    * @name RethinkDBAdapter#findAll
    * @method
-   * @param {Object} mapper The mapper.
-   * @param {Object} [query] Selection query.
-   * @param {Object} [query.where] Filtering criteria.
+   * @param {object} mapper The mapper.
+   * @param {object} [query] Selection query.
+   * @param {object} [query.where] Filtering criteria.
    * @param {string|Array} [query.orderBy] Sorting criteria.
    * @param {string|Array} [query.sort] Same as `query.sort`.
    * @param {number} [query.limit] Limit results.
    * @param {number} [query.skip] Offset results.
    * @param {number} [query.offset] Same as `query.skip`.
-   * @param {Object} [opts] Configuration options.
-   * @param {Object} [opts.operators] Override the default predicate functions
+   * @param {object} [opts] Configuration options.
+   * @param {string[]} [opts.fields] Select a subset of fields to be returned.
+   * @param {object} [opts.operators] Override the default predicate functions
    * for specified operators.
    * @param {boolean} [opts.raw=false] Whether to return a more detailed
    * response object.
-   * @param {Object} [opts.runOpts] Options to pass to r#run.
+   * @param {object} [opts.runOpts] Options to pass to r#run.
    * @param {string[]} [opts.with=[]] Relations to eager load.
    * @return {Promise}
    */
@@ -914,8 +935,8 @@ jsDataAdapter.Adapter.extend({
    * @name RethinkDBAdapter#getOperator
    * @method
    * @param {string} operator The name of the operator.
-   * @param {Object} [opts] Configuration options.
-   * @param {Object} [opts.operators] Override the default predicate functions
+   * @param {object} [opts] Configuration options.
+   * @param {object} [opts.operators] Override the default predicate functions
    * for specified operators.
    * @return {*} The predicate function for the specified operator.
    */
@@ -933,21 +954,21 @@ jsDataAdapter.Adapter.extend({
    *
    * @name RethinkDBAdapter#sum
    * @method
-   * @param {Object} mapper The mapper.
+   * @param {object} mapper The mapper.
    * @param {string} field The field to sum.
-   * @param {Object} [query] Selection query.
-   * @param {Object} [query.where] Filtering criteria.
+   * @param {object} [query] Selection query.
+   * @param {object} [query.where] Filtering criteria.
    * @param {string|Array} [query.orderBy] Sorting criteria.
    * @param {string|Array} [query.sort] Same as `query.sort`.
    * @param {number} [query.limit] Limit results.
    * @param {number} [query.skip] Offset results.
    * @param {number} [query.offset] Same as `query.skip`.
-   * @param {Object} [opts] Configuration options.
-   * @param {Object} [opts.operators] Override the default predicate functions
+   * @param {object} [opts] Configuration options.
+   * @param {object} [opts.operators] Override the default predicate functions
    * for specified operators.
    * @param {boolean} [opts.raw=false] Whether to return a more detailed
    * response object.
-   * @param {Object} [opts.runOpts] Options to pass to r#run.
+   * @param {object} [opts.runOpts] Options to pass to r#run.
    * @return {Promise}
    */
   sum: function sum(mapper, field, query, opts) {
@@ -967,14 +988,14 @@ jsDataAdapter.Adapter.extend({
    *
    * @name RethinkDBAdapter#update
    * @method
-   * @param {Object} mapper The mapper.
+   * @param {object} mapper The mapper.
    * @param {(string|number)} id The primary key of the record to be updated.
-   * @param {Object} props The update to apply to the record.
-   * @param {Object} [opts] Configuration options.
-   * @param {Object} [opts.updateOpts] Options to pass to r#update.
+   * @param {object} props The update to apply to the record.
+   * @param {object} [opts] Configuration options.
+   * @param {object} [opts.updateOpts] Options to pass to r#update.
    * @param {boolean} [opts.raw=false] Whether to return a more detailed
    * response object.
-   * @param {Object} [opts.runOpts] Options to pass to r#run.
+   * @param {object} [opts.runOpts] Options to pass to r#run.
    * @return {Promise}
    */
   update: function update(mapper, id, props, opts) {
@@ -994,22 +1015,22 @@ jsDataAdapter.Adapter.extend({
    *
    * @name RethinkDBAdapter#updateAll
    * @method
-   * @param {Object} mapper The mapper.
-   * @param {Object} props The update to apply to the selected records.
-   * @param {Object} [query] Selection query.
-   * @param {Object} [query.where] Filtering criteria.
+   * @param {object} mapper The mapper.
+   * @param {object} props The update to apply to the selected records.
+   * @param {object} [query] Selection query.
+   * @param {object} [query.where] Filtering criteria.
    * @param {string|Array} [query.orderBy] Sorting criteria.
    * @param {string|Array} [query.sort] Same as `query.sort`.
    * @param {number} [query.limit] Limit results.
    * @param {number} [query.skip] Offset results.
    * @param {number} [query.offset] Same as `query.skip`.
-   * @param {Object} [opts] Configuration options.
-   * @param {Object} [opts.operators] Override the default predicate functions
+   * @param {object} [opts] Configuration options.
+   * @param {object} [opts.operators] Override the default predicate functions
    * for specified operators.
    * @param {boolean} [opts.raw=false] Whether to return a more detailed
    * response object.
-   * @param {Object} [opts.runOpts] Options to pass to r#run.
-   * @param {Object} [opts.updateOpts] Options to pass to r#update.
+   * @param {object} [opts.runOpts] Options to pass to r#run.
+   * @param {object} [opts.updateOpts] Options to pass to r#update.
    * @return {Promise}
    */
   updateAll: function updateAll(mapper, props, query, opts) {
@@ -1030,13 +1051,13 @@ jsDataAdapter.Adapter.extend({
    *
    * @name RethinkDBAdapter#updateMany
    * @method
-   * @param {Object} mapper The mapper.
+   * @param {object} mapper The mapper.
    * @param {Object[]} records The records to update.
-   * @param {Object} [opts] Configuration options.
-   * @param {Object} [opts.insertOpts] Options to pass to r#insert.
+   * @param {object} [opts] Configuration options.
+   * @param {object} [opts.insertOpts] Options to pass to r#insert.
    * @param {boolean} [opts.raw=false] Whether to return a more detailed
    * response object.
-   * @param {Object} [opts.runOpts] Options to pass to r#run.
+   * @param {object} [opts.runOpts] Options to pass to r#run.
    * @return {Promise}
    */
   updateMany: function updateMany(mapper, records, opts) {
@@ -1063,7 +1084,7 @@ jsDataAdapter.Adapter.extend({
  * console.log(version.full)
  *
  * @name module:js-data-rethinkdb.version
- * @type {Object}
+ * @type {object}
  * @property {string} version.full The full semver value.
  * @property {number} version.major The major version number.
  * @property {number} version.minor The minor version number.
@@ -1074,97 +1095,11 @@ jsDataAdapter.Adapter.extend({
  * otherwise `false` if the current version is not beta.
  */
 var version = {
-  full: '3.0.0-rc.1',
+  full: '3.0.0-rc.2',
   major: 3,
   minor: 0,
   patch: 0
 };
-
-/**
- * {@link RethinkDBAdapter} class.
- *
- * @example <caption>ES2015 modules import</caption>
- * import {RethinkDBAdapter} from 'js-data-rethinkdb'
- * const adapter = new RethinkDBAdapter()
- *
- * @example <caption>CommonJS import</caption>
- * var RethinkDBAdapter = require('js-data-rethinkdb').RethinkDBAdapter
- * var adapter = new RethinkDBAdapter()
- *
- * @name module:js-data-rethinkdb.RethinkDBAdapter
- * @see RethinkDBAdapter
- * @type {Constructor}
- */
-
-/**
- * Registered as `js-data-rethinkdb` in NPM.
- *
- * @example <caption>Install from NPM</caption>
- * npm i --save js-data-rethinkdb@beta js-data@beta rethinkdbdash
- *
- * @example <caption>ES2015 modules import</caption>
- * import {RethinkDBAdapter} from 'js-data-rethinkdb'
- * const adapter = new RethinkDBAdapter()
- *
- * @example <caption>CommonJS import</caption>
- * var RethinkDBAdapter = require('js-data-rethinkdb').RethinkDBAdapter
- * var adapter = new RethinkDBAdapter()
- *
- * @module js-data-rethinkdb
- */
-
-/**
- * Create a subclass of this RethinkDBAdapter:
- * @example <caption>RethinkDBAdapter.extend</caption>
- * // Normally you would do: import {RethinkDBAdapter} from 'js-data-rethinkdb'
- * const JSDataRethinkDB = require('js-data-rethinkdb@3.0.0-beta.8')
- * const {RethinkDBAdapter} = JSDataRethinkDB
- * console.log('Using JSDataRethinkDB v' + JSDataRethinkDB.version.full)
- *
- * // Extend the class using ES2015 class syntax.
- * class CustomRethinkDBAdapterClass extends RethinkDBAdapter {
- *   foo () { return 'bar' }
- *   static beep () { return 'boop' }
- * }
- * const customRethinkDBAdapter = new CustomRethinkDBAdapterClass()
- * console.log(customRethinkDBAdapter.foo())
- * console.log(CustomRethinkDBAdapterClass.beep())
- *
- * // Extend the class using alternate method.
- * const OtherRethinkDBAdapterClass = RethinkDBAdapter.extend({
- *   foo () { return 'bar' }
- * }, {
- *   beep () { return 'boop' }
- * })
- * const otherRethinkDBAdapter = new OtherRethinkDBAdapterClass()
- * console.log(otherRethinkDBAdapter.foo())
- * console.log(OtherRethinkDBAdapterClass.beep())
- *
- * // Extend the class, providing a custom constructor.
- * function AnotherRethinkDBAdapterClass () {
- *   RethinkDBAdapter.call(this)
- *   this.created_at = new Date().getTime()
- * }
- * RethinkDBAdapter.extend({
- *   constructor: AnotherRethinkDBAdapterClass,
- *   foo () { return 'bar' }
- * }, {
- *   beep () { return 'boop' }
- * })
- * const anotherRethinkDBAdapter = new AnotherRethinkDBAdapterClass()
- * console.log(anotherRethinkDBAdapter.created_at)
- * console.log(anotherRethinkDBAdapter.foo())
- * console.log(AnotherRethinkDBAdapterClass.beep())
- *
- * @method RethinkDBAdapter.extend
- * @param {Object} [props={}] Properties to add to the prototype of the
- * subclass.
- * @param {Object} [props.constructor] Provide a custom constructor function
- * to be used as the subclass itself.
- * @param {Object} [classProps={}] Static properties to add to the subclass.
- * @returns {Constructor} Subclass of this RethinkDBAdapter class.
- * @since 3.0.0
- */
 
 exports.OPERATORS = OPERATORS;
 exports.RethinkDBAdapter = RethinkDBAdapter;
