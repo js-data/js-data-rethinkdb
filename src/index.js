@@ -414,14 +414,14 @@ Adapter.extend({
       .update(props, updateOpts)
       .run(this.getOpt('runOpts', opts))
       .then((cursor) => {
-        let record
         this._handleErrors(cursor)
-        if (cursor && cursor.changes && cursor.changes.length && cursor.changes[0].new_val) {
-          record = cursor.changes[0].new_val
-        } else {
+        if (cursor.skipped) {
           throw new Error('Not Found')
+        } else if (cursor && cursor.changes && cursor.changes.length && cursor.changes[0].new_val) {
+          return [cursor.changes[0].new_val, cursor]
+        } else {
+          return this._find(mapper, id, opts)
         }
-        return [record, cursor]
       })
   },
 
