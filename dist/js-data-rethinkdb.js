@@ -9,6 +9,210 @@ var jsDataAdapter = require('js-data-adapter');
 var rethinkdbdash = _interopDefault(require('rethinkdbdash'));
 var underscore = _interopDefault(require('mout/string/underscore'));
 
+var asyncGenerator = function () {
+  function AwaitValue(value) {
+    this.value = value;
+  }
+
+  function AsyncGenerator(gen) {
+    var front, back;
+
+    function send(key, arg) {
+      return new Promise(function (resolve, reject) {
+        var request = {
+          key: key,
+          arg: arg,
+          resolve: resolve,
+          reject: reject,
+          next: null
+        };
+
+        if (back) {
+          back = back.next = request;
+        } else {
+          front = back = request;
+          resume(key, arg);
+        }
+      });
+    }
+
+    function resume(key, arg) {
+      try {
+        var result = gen[key](arg);
+        var value = result.value;
+
+        if (value instanceof AwaitValue) {
+          Promise.resolve(value.value).then(function (arg) {
+            resume("next", arg);
+          }, function (arg) {
+            resume("throw", arg);
+          });
+        } else {
+          settle(result.done ? "return" : "normal", result.value);
+        }
+      } catch (err) {
+        settle("throw", err);
+      }
+    }
+
+    function settle(type, value) {
+      switch (type) {
+        case "return":
+          front.resolve({
+            value: value,
+            done: true
+          });
+          break;
+
+        case "throw":
+          front.reject(value);
+          break;
+
+        default:
+          front.resolve({
+            value: value,
+            done: false
+          });
+          break;
+      }
+
+      front = front.next;
+
+      if (front) {
+        resume(front.key, front.arg);
+      } else {
+        back = null;
+      }
+    }
+
+    this._invoke = send;
+
+    if (typeof gen.return !== "function") {
+      this.return = undefined;
+    }
+  }
+
+  if (typeof Symbol === "function" && Symbol.asyncIterator) {
+    AsyncGenerator.prototype[Symbol.asyncIterator] = function () {
+      return this;
+    };
+  }
+
+  AsyncGenerator.prototype.next = function (arg) {
+    return this._invoke("next", arg);
+  };
+
+  AsyncGenerator.prototype.throw = function (arg) {
+    return this._invoke("throw", arg);
+  };
+
+  AsyncGenerator.prototype.return = function (arg) {
+    return this._invoke("return", arg);
+  };
+
+  return {
+    wrap: function (fn) {
+      return function () {
+        return new AsyncGenerator(fn.apply(this, arguments));
+      };
+    },
+    await: function (value) {
+      return new AwaitValue(value);
+    }
+  };
+}();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var get = function get(object, property, receiver) {
+  if (object === null) object = Function.prototype;
+  var desc = Object.getOwnPropertyDescriptor(object, property);
+
+  if (desc === undefined) {
+    var parent = Object.getPrototypeOf(object);
+
+    if (parent === null) {
+      return undefined;
+    } else {
+      return get(parent, property, receiver);
+    }
+  } else if ("value" in desc) {
+    return desc.value;
+  } else {
+    var getter = desc.get;
+
+    if (getter === undefined) {
+      return undefined;
+    }
+
+    return getter.call(receiver);
+  }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var set = function set(object, property, value, receiver) {
+  var desc = Object.getOwnPropertyDescriptor(object, property);
+
+  if (desc === undefined) {
+    var parent = Object.getPrototypeOf(object);
+
+    if (parent !== null) {
+      set(parent, property, value, receiver);
+    }
+  } else if ("value" in desc && desc.writable) {
+    desc.value = value;
+  } else {
+    var setter = desc.set;
+
+    if (setter !== undefined) {
+      setter.call(receiver, value);
+    }
+  }
+
+  return value;
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 var toConsumableArray = function (arr) {
   if (Array.isArray(arr)) {
     for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
@@ -410,14 +614,14 @@ jsDataAdapter.Adapter.extend({
     updateOpts.returnChanges = true;
 
     return this.selectTable(mapper, opts).get(id).update(props, updateOpts).run(this.getOpt('runOpts', opts)).then(function (cursor) {
-      var record = void 0;
       _this5._handleErrors(cursor);
-      if (cursor && cursor.changes && cursor.changes.length && cursor.changes[0].new_val) {
-        record = cursor.changes[0].new_val;
-      } else {
+      if (cursor.skipped) {
         throw new Error('Not Found');
+      } else if (cursor && cursor.changes && cursor.changes.length && cursor.changes[0].new_val) {
+        return [cursor.changes[0].new_val, cursor];
+      } else {
+        return _this5._find(mapper, id, opts);
       }
-      return [record, cursor];
     });
   },
   _updateAll: function _updateAll(mapper, props, query, opts) {
@@ -1095,11 +1299,97 @@ jsDataAdapter.Adapter.extend({
  * otherwise `false` if the current version is not beta.
  */
 var version = {
-  full: '3.0.0-rc.2',
+  full: '3.0.0-rc.3',
   major: 3,
   minor: 0,
   patch: 0
 };
+
+/**
+ * {@link RethinkDBAdapter} class.
+ *
+ * @example <caption>ES2015 modules import</caption>
+ * import {RethinkDBAdapter} from 'js-data-rethinkdb'
+ * const adapter = new RethinkDBAdapter()
+ *
+ * @example <caption>CommonJS import</caption>
+ * var RethinkDBAdapter = require('js-data-rethinkdb').RethinkDBAdapter
+ * var adapter = new RethinkDBAdapter()
+ *
+ * @name module:js-data-rethinkdb.RethinkDBAdapter
+ * @see RethinkDBAdapter
+ * @type {Constructor}
+ */
+
+/**
+ * Registered as `js-data-rethinkdb` in NPM.
+ *
+ * @example <caption>Install from NPM</caption>
+ * npm i --save js-data-rethinkdb@beta js-data@beta rethinkdbdash
+ *
+ * @example <caption>ES2015 modules import</caption>
+ * import {RethinkDBAdapter} from 'js-data-rethinkdb'
+ * const adapter = new RethinkDBAdapter()
+ *
+ * @example <caption>CommonJS import</caption>
+ * var RethinkDBAdapter = require('js-data-rethinkdb').RethinkDBAdapter
+ * var adapter = new RethinkDBAdapter()
+ *
+ * @module js-data-rethinkdb
+ */
+
+/**
+ * Create a subclass of this RethinkDBAdapter:
+ * @example <caption>RethinkDBAdapter.extend</caption>
+ * // Normally you would do: import {RethinkDBAdapter} from 'js-data-rethinkdb'
+ * const JSDataRethinkDB = require('js-data-rethinkdb@3.0.0-beta.8')
+ * const {RethinkDBAdapter} = JSDataRethinkDB
+ * console.log('Using JSDataRethinkDB v' + JSDataRethinkDB.version.full)
+ *
+ * // Extend the class using ES2015 class syntax.
+ * class CustomRethinkDBAdapterClass extends RethinkDBAdapter {
+ *   foo () { return 'bar' }
+ *   static beep () { return 'boop' }
+ * }
+ * const customRethinkDBAdapter = new CustomRethinkDBAdapterClass()
+ * console.log(customRethinkDBAdapter.foo())
+ * console.log(CustomRethinkDBAdapterClass.beep())
+ *
+ * // Extend the class using alternate method.
+ * const OtherRethinkDBAdapterClass = RethinkDBAdapter.extend({
+ *   foo () { return 'bar' }
+ * }, {
+ *   beep () { return 'boop' }
+ * })
+ * const otherRethinkDBAdapter = new OtherRethinkDBAdapterClass()
+ * console.log(otherRethinkDBAdapter.foo())
+ * console.log(OtherRethinkDBAdapterClass.beep())
+ *
+ * // Extend the class, providing a custom constructor.
+ * function AnotherRethinkDBAdapterClass () {
+ *   RethinkDBAdapter.call(this)
+ *   this.created_at = new Date().getTime()
+ * }
+ * RethinkDBAdapter.extend({
+ *   constructor: AnotherRethinkDBAdapterClass,
+ *   foo () { return 'bar' }
+ * }, {
+ *   beep () { return 'boop' }
+ * })
+ * const anotherRethinkDBAdapter = new AnotherRethinkDBAdapterClass()
+ * console.log(anotherRethinkDBAdapter.created_at)
+ * console.log(anotherRethinkDBAdapter.foo())
+ * console.log(AnotherRethinkDBAdapterClass.beep())
+ *
+ * @method RethinkDBAdapter.extend
+ * @param {object} [props={}] Properties to add to the prototype of the
+ * subclass.
+ * @param {object} [props.constructor] Provide a custom constructor function
+ * to be used as the subclass itself.
+ * @param {object} [classProps={}] Static properties to add to the subclass.
+ * @returns {Constructor} Subclass of this RethinkDBAdapter class.
+ * @since 3.0.0
+ */
 
 exports.OPERATORS = OPERATORS;
 exports.RethinkDBAdapter = RethinkDBAdapter;
