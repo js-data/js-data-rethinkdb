@@ -1,3 +1,8 @@
+##### 3.0.0-rc.3 - 17 October 2016
+
+###### Bug fixes
+- Fixed update throwing error when record was unchanged.
+
 ##### 3.0.0-rc.2 - 23 August 2016
 
 ###### Backwards compatible changes
