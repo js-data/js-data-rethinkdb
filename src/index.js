@@ -16,12 +16,24 @@ const UPDATE_OPTS_DEFAULTS = {}
 const DELETE_OPTS_DEFAULTS = {}
 const RUN_OPTS_DEFAULTS = {}
 
+var getRowField = function (row, field) {
+  if (field.indexOf('.') === -1) {
+    return row(field)
+  }
+  let fields = field.split('.')
+  let resultRow = row(fields[ 0 ])
+  for (let i = 1; i < fields.length; i++) {
+    resultRow = resultRow(fields[ i ])
+  }
+  return resultRow
+}
+
 const equal = function (r, row, field, value) {
-  return row(field).default(null).eq(value)
+  return getRowField(field).default(null).eq(value)
 }
 
 const notEqual = function (r, row, field, value) {
-  return row(field).default(null).ne(value)
+  return getRowField(field).default(null).ne(value)
 }
 
 /**
@@ -55,34 +67,34 @@ export const OPERATORS = {
   '!=': notEqual,
   '!==': notEqual,
   '>': function (r, row, field, value) {
-    return row(field).default(null).gt(value)
+    return getRowField(field).default(null).gt(value)
   },
   '>=': function (r, row, field, value) {
-    return row(field).default(null).ge(value)
+    return getRowField(field).default(null).ge(value)
   },
   '<': function (r, row, field, value) {
-    return row(field).default(null).lt(value)
+    return getRowField(field).default(null).lt(value)
   },
   '<=': function (r, row, field, value) {
-    return row(field).default(null).le(value)
+    return getRowField(field).default(null).le(value)
   },
   'isectEmpty': function (r, row, field, value) {
-    return row(field).default([]).setIntersection(r.expr(value).default([])).count().eq(0)
+    return getRowField(field).default([]).setIntersection(r.expr(value).default([])).count().eq(0)
   },
   'isectNotEmpty': function (r, row, field, value) {
-    return row(field).default([]).setIntersection(r.expr(value).default([])).count().ne(0)
+    return getRowField(field).default([]).setIntersection(r.expr(value).default([])).count().ne(0)
   },
   'in': function (r, row, field, value) {
-    return r.expr(value).default(r.expr([])).contains(row(field).default(null))
+    return r.expr(value).default(r.expr([])).contains(getRowField(field).default(null))
   },
   'notIn': function (r, row, field, value) {
-    return r.expr(value).default(r.expr([])).contains(row(field).default(null)).not()
+    return r.expr(value).default(r.expr([])).contains(getRowField(field).default(null)).not()
   },
   'contains': function (r, row, field, value) {
-    return row(field).default([]).contains(value)
+    return getRowField(field).default([]).contains(value)
   },
   'notContains': function (r, row, field, value) {
-    return row(field).default([]).contains(value).not()
+    return getRowField(field).default([]).contains(value).not()
   }
 }
 
