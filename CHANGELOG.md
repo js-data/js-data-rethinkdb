@@ -1,7 +1,11 @@
+##### 3.0.0 - 18 August 2017
+
+Stable 3.0.0 release
+
 ##### 3.0.0-rc.3 - 17 October 2016
 
 ###### Bug fixes
-- Fixed update throwing error when record was unchanged.
+- #24 - Fixed update throwing error when record was unchanged.
 
 ##### 3.0.0-rc.2 - 23 August 2016
 
