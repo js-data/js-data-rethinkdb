@@ -2,43 +2,71 @@
 
 # js-data-rethinkdb
 
-[![Slack Status][sl_b]][sl_l]
-[![npm version][npm_b]][npm_l]
-[![Circle CI][circle_b]][circle_l]
-[![npm downloads][dn_b]][dn_l]
-[![Coverage Status][cov_b]][cov_l]
+[![Slack][1]][2]
+[![NPM][3]][4]
+[![Tests][5]][6]
+[![Downloads][7]][8]
+[![Coverage][9]][10]
 
-RethinkDB adapter for [js-data](http://www.js-data.io/).
+RethinkDB adapter for the [JSData Node.js ORM][11].
 
-To get started, visit __[http://js-data.io](http://www.js-data.io/docs/js-data-rethinkdb)__.
+### Installation
 
-## Links
+    npm install --save js-data js-data-rethinkdb
 
-* [Quick start](http://www.js-data.io/docs/home#quick-start) - Get started in 5 minutes
-* [Guides and Tutorials](http://www.js-data.io/docs/home) - Learn how to use JSData
-* [`RethinkDBAdapter` Guide](http://www.js-data.io/docs/js-data-rethinkdb) - Learn how to use `RethinkDBAdapter`
-* [API Reference Docs](http://api.js-data.io) - Explore components, methods, options, etc.
-* [Community & Support](http://js-data.io/docs/community) - Find solutions and chat with the community
-* [General Contributing Guide](http://js-data.io/docs/contributing) - Give back and move the project forward
-  * [Contributing to js-data-rethinkdb](https://github.com/js-data/js-data-rethinkdb/blob/master/.github/CONTRIBUTING.md)
+### Usage
 
-## License
+```js
+import { RethinkDBAdapter } from 'js-data-rethinkdb';
 
-The MIT License (MIT)
+// Create an instance of RethinkDBAdapter
+const adapter = new RethinkDBAdapter();
 
-Copyright (c) 2014-2016 js-data-rethinkdb project authors
+// Other JSData setup hidden
 
-* [LICENSE](https://github.com/js-data/js-data-rethinkdb/blob/master/LICENSE)
-* [AUTHORS](https://github.com/js-data/js-data-rethinkdb/blob/master/AUTHORS)
-* [CONTRIBUTORS](https://github.com/js-data/js-data-rethinkdb/blob/master/CONTRIBUTORS)
+// Register the adapter instance
+store.registerAdapter('rethinkdb', adapter, { default: true });
+```
 
-[sl_b]: http://slack.js-data.io/badge.svg
-[sl_l]: http://slack.js-data.io
-[npm_b]: https://img.shields.io/npm/v/js-data-rethinkdb.svg?style=flat
-[npm_l]: https://www.npmjs.org/package/js-data-rethinkdb
-[circle_b]: https://img.shields.io/circleci/project/js-data/js-data-rethinkdb.svg?style=flat
-[circle_l]: https://circleci.com/gh/js-data/js-data-rethinkdb
-[dn_b]: https://img.shields.io/npm/dm/js-data-rethinkdb.svg?style=flat
-[dn_l]: https://www.npmjs.org/package/js-data-rethinkdb
-[cov_b]: https://img.shields.io/codecov/c/github/js-data/js-data-rethinkdb.svg?style=flat
-[cov_l]: https://codecov.io/github/js-data/js-data-rethinkdb
+### JSData + RethinkDB Tutorial
+
+Start with the [JSData + RethinkDB tutorial][12] or checkout the [API Reference Documentation][13].
+
+### Need help?
+
+Please [post a question][14] on Stack Overflow. **This is the preferred method.**
+
+You can also chat with folks on the [Slack Channel][15]. If you end up getting
+your question answered, please still consider consider posting your question to
+Stack Overflow (then possibly answering it yourself). Thanks!
+
+### Want to contribute?
+
+Awesome! You can get started over at the [Contributing guide][16].
+
+Thank you!
+
+### License
+
+[The MIT License (MIT)][17]
+
+Copyright (c) 2014-2017 [js-data-rethinkdb project authors][18]
+
+[1]: http://slack.js-data.io/badge.svg
+[2]: http://slack.js-data.io
+[3]: https://img.shields.io/npm/v/js-data-rethinkdb.svg?style=flat
+[4]: https://www.npmjs.org/package/js-data-rethinkdb
+[5]: https://img.shields.io/circleci/project/js-data/js-data-rethinkdb.svg?style=flat
+[6]: https://circleci.com/gh/js-data/js-data-rethinkdb
+[7]: https://img.shields.io/npm/dm/js-data-rethinkdb.svg?style=flat
+[8]: https://www.npmjs.org/package/js-data-rethinkdb
+[9]: https://img.shields.io/codecov/c/github/js-data/js-data-rethinkdb.svg?style=flat
+[10]: https://codecov.io/github/js-data/js-data-rethinkdb
+[11]: http://www.js-data.io/
+[12]: http://www.js-data.io/docs/js-data-rethinkdb
+[13]: http://api.js-data.io/js-data-rethinkdb
+[14]: http://stackoverflow.com/questions/tagged/jsdata
+[15]: http://slack.js-data.io/
+[16]: https://github.com/js-data/js-data-rethinkdb/blob/master/.github/CONTRIBUTING.md
+[17]: https://github.com/js-data/js-data-rethinkdb/blob/master/LICENSE
+[18]: https://github.com/js-data/js-data-rethinkdb/blob/master/AUTHORS
