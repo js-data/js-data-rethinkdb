@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<title>js-data-rethinkdb Class: RethinkDBAdapter</title>
+	<title>js-data-rethinkdb Class: Adapter</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -93,7 +93,7 @@
 			<li class="dropdown">
 				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
 				<ul class="dropdown-menu ">
-					<li><a href="Adapter.html">Adapter</a></li><li><a href="Response.html">Response</a></li><li><a href="RethinkDBAdapter.html">RethinkDBAdapter</a></li>
+					<li><a href="Adapter.html">Adapter</a></li><li><a href="module-js-data-rethinkdb-RethinkDBAdapter.html">js-data-rethinkdb~RethinkDBAdapter</a></li><li><a href="Response.html">Response</a></li>
 				</ul>
 			</li>
 			
@@ -121,13 +121,13 @@
 		<div id="main">
 			
 
-	<h1 class="page-title">Class: RethinkDBAdapter</h1>
+	<h1 class="page-title">Class: Adapter</h1>
 <section>
 
 <header>
     
         <h2>
-        RethinkDBAdapter
+        Adapter
         </h2>
         
     
@@ -140,7 +140,7 @@
         
 <hr>
 <dt>
-  <h4 class="name" id="RethinkDBAdapter"><span class="type-signature"></span>new RethinkDBAdapter(<span class="optional">opts</span>)</h4>
+  <h4 class="name" id="Adapter"><span class="type-signature">&lt;abstract> </span>new Adapter(<span class="optional">opts</span>)</h4>
 
   
 </dt>
@@ -148,7 +148,7 @@
 
   
   <div class="description">
-    <p>RethinkDBAdapter class.</p>
+    <p>Abstract class meant to be extended by adapters.</p>
   </div>
   
 
@@ -214,7 +214,7 @@
 
             
 
-            <td class="description last"><p>Configuration options.</p>
+            <td class="description last"><p>Configuration opts.</p>
                 <h6 class="method-params-label method-subparams-label">Properties</h6>
                 
 
@@ -277,165 +277,7 @@
                 </td>
             
 
-            <td class="description last"><p>See <a href="Adapter.html#debug">Adapter#debug</a>.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>deleteOpts</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">Object</a></span>
-
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    {}
-                
-                </td>
-            
-
-            <td class="description last"><p>See <a href="RethinkDBAdapter.html#deleteOpts">RethinkDBAdapter#deleteOpts</a>.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>insertOpts</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">Object</a></span>
-
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    {}
-                
-                </td>
-            
-
-            <td class="description last"><p>See <a href="RethinkDBAdapter.html#insertOpts">RethinkDBAdapter#insertOpts</a>.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>operators</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">Object</a></span>
-
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    <a href="module-js-data-rethinkdb.html#.OPERATORS">module:js-data-rethinkdb.OPERATORS</a>
-                
-                </td>
-            
-
-            <td class="description last"><p>See <a href="RethinkDBAdapter.html#operators">RethinkDBAdapter#operators</a>.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>r</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">Object</a></span>
-
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                </td>
-            
-
-            <td class="description last"><p>See <a href="RethinkDBAdapter.html#r">RethinkDBAdapter#r</a>.</p></td>
+            <td class="description last"><p>Whether to log debugging information.</p></td>
         </tr>
 
     
@@ -475,127 +317,8 @@
                 </td>
             
 
-            <td class="description last"><p>See <a href="Adapter.html#raw">Adapter#raw</a>.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>rOpts</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">Object</a></span>
-
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    {}
-                
-                </td>
-            
-
-            <td class="description last"><p>See <a href="RethinkDBAdapter.html#rOpts">RethinkDBAdapter#rOpts</a>.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>runOpts</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">Object</a></span>
-
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    {}
-                
-                </td>
-            
-
-            <td class="description last"><p>See <a href="RethinkDBAdapter.html#runOpts">RethinkDBAdapter#runOpts</a>.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>updateOpts</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">Object</a></span>
-
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    {}
-                
-                </td>
-            
-
-            <td class="description last"><p>See <a href="RethinkDBAdapter.html#updateOpts">RethinkDBAdapter#updateOpts</a>.</p></td>
+            <td class="description last"><p>Whether to return a more detailed response
+object.</p></td>
         </tr>
 
     
@@ -651,8 +374,8 @@
         
         
           <td>
-            <a href="src_index.js.html">src/index.js</a>,
-             <a href="src_index.js.html#sunlight-1-line-91">line 91</a>
+            <a href="node_modules_js-data-adapter_src_index.js.html">node_modules/js-data-adapter/src/index.js</a>,
+             <a href="node_modules_js-data-adapter_src_index.js.html#sunlight-1-line-93">line 93</a>
           </td>
         
         
@@ -685,49 +408,6 @@
 
 
   
-    <div class="code-panel panel panel-warning">
-      <div class="panel-heading">
-        <strong>Example</strong>
-      </div>
-      <div class="panel-body">
-        
-    <pre id="pre-"><code class="javascript">// Use Container instead of DataStore on the server
-import {Container} from &#x27;js-data&#x27;
-import {RethinkDBAdapter} from &#x27;js-data-rethinkdb&#x27;
-
-// Create a store to hold your Mappers
-const store = new Container()
-
-// Create an instance of RethinkDBAdapter with default settings
-const adapter = new RethinkDBAdapter()
-
-// Mappers in &quot;store&quot; will use the RethinkDB adapter by default
-store.registerAdapter(&#x27;rethinkdb&#x27;, adapter, { default: true })
-
-// Create a Mapper that maps to a &quot;user&quot; table
-store.defineMapper(&#x27;user&#x27;)</code></pre>
-    <div class="tonic" id="tonic-" style="display: none;">
-      // Use Container instead of DataStore on the server
-import {Container} from &#x27;js-data&#x27;
-import {RethinkDBAdapter} from &#x27;js-data-rethinkdb&#x27;
-
-// Create a store to hold your Mappers
-const store = new Container()
-
-// Create an instance of RethinkDBAdapter with default settings
-const adapter = new RethinkDBAdapter()
-
-// Mappers in &quot;store&quot; will use the RethinkDB adapter by default
-store.registerAdapter(&#x27;rethinkdb&#x27;, adapter, { default: true })
-
-// Create a Mapper that maps to a &quot;user&quot; table
-store.defineMapper(&#x27;user&#x27;)
-    </div>
-
-
-      </div>
-    </div>
-  
 </dd>
 
     
@@ -739,7 +419,7 @@ store.defineMapper(&#x27;user&#x27;)
         
 
 
-    This class extends the <a href="Adapter.html">Adapter</a> class.
+    This class extends the Component class.
 
 
     
@@ -827,15 +507,6 @@ store.defineMapper(&#x27;user&#x27;)
     
 
   
-  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
-  <dd class="inherited-from">
-    <ul class="dummy">
-      <li>
-        <a href="Adapter.html#debug">Adapter#debug</a>
-      </li>
-    </ul>
-  </dd>
-  
 
     
 
@@ -853,438 +524,6 @@ store.defineMapper(&#x27;user&#x27;)
 </dl>
 
 
-    
-</dd>
-
-        
-            
-<hr>
-<dt class="name" id="deleteOpts">
-    <h4><strong><span class="type-signature"></span>deleteOpts</strong></h4>
-
-    
-</dt>
-<dd>
-    
-    <div class="description">
-        <p>Default options to pass to r#delete.</p>
-    </div>
-    
-
-    
-<div class="panel panel-default">
-  <div class="panel-heading"><strong>Details</strong></div>
-  <table class="table table-striped table-bordered">
-    <thead>
-      <tr>
-        
-          <th>Type</th>
-        
-        
-        
-        
-          <th>Default value</th>
-        
-        
-          <th>Source</th>
-        
-        
-        
-        
-        
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        
-          <td>
-            
-<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">Object</a></span>
-
-
-
-          </td>
-        
-        
-        
-        
-          <td><pre><code>{}</code></pre></td>
-        
-        
-          <td>
-            <a href="src_index.js.html">src/index.js</a>,
-             <a href="src_index.js.html#sunlight-1-line-198">line 198</a>
-          </td>
-        
-        
-        
-        
-        
-      </tr>
-    </tbody>
-  </table>
-</div>
-<dl class="details">
-    
-
-  
-
-    
-
-    
-
-    
-
-  
-
-  
-
-  
-
-  
-</dl>
-
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt class="name" id="insertOpts">
-    <h4><strong><span class="type-signature"></span>insertOpts</strong></h4>
-
-    
-</dt>
-<dd>
-    
-    <div class="description">
-        <p>Default options to pass to r#insert.</p>
-    </div>
-    
-
-    
-<div class="panel panel-default">
-  <div class="panel-heading"><strong>Details</strong></div>
-  <table class="table table-striped table-bordered">
-    <thead>
-      <tr>
-        
-          <th>Type</th>
-        
-        
-        
-        
-          <th>Default value</th>
-        
-        
-          <th>Source</th>
-        
-        
-        
-        
-        
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        
-          <td>
-            
-<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">Object</a></span>
-
-
-
-          </td>
-        
-        
-        
-        
-          <td><pre><code>{}</code></pre></td>
-        
-        
-          <td>
-            <a href="src_index.js.html">src/index.js</a>,
-             <a href="src_index.js.html#sunlight-1-line-178">line 178</a>
-          </td>
-        
-        
-        
-        
-        
-      </tr>
-    </tbody>
-  </table>
-</div>
-<dl class="details">
-    
-
-  
-
-    
-
-    
-
-    
-
-  
-
-  
-
-  
-
-  
-</dl>
-
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt class="name" id="operators">
-    <h4><strong><span class="type-signature"></span>operators</strong></h4>
-
-    
-</dt>
-<dd>
-    
-    <div class="description">
-        <p>Override the default predicate functions for the specified operators.</p>
-    </div>
-    
-
-    
-<div class="panel panel-default">
-  <div class="panel-heading"><strong>Details</strong></div>
-  <table class="table table-striped table-bordered">
-    <thead>
-      <tr>
-        
-          <th>Type</th>
-        
-        
-        
-        
-          <th>Default value</th>
-        
-        
-          <th>Source</th>
-        
-        
-        
-        
-        
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        
-          <td>
-            
-<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">Object</a></span>
-
-
-
-          </td>
-        
-        
-        
-        
-          <td><pre><code>{}</code></pre></td>
-        
-        
-          <td>
-            <a href="src_index.js.html">src/index.js</a>,
-             <a href="src_index.js.html#sunlight-1-line-218">line 218</a>
-          </td>
-        
-        
-        
-        
-        
-      </tr>
-    </tbody>
-  </table>
-</div>
-<dl class="details">
-    
-
-  
-
-    
-
-    
-
-    
-
-  
-
-  
-
-  
-
-  
-</dl>
-
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt class="name" id="r">
-    <h4><strong><span class="type-signature"></span>r</strong></h4>
-
-    
-</dt>
-<dd>
-    
-    <div class="description">
-        <p>The rethinkdbdash instance used by this adapter. Use this directly when
-you need to write custom queries.</p>
-    </div>
-    
-
-    
-<div class="panel panel-default">
-  <div class="panel-heading"><strong>Details</strong></div>
-  <table class="table table-striped table-bordered">
-    <thead>
-      <tr>
-        
-          <th>Type</th>
-        
-        
-        
-        
-        
-          <th>Source</th>
-        
-        
-        
-        
-        
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        
-          <td>
-            
-<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">Object</a></span>
-
-
-
-          </td>
-        
-        
-        
-        
-        
-          <td>
-            <a href="src_index.js.html">src/index.js</a>,
-             <a href="src_index.js.html#sunlight-1-line-130">line 130</a>
-          </td>
-        
-        
-        
-        
-        
-      </tr>
-    </tbody>
-  </table>
-</div>
-<dl class="details">
-    
-
-  
-
-    
-
-    
-
-    
-
-  
-
-  
-
-  
-
-  
-</dl>
-
-
-    
-        <div class="code-panel panel panel-warning">
-          <div class="panel-heading">
-            <strong>Examples</strong>
-          </div>
-          <div class="panel-body">
-            
-        <p class="code-caption" id="btn-Use default instance.">
-          <button class="btn btn-primary" onclick="loadTonic('Use default instance.')">Try it out</button>
-        </p>
-    
-    <pre id="pre-Use default instance."><code class="javascript">import {RethinkDBAdapter} from &#x27;js-data-rethinkdb&#x27;
-const adapter = new RethinkDBAdapter()
-adapter.r.dbDrop(&#x27;foo&#x27;).then(...)</code></pre>
-    <div class="tonic" id="tonic-Use default instance." style="display: none;">
-      import {RethinkDBAdapter} from &#x27;js-data-rethinkdb&#x27;
-const adapter = new RethinkDBAdapter()
-adapter.r.dbDrop(&#x27;foo&#x27;).then(...)
-    </div>
-
-        <p class="code-caption" id="btn-Configure default instance.">
-          <button class="btn btn-primary" onclick="loadTonic('Configure default instance.')">Try it out</button>
-        </p>
-    
-    <pre id="pre-Configure default instance."><code class="javascript">import {RethinkDBAdapter} from &#x27;js-data-rethinkdb&#x27;
-const adapter = new RethinkDBAdapter({
-  rOpts: {
-    user: &#x27;myUser&#x27;,
-    password: &#x27;myPassword&#x27;
-  }
-})
-adapter.r.dbDrop(&#x27;foo&#x27;).then(...)</code></pre>
-    <div class="tonic" id="tonic-Configure default instance." style="display: none;">
-      import {RethinkDBAdapter} from &#x27;js-data-rethinkdb&#x27;
-const adapter = new RethinkDBAdapter({
-  rOpts: {
-    user: &#x27;myUser&#x27;,
-    password: &#x27;myPassword&#x27;
-  }
-})
-adapter.r.dbDrop(&#x27;foo&#x27;).then(...)
-    </div>
-
-        <p class="code-caption" id="btn-Provide a custom instance.">
-          <button class="btn btn-primary" onclick="loadTonic('Provide a custom instance.')">Try it out</button>
-        </p>
-    
-    <pre id="pre-Provide a custom instance."><code class="javascript">import rethinkdbdash from &#x27;rethinkdbdash&#x27;
-import {RethinkDBAdapter} from &#x27;js-data-rethinkdb&#x27;
-const r = rethinkdbdash()
-const adapter = new RethinkDBAdapter({
-  r: r
-})
-adapter.r.dbDrop(&#x27;foo&#x27;).then(...)</code></pre>
-    <div class="tonic" id="tonic-Provide a custom instance." style="display: none;">
-      import rethinkdbdash from &#x27;rethinkdbdash&#x27;
-import {RethinkDBAdapter} from &#x27;js-data-rethinkdb&#x27;
-const r = rethinkdbdash()
-const adapter = new RethinkDBAdapter({
-  r: r
-})
-adapter.r.dbDrop(&#x27;foo&#x27;).then(...)
-    </div>
-
-
-          </div>
-        </div>
     
 </dd>
 
@@ -1360,383 +599,6 @@ adapter.r.dbDrop(&#x27;foo&#x27;).then(...)
     
 
   
-  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
-  <dd class="inherited-from">
-    <ul class="dummy">
-      <li>
-        <a href="Adapter.html#raw">Adapter#raw</a>
-      </li>
-    </ul>
-  </dd>
-  
-
-    
-
-    
-
-    
-
-  
-
-  
-
-  
-
-  
-</dl>
-
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt class="name" id="rOpts">
-    <h4><strong><span class="type-signature"></span>rOpts</strong></h4>
-
-    
-</dt>
-<dd>
-    
-    <div class="description">
-        <p>Options to pass to a new <code>rethinkdbdash</code> instance, if one was not provided
-at <a href="RethinkDBAdapter.html#r">RethinkDBAdapter#r</a>. See the <a href="https://github.com/neumino/rethinkdbdash#importing-the-driver">rethinkdbdash README</a> for
-instance options.</p>
-    </div>
-    
-
-    
-<div class="panel panel-default">
-  <div class="panel-heading"><strong>Details</strong></div>
-  <table class="table table-striped table-bordered">
-    <thead>
-      <tr>
-        
-          <th>Type</th>
-        
-        
-        
-        
-        
-          <th>Source</th>
-        
-        
-        
-        
-          <th>See</th>
-        
-        
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        
-          <td>
-            
-<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">Object</a></span>
-
-
-
-          </td>
-        
-        
-        
-        
-        
-          <td>
-            <a href="src_index.js.html">src/index.js</a>,
-             <a href="src_index.js.html#sunlight-1-line-228">line 228</a>
-          </td>
-        
-        
-        
-        
-          <td>
-            <ul>
-              <li><a href="https://github.com/neumino/rethinkdbdash#importing-the-driver">https://github.com/neumino/rethinkdbdash#importing-the-driver</a></li>
-              </ul>
-          </td>
-        
-        
-      </tr>
-    </tbody>
-  </table>
-</div>
-<dl class="details">
-    
-
-  
-
-    
-
-    
-
-    
-
-  
-
-  
-
-  
-
-  
-</dl>
-
-
-    
-        <div class="code-panel panel panel-warning">
-          <div class="panel-heading">
-            <strong>Examples</strong>
-          </div>
-          <div class="panel-body">
-            
-        <p class="code-caption" id="btn-Connect to localhost:8080, and let the driver find other instances.">
-          <button class="btn btn-primary" onclick="loadTonic('Connect to localhost:8080, and let the driver find other instances.')">Try it out</button>
-        </p>
-    
-    <pre id="pre-Connect to localhost:8080, and let the driver find other instances."><code class="javascript">import {RethinkDBAdapter} from &#x27;js-data-rethinkdb&#x27;
-const adapter = new RethinkDBAdapter({
-  rOpts: {
-    discovery: true
-  }
-})</code></pre>
-    <div class="tonic" id="tonic-Connect to localhost:8080, and let the driver find other instances." style="display: none;">
-      import {RethinkDBAdapter} from &#x27;js-data-rethinkdb&#x27;
-const adapter = new RethinkDBAdapter({
-  rOpts: {
-    discovery: true
-  }
-})
-    </div>
-
-        <p class="code-caption" id="btn-Connect to and only to localhost:8080.">
-          <button class="btn btn-primary" onclick="loadTonic('Connect to and only to localhost:8080.')">Try it out</button>
-        </p>
-    
-    <pre id="pre-Connect to and only to localhost:8080."><code class="javascript">import {RethinkDBAdapter} from &#x27;js-data-rethinkdb&#x27;
-const adapter = new RethinkDBAdapter()</code></pre>
-    <div class="tonic" id="tonic-Connect to and only to localhost:8080." style="display: none;">
-      import {RethinkDBAdapter} from &#x27;js-data-rethinkdb&#x27;
-const adapter = new RethinkDBAdapter()
-    </div>
-
-        <p class="code-caption" id="btn-Do not create a connection pool.">
-          <button class="btn btn-primary" onclick="loadTonic('Do not create a connection pool.')">Try it out</button>
-        </p>
-    
-    <pre id="pre-Do not create a connection pool."><code class="javascript">import {RethinkDBAdapter} from &#x27;js-data-rethinkdb&#x27;
-const adapter = new RethinkDBAdapter({
-  rOpts: {
-    pool: false
-  }
-})</code></pre>
-    <div class="tonic" id="tonic-Do not create a connection pool." style="display: none;">
-      import {RethinkDBAdapter} from &#x27;js-data-rethinkdb&#x27;
-const adapter = new RethinkDBAdapter({
-  rOpts: {
-    pool: false
-  }
-})
-    </div>
-
-        <p class="code-caption" id="btn-Connect to a cluster seeding from `192.168.0.100`, `192.168.0.101`, `192.168.0.102`.">
-          <button class="btn btn-primary" onclick="loadTonic('Connect to a cluster seeding from `192.168.0.100`, `192.168.0.101`, `192.168.0.102`.')">Try it out</button>
-        </p>
-    
-    <pre id="pre-Connect to a cluster seeding from `192.168.0.100`, `192.168.0.101`, `192.168.0.102`."><code class="javascript">import {RethinkDBAdapter} from &#x27;js-data-rethinkdb&#x27;
-const adapter = new RethinkDBAdapter({
-  rOpts: {
-    servers: [
-      { host: &#x27;192.168.0.100&#x27;, port: 28015 },
-      { host: &#x27;192.168.0.101&#x27;, port: 28015 },
-      { host: &#x27;192.168.0.102&#x27;, port: 28015 }
-    ]
-  }
-})</code></pre>
-    <div class="tonic" id="tonic-Connect to a cluster seeding from `192.168.0.100`, `192.168.0.101`, `192.168.0.102`." style="display: none;">
-      import {RethinkDBAdapter} from &#x27;js-data-rethinkdb&#x27;
-const adapter = new RethinkDBAdapter({
-  rOpts: {
-    servers: [
-      { host: &#x27;192.168.0.100&#x27;, port: 28015 },
-      { host: &#x27;192.168.0.101&#x27;, port: 28015 },
-      { host: &#x27;192.168.0.102&#x27;, port: 28015 }
-    ]
-  }
-})
-    </div>
-
-
-          </div>
-        </div>
-    
-</dd>
-
-        
-            
-<hr>
-<dt class="name" id="runOpts">
-    <h4><strong><span class="type-signature"></span>runOpts</strong></h4>
-
-    
-</dt>
-<dd>
-    
-    <div class="description">
-        <p>Default options to pass to r#run.</p>
-    </div>
-    
-
-    
-<div class="panel panel-default">
-  <div class="panel-heading"><strong>Details</strong></div>
-  <table class="table table-striped table-bordered">
-    <thead>
-      <tr>
-        
-          <th>Type</th>
-        
-        
-        
-        
-          <th>Default value</th>
-        
-        
-          <th>Source</th>
-        
-        
-        
-        
-        
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        
-          <td>
-            
-<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">Object</a></span>
-
-
-
-          </td>
-        
-        
-        
-        
-          <td><pre><code>{}</code></pre></td>
-        
-        
-          <td>
-            <a href="src_index.js.html">src/index.js</a>,
-             <a href="src_index.js.html#sunlight-1-line-208">line 208</a>
-          </td>
-        
-        
-        
-        
-        
-      </tr>
-    </tbody>
-  </table>
-</div>
-<dl class="details">
-    
-
-  
-
-    
-
-    
-
-    
-
-  
-
-  
-
-  
-
-  
-</dl>
-
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt class="name" id="updateOpts">
-    <h4><strong><span class="type-signature"></span>updateOpts</strong></h4>
-
-    
-</dt>
-<dd>
-    
-    <div class="description">
-        <p>Default options to pass to r#update.</p>
-    </div>
-    
-
-    
-<div class="panel panel-default">
-  <div class="panel-heading"><strong>Details</strong></div>
-  <table class="table table-striped table-bordered">
-    <thead>
-      <tr>
-        
-          <th>Type</th>
-        
-        
-        
-        
-          <th>Default value</th>
-        
-        
-          <th>Source</th>
-        
-        
-        
-        
-        
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        
-          <td>
-            
-<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">Object</a></span>
-
-
-
-          </td>
-        
-        
-        
-        
-          <td><pre><code>{}</code></pre></td>
-        
-        
-          <td>
-            <a href="src_index.js.html">src/index.js</a>,
-             <a href="src_index.js.html#sunlight-1-line-188">line 188</a>
-          </td>
-        
-        
-        
-        
-        
-      </tr>
-    </tbody>
-  </table>
-</div>
-<dl class="details">
-    
-
-  
 
     
 
@@ -1775,7 +637,7 @@ const adapter = new RethinkDBAdapter({
 
   
   <div class="description">
-    <p>Create a subclass of this RethinkDBAdapter:</p>
+    <p>Create a subclass of this Adapter:</p>
   </div>
   
 
@@ -1995,7 +857,7 @@ to be used as the subclass itself.</p></td>
 </td>
             
             
-              <td><p>Subclass of this RethinkDBAdapter class.</p></td>
+              <td><p>Subclass of this Adapter class.</p></td>
             
           </tr>
         
@@ -2013,8 +875,6 @@ to be used as the subclass itself.</p></td>
         
         
         
-          <th>Since</th>
-        
         
         
           <th>Source</th>
@@ -2030,13 +890,11 @@ to be used as the subclass itself.</p></td>
         
         
         
-          <td>3.0.0</td>
-        
         
         
           <td>
-            <a href="src_index.js.html">src/index.js</a>,
-             <a href="src_index.js.html#sunlight-1-line-1091">line 1091</a>
+            <a href="node_modules_js-data-adapter_src_index.js.html">node_modules/js-data-adapter/src/index.js</a>,
+             <a href="node_modules_js-data-adapter_src_index.js.html#sunlight-1-line-1396">line 1396</a>
           </td>
         
         
@@ -2075,89 +933,89 @@ to be used as the subclass itself.</p></td>
       </div>
       <div class="panel-body">
         
-        <p class="code-caption" id="btn-RethinkDBAdapter.extend">
-          <button class="btn btn-primary" onclick="loadTonic('RethinkDBAdapter.extend')">Try it out</button>
+        <p class="code-caption" id="btn-Adapter.extend">
+          <button class="btn btn-primary" onclick="loadTonic('Adapter.extend')">Try it out</button>
         </p>
     
-    <pre id="pre-RethinkDBAdapter.extend"><code class="javascript">// Normally you would do: import {RethinkDBAdapter} from &#x27;js-data-rethinkdb&#x27;
-const JSDataRethinkDB = require(&#x27;js-data-rethinkdb@3.0.0-beta.8&#x27;)
-const {RethinkDBAdapter} = JSDataRethinkDB
-console.log(&#x27;Using JSDataRethinkDB v&#x27; + JSDataRethinkDB.version.full)
+    <pre id="pre-Adapter.extend"><code class="javascript">// Normally you would do: import {Adapter} from &#x27;js-data&#x27;
+const JSData = require(&#x27;js-data@3.0.0-beta.10&#x27;)
+const {Adapter} = JSData
+console.log(&#x27;Using JSData v&#x27; + JSData.version.full)
 
 // Extend the class using ES2015 class syntax.
-class CustomRethinkDBAdapterClass extends RethinkDBAdapter {
+class CustomAdapterClass extends Adapter {
   foo () { return &#x27;bar&#x27; }
   static beep () { return &#x27;boop&#x27; }
 }
-const customRethinkDBAdapter = new CustomRethinkDBAdapterClass()
-console.log(customRethinkDBAdapter.foo())
-console.log(CustomRethinkDBAdapterClass.beep())
+const customAdapter = new CustomAdapterClass()
+console.log(customAdapter.foo())
+console.log(CustomAdapterClass.beep())
 
 // Extend the class using alternate method.
-const OtherRethinkDBAdapterClass = RethinkDBAdapter.extend({
+const OtherAdapterClass = Adapter.extend({
   foo () { return &#x27;bar&#x27; }
 }, {
   beep () { return &#x27;boop&#x27; }
 })
-const otherRethinkDBAdapter = new OtherRethinkDBAdapterClass()
-console.log(otherRethinkDBAdapter.foo())
-console.log(OtherRethinkDBAdapterClass.beep())
+const otherAdapter = new OtherAdapterClass()
+console.log(otherAdapter.foo())
+console.log(OtherAdapterClass.beep())
 
 // Extend the class, providing a custom constructor.
-function AnotherRethinkDBAdapterClass () {
-  RethinkDBAdapter.call(this)
+function AnotherAdapterClass () {
+  Adapter.call(this)
   this.created_at = new Date().getTime()
 }
-RethinkDBAdapter.extend({
-  constructor: AnotherRethinkDBAdapterClass,
+Adapter.extend({
+  constructor: AnotherAdapterClass,
   foo () { return &#x27;bar&#x27; }
 }, {
   beep () { return &#x27;boop&#x27; }
 })
-const anotherRethinkDBAdapter = new AnotherRethinkDBAdapterClass()
-console.log(anotherRethinkDBAdapter.created_at)
-console.log(anotherRethinkDBAdapter.foo())
-console.log(AnotherRethinkDBAdapterClass.beep())</code></pre>
-    <div class="tonic" id="tonic-RethinkDBAdapter.extend" style="display: none;">
-      // Normally you would do: import {RethinkDBAdapter} from &#x27;js-data-rethinkdb&#x27;
-const JSDataRethinkDB = require(&#x27;js-data-rethinkdb@3.0.0-beta.8&#x27;)
-const {RethinkDBAdapter} = JSDataRethinkDB
-console.log(&#x27;Using JSDataRethinkDB v&#x27; + JSDataRethinkDB.version.full)
+const anotherAdapter = new AnotherAdapterClass()
+console.log(anotherAdapter.created_at)
+console.log(anotherAdapter.foo())
+console.log(AnotherAdapterClass.beep())</code></pre>
+    <div class="tonic" id="tonic-Adapter.extend" style="display: none;">
+      // Normally you would do: import {Adapter} from &#x27;js-data&#x27;
+const JSData = require(&#x27;js-data@3.0.0-beta.10&#x27;)
+const {Adapter} = JSData
+console.log(&#x27;Using JSData v&#x27; + JSData.version.full)
 
 // Extend the class using ES2015 class syntax.
-class CustomRethinkDBAdapterClass extends RethinkDBAdapter {
+class CustomAdapterClass extends Adapter {
   foo () { return &#x27;bar&#x27; }
   static beep () { return &#x27;boop&#x27; }
 }
-const customRethinkDBAdapter = new CustomRethinkDBAdapterClass()
-console.log(customRethinkDBAdapter.foo())
-console.log(CustomRethinkDBAdapterClass.beep())
+const customAdapter = new CustomAdapterClass()
+console.log(customAdapter.foo())
+console.log(CustomAdapterClass.beep())
 
 // Extend the class using alternate method.
-const OtherRethinkDBAdapterClass = RethinkDBAdapter.extend({
+const OtherAdapterClass = Adapter.extend({
   foo () { return &#x27;bar&#x27; }
 }, {
   beep () { return &#x27;boop&#x27; }
 })
-const otherRethinkDBAdapter = new OtherRethinkDBAdapterClass()
-console.log(otherRethinkDBAdapter.foo())
-console.log(OtherRethinkDBAdapterClass.beep())
+const otherAdapter = new OtherAdapterClass()
+console.log(otherAdapter.foo())
+console.log(OtherAdapterClass.beep())
 
 // Extend the class, providing a custom constructor.
-function AnotherRethinkDBAdapterClass () {
-  RethinkDBAdapter.call(this)
+function AnotherAdapterClass () {
+  Adapter.call(this)
   this.created_at = new Date().getTime()
 }
-RethinkDBAdapter.extend({
-  constructor: AnotherRethinkDBAdapterClass,
+Adapter.extend({
+  constructor: AnotherAdapterClass,
   foo () { return &#x27;bar&#x27; }
 }, {
   beep () { return &#x27;boop&#x27; }
 })
-const anotherRethinkDBAdapter = new AnotherRethinkDBAdapterClass()
-console.log(anotherRethinkDBAdapter.created_at)
-console.log(anotherRethinkDBAdapter.foo())
-console.log(AnotherRethinkDBAdapterClass.beep())
+const anotherAdapter = new AnotherAdapterClass()
+console.log(anotherAdapter.created_at)
+console.log(anotherAdapter.foo())
+console.log(AnotherAdapterClass.beep())
     </div>
 
 
@@ -2430,15 +1288,6 @@ console.log(AnotherRethinkDBAdapterClass.beep())
     
 
   
-  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
-  <dd class="inherited-from">
-    <ul class="dummy">
-      <li>
-        <a href="Adapter.html#afterCount">Adapter#afterCount</a>
-      </li>
-    </ul>
-  </dd>
-  
 
     
 
@@ -2641,8 +1490,6 @@ console.log(AnotherRethinkDBAdapterClass.beep())
           <th>Source</th>
         
         
-          <th>Overrides</th>
-        
         
         
         
@@ -2660,10 +1507,6 @@ console.log(AnotherRethinkDBAdapterClass.beep())
              <a href="node_modules_js-data-adapter_src_index.js.html#sunlight-1-line-138">line 138</a>
           </td>
         
-        
-          <td>
-            <a href="Adapter.html#afterCreate">Adapter#afterCreate</a>
-          </td>
         
         
         
@@ -2729,14 +1572,289 @@ console.log(AnotherRethinkDBAdapterClass.beep())
     
 
   
-  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
-  <dd class="inherited-from">
-    <ul class="dummy">
-      <li>
-        <a href="Adapter.html#afterCreate">Adapter#afterCreate</a>
-      </li>
-    </ul>
-  </dd>
+
+    
+
+    
+
+    
+
+  
+
+  
+
+  
+
+  
+</dl>
+
+
+  
+</dd>
+
+        
+            
+<hr>
+<dt>
+  <h4 class="name" id="afterCreate"><span class="type-signature"></span>afterCreate(mapper, props, opts, response)</h4>
+
+  
+</dt>
+<dd>
+
+  
+  <div class="description">
+    <p>Lifecycle method method called by <a href="#createMany__anchor">createMany</a>.</p>
+<p>Override this method to add custom behavior for this lifecycle hook.</p>
+<p>Returning a Promise causes <a href="#createMany__anchor">createMany</a> to wait for the Promise to resolve before continuing.</p>
+<p>If <code>opts.raw</code> is <code>true</code> then <code>response</code> will be a detailed response object, otherwise <code>response</code> will be the created records.</p>
+<p><code>response</code> may be modified. You can also re-assign <code>response</code> to another value by returning a different value or a Promise that resolves to a different value.</p>
+<p>A thrown error or rejected Promise will bubble up and reject the Promise returned by <a href="#createMany__anchor">createMany</a>.</p>
+  </div>
+  
+
+  
+
+  
+
+  
+  
+    <div class="panel panel-success">
+      <!-- Default panel contents -->
+      <div class="panel-heading"><strong>Method parameters:</strong></div>
+      
+
+<table class="params table table-striped table-bordered">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>mapper</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">Object</a></span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The <code>mapper</code> argument passed to <a href="#createMany__anchor">createMany</a>.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>props</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" target="_blank">Array</a>.&lt;<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">Object</a>&gt;</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The <code>props</code> argument passed to <a href="#createMany__anchor">createMany</a>.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>opts</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">Object</a></span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The <code>opts</code> argument passed to <a href="#createMany__anchor">createMany</a>.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>response</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" target="_blank">Array</a>.&lt;<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">Object</a>&gt;</span>
+|
+
+<span class="param-type"><a href="Response.html">Response</a></span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Created records or <a href="Response.html">Response</a>, depending on the value of <code>opts.raw</code>.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+<div class="panel panel-default">
+  <div class="panel-heading"><strong>Details</strong></div>
+  <table class="table table-striped table-bordered">
+    <thead>
+      <tr>
+        
+        
+        
+        
+        
+          <th>Source</th>
+        
+        
+        
+        
+        
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        
+        
+        
+        
+        
+          <td>
+            <a href="node_modules_js-data-adapter_src_index.js.html">node_modules/js-data-adapter/src/index.js</a>,
+             <a href="node_modules_js-data-adapter_src_index.js.html#sunlight-1-line-161">line 161</a>
+          </td>
+        
+        
+        
+        
+        
+      </tr>
+    </tbody>
+  </table>
+</div>
+<dl class="details">
+    
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    <dl>
+
+<table class="props table table-striped table-bordered">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>opts.op</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" target="_blank">String</a></span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p><code>afterCreateMany</code></p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+</dl>
+
+    
+
   
 
     
@@ -3025,15 +2143,6 @@ console.log(AnotherRethinkDBAdapterClass.beep())
     
 
   
-  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
-  <dd class="inherited-from">
-    <ul class="dummy">
-      <li>
-        <a href="Adapter.html#afterDestroy">Adapter#afterDestroy</a>
-      </li>
-    </ul>
-  </dd>
-  
 
     
 
@@ -3317,15 +2426,6 @@ console.log(AnotherRethinkDBAdapterClass.beep())
 
     
 
-  
-  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
-  <dd class="inherited-from">
-    <ul class="dummy">
-      <li>
-        <a href="Adapter.html#afterDestroyAll">Adapter#afterDestroyAll</a>
-      </li>
-    </ul>
-  </dd>
   
 
     
@@ -3614,15 +2714,6 @@ console.log(AnotherRethinkDBAdapterClass.beep())
     
 
   
-  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
-  <dd class="inherited-from">
-    <ul class="dummy">
-      <li>
-        <a href="Adapter.html#afterFind">Adapter#afterFind</a>
-      </li>
-    </ul>
-  </dd>
-  
 
     
 
@@ -3906,15 +2997,6 @@ console.log(AnotherRethinkDBAdapterClass.beep())
 
     
 
-  
-  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
-  <dd class="inherited-from">
-    <ul class="dummy">
-      <li>
-        <a href="Adapter.html#afterFindAll">Adapter#afterFindAll</a>
-      </li>
-    </ul>
-  </dd>
   
 
     
@@ -4223,15 +3305,6 @@ console.log(AnotherRethinkDBAdapterClass.beep())
 
     
 
-  
-  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
-  <dd class="inherited-from">
-    <ul class="dummy">
-      <li>
-        <a href="Adapter.html#afterSum">Adapter#afterSum</a>
-      </li>
-    </ul>
-  </dd>
   
 
     
@@ -4544,15 +3617,6 @@ console.log(AnotherRethinkDBAdapterClass.beep())
     
 
   
-  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
-  <dd class="inherited-from">
-    <ul class="dummy">
-      <li>
-        <a href="Adapter.html#afterUpdate">Adapter#afterUpdate</a>
-      </li>
-    </ul>
-  </dd>
-  
 
     
 
@@ -4861,15 +3925,6 @@ console.log(AnotherRethinkDBAdapterClass.beep())
     
 
   
-  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
-  <dd class="inherited-from">
-    <ul class="dummy">
-      <li>
-        <a href="Adapter.html#afterUpdateAll">Adapter#afterUpdateAll</a>
-      </li>
-    </ul>
-  </dd>
-  
 
     
 
@@ -5154,15 +4209,6 @@ console.log(AnotherRethinkDBAdapterClass.beep())
     
 
   
-  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
-  <dd class="inherited-from">
-    <ul class="dummy">
-      <li>
-        <a href="Adapter.html#afterUpdateMany">Adapter#afterUpdateMany</a>
-      </li>
-    </ul>
-  </dd>
-  
 
     
 
@@ -5417,15 +4463,6 @@ console.log(AnotherRethinkDBAdapterClass.beep())
 
     
 
-  
-  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
-  <dd class="inherited-from">
-    <ul class="dummy">
-      <li>
-        <a href="Adapter.html#beforeCount">Adapter#beforeCount</a>
-      </li>
-    </ul>
-  </dd>
   
 
     
@@ -5683,15 +4720,6 @@ console.log(AnotherRethinkDBAdapterClass.beep())
     
 
   
-  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
-  <dd class="inherited-from">
-    <ul class="dummy">
-      <li>
-        <a href="Adapter.html#beforeCreate">Adapter#beforeCreate</a>
-      </li>
-    </ul>
-  </dd>
-  
 
     
 
@@ -5947,15 +4975,6 @@ console.log(AnotherRethinkDBAdapterClass.beep())
 
     
 
-  
-  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
-  <dd class="inherited-from">
-    <ul class="dummy">
-      <li>
-        <a href="Adapter.html#beforeCreateMany">Adapter#beforeCreateMany</a>
-      </li>
-    </ul>
-  </dd>
   
 
     
@@ -6215,15 +5234,6 @@ console.log(AnotherRethinkDBAdapterClass.beep())
     
 
   
-  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
-  <dd class="inherited-from">
-    <ul class="dummy">
-      <li>
-        <a href="Adapter.html#beforeDestroy">Adapter#beforeDestroy</a>
-      </li>
-    </ul>
-  </dd>
-  
 
     
 
@@ -6478,15 +5488,6 @@ console.log(AnotherRethinkDBAdapterClass.beep())
 
     
 
-  
-  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
-  <dd class="inherited-from">
-    <ul class="dummy">
-      <li>
-        <a href="Adapter.html#beforeDestroyAll">Adapter#beforeDestroyAll</a>
-      </li>
-    </ul>
-  </dd>
   
 
     
@@ -6746,15 +5747,6 @@ console.log(AnotherRethinkDBAdapterClass.beep())
     
 
   
-  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
-  <dd class="inherited-from">
-    <ul class="dummy">
-      <li>
-        <a href="Adapter.html#beforeFind">Adapter#beforeFind</a>
-      </li>
-    </ul>
-  </dd>
-  
 
     
 
@@ -7010,15 +6002,6 @@ console.log(AnotherRethinkDBAdapterClass.beep())
     
 
   
-  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
-  <dd class="inherited-from">
-    <ul class="dummy">
-      <li>
-        <a href="Adapter.html#beforeFindAll">Adapter#beforeFindAll</a>
-      </li>
-    </ul>
-  </dd>
-  
 
     
 
@@ -7273,15 +6256,6 @@ console.log(AnotherRethinkDBAdapterClass.beep())
 
     
 
-  
-  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
-  <dd class="inherited-from">
-    <ul class="dummy">
-      <li>
-        <a href="Adapter.html#beforeSum">Adapter#beforeSum</a>
-      </li>
-    </ul>
-  </dd>
   
 
     
@@ -7566,15 +6540,6 @@ console.log(AnotherRethinkDBAdapterClass.beep())
     
 
   
-  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
-  <dd class="inherited-from">
-    <ul class="dummy">
-      <li>
-        <a href="Adapter.html#beforeUpdate">Adapter#beforeUpdate</a>
-      </li>
-    </ul>
-  </dd>
-  
 
     
 
@@ -7855,15 +6820,6 @@ console.log(AnotherRethinkDBAdapterClass.beep())
     
 
   
-  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
-  <dd class="inherited-from">
-    <ul class="dummy">
-      <li>
-        <a href="Adapter.html#beforeUpdateAll">Adapter#beforeUpdateAll</a>
-      </li>
-    </ul>
-  </dd>
-  
 
     
 
@@ -8120,15 +7076,6 @@ console.log(AnotherRethinkDBAdapterClass.beep())
     
 
   
-  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
-  <dd class="inherited-from">
-    <ul class="dummy">
-      <li>
-        <a href="Adapter.html#beforeUpdateMany">Adapter#beforeUpdateMany</a>
-      </li>
-    </ul>
-  </dd>
-  
 
     
 
@@ -8161,7 +7108,8 @@ console.log(AnotherRethinkDBAdapterClass.beep())
 
   
   <div class="description">
-    <p>Return the number of records that match the selection query.</p>
+    <p>Retrieve the number of records that match the selection query. Called by
+<code>Mapper#count</code>.</p>
   </div>
   
 
@@ -8225,7 +7173,7 @@ console.log(AnotherRethinkDBAdapterClass.beep())
 
             
 
-            <td class="description last"><p>the mapper.</p></td>
+            <td class="description last"><p>The mapper.</p></td>
         </tr>
 
     
@@ -8561,45 +7509,6 @@ console.log(AnotherRethinkDBAdapterClass.beep())
 
         <tr>
             
-                <td class="name"><code>operators</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">Object</a></span>
-
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                </td>
-            
-
-            <td class="description last"><p>Override the default predicate functions
-for specified operators.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
                 <td class="name"><code>raw</code></td>
             
 
@@ -8635,44 +7544,6 @@ for specified operators.</p></td>
 
             <td class="description last"><p>Whether to return a more detailed
 response object.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>runOpts</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">Object</a></span>
-
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                </td>
-            
-
-            <td class="description last"><p>Options to pass to r#run.</p></td>
         </tr>
 
     
@@ -8744,8 +7615,6 @@ response object.</p></td>
           <th>Source</th>
         
         
-          <th>Overrides</th>
-        
         
         
         
@@ -8759,14 +7628,10 @@ response object.</p></td>
         
         
           <td>
-            <a href="src_index.js.html">src/index.js</a>,
-             <a href="src_index.js.html#sunlight-1-line-695">line 695</a>
+            <a href="node_modules_js-data-adapter_src_index.js.html">node_modules/js-data-adapter/src/index.js</a>,
+             <a href="node_modules_js-data-adapter_src_index.js.html#sunlight-1-line-581">line 581</a>
           </td>
         
-        
-          <td>
-            <a href="Adapter.html#count">Adapter#count</a>
-          </td>
         
         
         
@@ -8811,7 +7676,7 @@ response object.</p></td>
 
   
   <div class="description">
-    <p>Create a new record.</p>
+    <p>Create a new record. Called by <code>Mapper#create</code>.</p>
   </div>
   
 
@@ -8971,44 +7836,6 @@ response object.</p></td>
 
         <tr>
             
-                <td class="name"><code>insertOpts</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">Object</a></span>
-
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                </td>
-            
-
-            <td class="description last"><p>Options to pass to r#insert.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
                 <td class="name"><code>raw</code></td>
             
 
@@ -9044,44 +7871,6 @@ response object.</p></td>
 
             <td class="description last"><p>Whether to return a more detailed
 response object.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>runOpts</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">Object</a></span>
-
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                </td>
-            
-
-            <td class="description last"><p>Options to pass to r#run.</p></td>
         </tr>
 
     
@@ -9153,8 +7942,6 @@ response object.</p></td>
           <th>Source</th>
         
         
-          <th>Overrides</th>
-        
         
         
         
@@ -9168,14 +7955,10 @@ response object.</p></td>
         
         
           <td>
-            <a href="src_index.js.html">src/index.js</a>,
-             <a href="src_index.js.html#sunlight-1-line-724">line 724</a>
+            <a href="node_modules_js-data-adapter_src_index.js.html">node_modules/js-data-adapter/src/index.js</a>,
+             <a href="node_modules_js-data-adapter_src_index.js.html#sunlight-1-line-627">line 627</a>
           </td>
         
-        
-          <td>
-            <a href="Adapter.html#create">Adapter#create</a>
-          </td>
         
         
         
@@ -9220,7 +8003,7 @@ response object.</p></td>
 
   
   <div class="description">
-    <p>Create multiple records in a single batch.</p>
+    <p>Create multiple records in a single batch. Called by <code>Mapper#createMany</code>.</p>
   </div>
   
 
@@ -9380,44 +8163,6 @@ response object.</p></td>
 
         <tr>
             
-                <td class="name"><code>insertOpts</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">Object</a></span>
-
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                </td>
-            
-
-            <td class="description last"><p>Options to pass to r#insert.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
                 <td class="name"><code>raw</code></td>
             
 
@@ -9453,44 +8198,6 @@ response object.</p></td>
 
             <td class="description last"><p>Whether to return a more detailed
 response object.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>runOpts</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">Object</a></span>
-
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                </td>
-            
-
-            <td class="description last"><p>Options to pass to r#run.</p></td>
         </tr>
 
     
@@ -9562,8 +8269,6 @@ response object.</p></td>
           <th>Source</th>
         
         
-          <th>Overrides</th>
-        
         
         
         
@@ -9577,14 +8282,10 @@ response object.</p></td>
         
         
           <td>
-            <a href="src_index.js.html">src/index.js</a>,
-             <a href="src_index.js.html#sunlight-1-line-746">line 746</a>
+            <a href="node_modules_js-data-adapter_src_index.js.html">node_modules/js-data-adapter/src/index.js</a>,
+             <a href="node_modules_js-data-adapter_src_index.js.html#sunlight-1-line-669">line 669</a>
           </td>
         
-        
-          <td>
-            <a href="Adapter.html#createMany">Adapter#createMany</a>
-          </td>
         
         
         
@@ -9629,7 +8330,8 @@ response object.</p></td>
 
   
   <div class="description">
-    <p>Destroy the record with the given primary key.</p>
+    <p>Destroy the record with the given primary key. Called by
+<code>Mapper#destroy</code>.</p>
   </div>
   
 
@@ -9792,44 +8494,6 @@ response object.</p></td>
 
         <tr>
             
-                <td class="name"><code>deleteOpts</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">Object</a></span>
-
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                </td>
-            
-
-            <td class="description last"><p>Options to pass to r#delete.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
                 <td class="name"><code>raw</code></td>
             
 
@@ -9865,44 +8529,6 @@ response object.</p></td>
 
             <td class="description last"><p>Whether to return a more detailed
 response object.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>runOpts</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">Object</a></span>
-
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                </td>
-            
-
-            <td class="description last"><p>Options to pass to r#run.</p></td>
         </tr>
 
     
@@ -9974,8 +8600,6 @@ response object.</p></td>
           <th>Source</th>
         
         
-          <th>Overrides</th>
-        
         
         
         
@@ -9989,14 +8613,10 @@ response object.</p></td>
         
         
           <td>
-            <a href="src_index.js.html">src/index.js</a>,
-             <a href="src_index.js.html#sunlight-1-line-768">line 768</a>
+            <a href="node_modules_js-data-adapter_src_index.js.html">node_modules/js-data-adapter/src/index.js</a>,
+             <a href="node_modules_js-data-adapter_src_index.js.html#sunlight-1-line-712">line 712</a>
           </td>
         
-        
-          <td>
-            <a href="Adapter.html#destroy">Adapter#destroy</a>
-          </td>
         
         
         
@@ -10041,7 +8661,8 @@ response object.</p></td>
 
   
   <div class="description">
-    <p>Destroy the records that match the selection query.</p>
+    <p>Destroy the records that match the selection query. Called by
+<code>Mapper#destroyAll</code>.</p>
   </div>
   
 
@@ -10441,83 +9062,6 @@ response object.</p></td>
 
         <tr>
             
-                <td class="name"><code>deleteOpts</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">Object</a></span>
-
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                </td>
-            
-
-            <td class="description last"><p>Options to pass to r#delete.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>operators</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">Object</a></span>
-
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                </td>
-            
-
-            <td class="description last"><p>Override the default predicate functions
-for specified operators.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
                 <td class="name"><code>raw</code></td>
             
 
@@ -10553,44 +9097,6 @@ for specified operators.</p></td>
 
             <td class="description last"><p>Whether to return a more detailed
 response object.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>runOpts</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">Object</a></span>
-
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                </td>
-            
-
-            <td class="description last"><p>Options to pass to r#run.</p></td>
         </tr>
 
     
@@ -10662,542 +9168,6 @@ response object.</p></td>
           <th>Source</th>
         
         
-          <th>Overrides</th>
-        
-        
-        
-        
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        
-        
-        
-        
-        
-          <td>
-            <a href="src_index.js.html">src/index.js</a>,
-             <a href="src_index.js.html#sunlight-1-line-789">line 789</a>
-          </td>
-        
-        
-          <td>
-            <a href="Adapter.html#destroyAll">Adapter#destroyAll</a>
-          </td>
-        
-        
-        
-        
-      </tr>
-    </tbody>
-  </table>
-</div>
-<dl class="details">
-    
-
-  
-
-    
-
-    
-
-    
-
-  
-
-  
-
-  
-
-  
-</dl>
-
-
-  
-</dd>
-
-        
-            
-<hr>
-<dt>
-  <h4 class="name" id="filterSequence"><span class="type-signature"></span>filterSequence(mapper, <span class="optional">query</span>, <span class="optional">opts</span>)</h4>
-
-  
-</dt>
-<dd>
-
-  
-  <div class="description">
-    <p>Apply the specified selection query to the provided RQL sequence.</p>
-  </div>
-  
-
-  
-
-  
-
-  
-  
-    <div class="panel panel-success">
-      <!-- Default panel contents -->
-      <div class="panel-heading"><strong>Method parameters:</strong></div>
-      
-
-<table class="params table table-striped table-bordered">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-        <th>Argument</th>
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>mapper</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">Object</a></span>
-
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last"><p>The mapper.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>query</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">Object</a></span>
-
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last"><p>Selection query.</p>
-                <h6 class="method-params-label method-subparams-label">Properties</h6>
-                
-
-<table class="params table table-striped table-bordered">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-        <th>Argument</th>
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>where</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">Object</a></span>
-
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last"><p>Filtering criteria.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>orderBy</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" target="_blank">String</a></span>
-|
-
-<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" target="_blank">Array</a></span>
-
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last"><p>Sorting criteria.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>sort</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" target="_blank">String</a></span>
-|
-
-<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" target="_blank">Array</a></span>
-
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last"><p>Same as <code>query.sort</code>.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>limit</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number" target="_blank">Number</a></span>
-
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last"><p>Limit results.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>skip</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number" target="_blank">Number</a></span>
-
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last"><p>Offset results.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>offset</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number" target="_blank">Number</a></span>
-
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last"><p>Same as <code>query.skip</code>.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-            </td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>opts</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">Object</a></span>
-
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last"><p>Configuration options.</p>
-                <h6 class="method-params-label method-subparams-label">Properties</h6>
-                
-
-<table class="params table table-striped table-bordered">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-        <th>Argument</th>
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>operators</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">Object</a></span>
-
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last"><p>Override the default predicate functions
-for specified operators.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-            </td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    </div>
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-<div class="panel panel-default">
-  <div class="panel-heading"><strong>Details</strong></div>
-  <table class="table table-striped table-bordered">
-    <thead>
-      <tr>
-        
-        
-        
-        
-        
-          <th>Source</th>
-        
-        
         
         
         
@@ -11211,8 +9181,8 @@ for specified operators.</p></td>
         
         
           <td>
-            <a href="src_index.js.html">src/index.js</a>,
-             <a href="src_index.js.html#sunlight-1-line-561">line 561</a>
+            <a href="node_modules_js-data-adapter_src_index.js.html">node_modules/js-data-adapter/src/index.js</a>,
+             <a href="node_modules_js-data-adapter_src_index.js.html#sunlight-1-line-750">line 750</a>
           </td>
         
         
@@ -11259,7 +9229,7 @@ for specified operators.</p></td>
 
   
   <div class="description">
-    <p>Retrieve the record with the given primary key.</p>
+    <p>Retrieve the record with the given primary key. Called by <code>Mapper#find</code>.</p>
   </div>
   
 
@@ -11422,44 +9392,6 @@ for specified operators.</p></td>
 
         <tr>
             
-                <td class="name"><code>fields</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" target="_blank">Array</a>.&lt;<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" target="_blank">String</a>&gt;</span>
-
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                </td>
-            
-
-            <td class="description last"><p>Select a subset of fields to be returned.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
                 <td class="name"><code>raw</code></td>
             
 
@@ -11495,44 +9427,6 @@ for specified operators.</p></td>
 
             <td class="description last"><p>Whether to return a more detailed
 response object.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>runOpts</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">Object</a></span>
-
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                </td>
-            
-
-            <td class="description last"><p>Options to pass to r#run.</p></td>
         </tr>
 
     
@@ -11644,8 +9538,6 @@ response object.</p></td>
           <th>Source</th>
         
         
-          <th>Overrides</th>
-        
         
         
         
@@ -11659,14 +9551,10 @@ response object.</p></td>
         
         
           <td>
-            <a href="src_index.js.html">src/index.js</a>,
-             <a href="src_index.js.html#sunlight-1-line-819">line 819</a>
+            <a href="node_modules_js-data-adapter_src_index.js.html">node_modules/js-data-adapter/src/index.js</a>,
+             <a href="node_modules_js-data-adapter_src_index.js.html#sunlight-1-line-835">line 835</a>
           </td>
         
-        
-          <td>
-            <a href="Adapter.html#find">Adapter#find</a>
-          </td>
         
         
         
@@ -12111,83 +9999,6 @@ response object.</p></td>
 
         <tr>
             
-                <td class="name"><code>fields</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" target="_blank">Array</a>.&lt;<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" target="_blank">String</a>&gt;</span>
-
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                </td>
-            
-
-            <td class="description last"><p>Select a subset of fields to be returned.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>operators</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">Object</a></span>
-
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                </td>
-            
-
-            <td class="description last"><p>Override the default predicate functions
-for specified operators.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
                 <td class="name"><code>raw</code></td>
             
 
@@ -12223,44 +10034,6 @@ for specified operators.</p></td>
 
             <td class="description last"><p>Whether to return a more detailed
 response object.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>runOpts</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">Object</a></span>
-
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                </td>
-            
-
-            <td class="description last"><p>Options to pass to r#run.</p></td>
         </tr>
 
     
@@ -12372,300 +10145,6 @@ response object.</p></td>
           <th>Source</th>
         
         
-          <th>Overrides</th>
-        
-        
-        
-        
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        
-        
-        
-        
-        
-          <td>
-            <a href="src_index.js.html">src/index.js</a>,
-             <a href="src_index.js.html#sunlight-1-line-858">line 858</a>
-          </td>
-        
-        
-          <td>
-            <a href="Adapter.html#findAll">Adapter#findAll</a>
-          </td>
-        
-        
-        
-        
-      </tr>
-    </tbody>
-  </table>
-</div>
-<dl class="details">
-    
-
-  
-
-    
-
-    
-
-    
-
-  
-
-  
-
-  
-
-  
-</dl>
-
-
-  
-</dd>
-
-        
-            
-<hr>
-<dt>
-  <h4 class="name" id="getOperator"><span class="type-signature"></span>getOperator(operator, <span class="optional">opts</span>)</h4>
-
-  
-</dt>
-<dd>
-
-  
-  <div class="description">
-    <p>Resolve the predicate function for the specified operator based on the
-given options and this adapter's settings.</p>
-  </div>
-  
-
-  
-
-  
-
-  
-  
-    <div class="panel panel-success">
-      <!-- Default panel contents -->
-      <div class="panel-heading"><strong>Method parameters:</strong></div>
-      
-
-<table class="params table table-striped table-bordered">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-        <th>Argument</th>
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>operator</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" target="_blank">String</a></span>
-
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last"><p>The name of the operator.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>opts</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">Object</a></span>
-
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last"><p>Configuration options.</p>
-                <h6 class="method-params-label method-subparams-label">Properties</h6>
-                
-
-<table class="params table table-striped table-bordered">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-        <th>Argument</th>
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>operators</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">Object</a></span>
-
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last"><p>Override the default predicate functions
-for specified operators.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-            </td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    </div>
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-  <div class="panel panel-info">
-    <!-- Default panel contents -->
-    <div class="panel-heading"><strong>Return value:</strong></div>
-    <table class="table table-striped table-bordered">
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-        
-          <tr>
-            
-              <td>
-<span class="param-type">*</span>
-
-
-</td>
-            
-            
-              <td><p>The predicate function for the specified operator.</p></td>
-            
-          </tr>
-        
-      </tbody>
-    </table>
-  </div>
-  
-
-  
-<div class="panel panel-default">
-  <div class="panel-heading"><strong>Details</strong></div>
-  <table class="table table-striped table-bordered">
-    <thead>
-      <tr>
-        
-        
-        
-        
-        
-          <th>Source</th>
-        
-        
         
         
         
@@ -12679,8 +10158,8 @@ for specified operators.</p></td>
         
         
           <td>
-            <a href="src_index.js.html">src/index.js</a>,
-             <a href="src_index.js.html#sunlight-1-line-906">line 906</a>
+            <a href="node_modules_js-data-adapter_src_index.js.html">node_modules/js-data-adapter/src/index.js</a>,
+             <a href="node_modules_js-data-adapter_src_index.js.html#sunlight-1-line-874">line 874</a>
           </td>
         
         
@@ -12905,7 +10384,7 @@ this adapter's settings. Override with care.</p>
         
           <td>
             <a href="node_modules_js-data-adapter_src_index.js.html">node_modules/js-data-adapter/src/index.js</a>,
-             <a href="node_modules_js-data-adapter_src_index.js.html#sunlight-1-line-989">line 989</a>
+             <a href="node_modules_js-data-adapter_src_index.js.html#sunlight-1-line-960">line 960</a>
           </td>
         
         
@@ -12919,15 +10398,6 @@ this adapter's settings. Override with care.</p>
 <dl class="details">
     
 
-  
-  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
-  <dd class="inherited-from">
-    <ul class="dummy">
-      <li>
-        <a href="Adapter.html#getOpt">Adapter#getOpt</a>
-      </li>
-    </ul>
-  </dd>
   
 
     
@@ -13057,15 +10527,6 @@ this adapter's settings. Override with care.</p>
     
 
   
-  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
-  <dd class="inherited-from">
-    <ul class="dummy">
-      <li>
-        <a href="Adapter.html#loadBelongsTo">Adapter#loadBelongsTo</a>
-      </li>
-    </ul>
-  </dd>
-  
 
     
 
@@ -13179,7 +10640,7 @@ this adapter's settings. Override with care.</p>
         
           <td>
             <a href="node_modules_js-data-adapter_src_index.js.html">node_modules/js-data-adapter/src/index.js</a>,
-             <a href="node_modules_js-data-adapter_src_index.js.html#sunlight-1-line-1004">line 1004</a>
+             <a href="node_modules_js-data-adapter_src_index.js.html#sunlight-1-line-975">line 975</a>
           </td>
         
         
@@ -13193,15 +10654,6 @@ this adapter's settings. Override with care.</p>
 <dl class="details">
     
 
-  
-  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
-  <dd class="inherited-from">
-    <ul class="dummy">
-      <li>
-        <a href="Adapter.html#loadHasMany">Adapter#loadHasMany</a>
-      </li>
-    </ul>
-  </dd>
   
 
     
@@ -13316,7 +10768,7 @@ this adapter's settings. Override with care.</p>
         
           <td>
             <a href="node_modules_js-data-adapter_src_index.js.html">node_modules/js-data-adapter/src/index.js</a>,
-             <a href="node_modules_js-data-adapter_src_index.js.html#sunlight-1-line-1138">line 1138</a>
+             <a href="node_modules_js-data-adapter_src_index.js.html#sunlight-1-line-1109">line 1109</a>
           </td>
         
         
@@ -13330,15 +10782,6 @@ this adapter's settings. Override with care.</p>
 <dl class="details">
     
 
-  
-  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
-  <dd class="inherited-from">
-    <ul class="dummy">
-      <li>
-        <a href="Adapter.html#loadHasOne">Adapter#loadHasOne</a>
-      </li>
-    </ul>
-  </dd>
   
 
     
@@ -13453,7 +10896,7 @@ this adapter's settings. Override with care.</p>
         
           <td>
             <a href="node_modules_js-data-adapter_src_index.js.html">node_modules/js-data-adapter/src/index.js</a>,
-             <a href="node_modules_js-data-adapter_src_index.js.html#sunlight-1-line-1207">line 1207</a>
+             <a href="node_modules_js-data-adapter_src_index.js.html#sunlight-1-line-1178">line 1178</a>
           </td>
         
         
@@ -13467,15 +10910,6 @@ this adapter's settings. Override with care.</p>
 <dl class="details">
     
 
-  
-  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
-  <dd class="inherited-from">
-    <ul class="dummy">
-      <li>
-        <a href="Adapter.html#makeBelongsToForeignKey">Adapter#makeBelongsToForeignKey</a>
-      </li>
-    </ul>
-  </dd>
   
 
     
@@ -13592,7 +11026,7 @@ the id of the parent doesn't exactly match up to the key on the child.</p>
         
           <td>
             <a href="node_modules_js-data-adapter_src_index.js.html">node_modules/js-data-adapter/src/index.js</a>,
-             <a href="node_modules_js-data-adapter_src_index.js.html#sunlight-1-line-1161">line 1161</a>
+             <a href="node_modules_js-data-adapter_src_index.js.html#sunlight-1-line-1132">line 1132</a>
           </td>
         
         
@@ -13606,15 +11040,6 @@ the id of the parent doesn't exactly match up to the key on the child.</p>
 <dl class="details">
     
 
-  
-  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
-  <dd class="inherited-from">
-    <ul class="dummy">
-      <li>
-        <a href="Adapter.html#makeHasManyForeignKey">Adapter#makeHasManyForeignKey</a>
-      </li>
-    </ul>
-  </dd>
   
 
     
@@ -13729,7 +11154,7 @@ the id of the parent doesn't exactly match up to the key on the child.</p>
         
           <td>
             <a href="node_modules_js-data-adapter_src_index.js.html">node_modules/js-data-adapter/src/index.js</a>,
-             <a href="node_modules_js-data-adapter_src_index.js.html#sunlight-1-line-1194">line 1194</a>
+             <a href="node_modules_js-data-adapter_src_index.js.html#sunlight-1-line-1165">line 1165</a>
           </td>
         
         
@@ -13743,15 +11168,6 @@ the id of the parent doesn't exactly match up to the key on the child.</p>
 <dl class="details">
     
 
-  
-  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
-  <dd class="inherited-from">
-    <ul class="dummy">
-      <li>
-        <a href="Adapter.html#makeHasManyForeignKeys">Adapter#makeHasManyForeignKeys</a>
-      </li>
-    </ul>
-  </dd>
   
 
     
@@ -13866,7 +11282,7 @@ the id of the parent doesn't exactly match up to the key on the child.</p>
         
           <td>
             <a href="node_modules_js-data-adapter_src_index.js.html">node_modules/js-data-adapter/src/index.js</a>,
-             <a href="node_modules_js-data-adapter_src_index.js.html#sunlight-1-line-1177">line 1177</a>
+             <a href="node_modules_js-data-adapter_src_index.js.html#sunlight-1-line-1148">line 1148</a>
           </td>
         
         
@@ -13880,15 +11296,6 @@ the id of the parent doesn't exactly match up to the key on the child.</p>
 <dl class="details">
     
 
-  
-  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
-  <dd class="inherited-from">
-    <ul class="dummy">
-      <li>
-        <a href="Adapter.html#makeHasManyLocalKeys">Adapter#makeHasManyLocalKeys</a>
-      </li>
-    </ul>
-  </dd>
   
 
     
@@ -14048,7 +11455,7 @@ return {Object} If <code>opts.raw == true</code> then return <code>response</cod
         
           <td>
             <a href="node_modules_js-data-adapter_src_index.js.html">node_modules/js-data-adapter/src/index.js</a>,
-             <a href="node_modules_js-data-adapter_src_index.js.html#sunlight-1-line-1270">line 1270</a>
+             <a href="node_modules_js-data-adapter_src_index.js.html#sunlight-1-line-1241">line 1241</a>
           </td>
         
         
@@ -14062,15 +11469,6 @@ return {Object} If <code>opts.raw == true</code> then return <code>response</cod
 <dl class="details">
     
 
-  
-  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
-  <dd class="inherited-from">
-    <ul class="dummy">
-      <li>
-        <a href="Adapter.html#respond">Adapter#respond</a>
-      </li>
-    </ul>
-  </dd>
   
 
     
@@ -14104,8 +11502,8 @@ return {Object} If <code>opts.raw == true</code> then return <code>response</cod
 
   
   <div class="description">
-    <p>Return the sum of the specified field of records that match the selection
-query.</p>
+    <p>Retrieve sum of the specified field of the records that match the selection
+query. Called by <code>Mapper#sum</code>.</p>
   </div>
   
 
@@ -14201,7 +11599,7 @@ query.</p>
 
             
 
-            <td class="description last"><p>The field to sum.</p></td>
+            <td class="description last"><p>By to sum.</p></td>
         </tr>
 
     
@@ -14537,45 +11935,6 @@ query.</p>
 
         <tr>
             
-                <td class="name"><code>operators</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">Object</a></span>
-
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                </td>
-            
-
-            <td class="description last"><p>Override the default predicate functions
-for specified operators.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
                 <td class="name"><code>raw</code></td>
             
 
@@ -14611,44 +11970,6 @@ for specified operators.</p></td>
 
             <td class="description last"><p>Whether to return a more detailed
 response object.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>runOpts</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">Object</a></span>
-
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                </td>
-            
-
-            <td class="description last"><p>Options to pass to r#run.</p></td>
         </tr>
 
     
@@ -14720,8 +12041,6 @@ response object.</p></td>
           <th>Source</th>
         
         
-          <th>Overrides</th>
-        
         
         
         
@@ -14735,14 +12054,10 @@ response object.</p></td>
         
         
           <td>
-            <a href="src_index.js.html">src/index.js</a>,
-             <a href="src_index.js.html#sunlight-1-line-925">line 925</a>
+            <a href="node_modules_js-data-adapter_src_index.js.html">node_modules/js-data-adapter/src/index.js</a>,
+             <a href="node_modules_js-data-adapter_src_index.js.html#sunlight-1-line-1191">line 1191</a>
           </td>
         
-        
-          <td>
-            <a href="Adapter.html#sum">Adapter#sum</a>
-          </td>
         
         
         
@@ -14787,7 +12102,8 @@ response object.</p></td>
 
   
   <div class="description">
-    <p>Apply the given update to the record with the specified primary key.</p>
+    <p>Apply the given update to the record with the specified primary key. Called
+by <code>Mapper#update</code>.</p>
   </div>
   
 
@@ -14982,44 +12298,6 @@ response object.</p></td>
 
         <tr>
             
-                <td class="name"><code>updateOpts</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">Object</a></span>
-
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                </td>
-            
-
-            <td class="description last"><p>Options to pass to r#update.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
                 <td class="name"><code>raw</code></td>
             
 
@@ -15055,44 +12333,6 @@ response object.</p></td>
 
             <td class="description last"><p>Whether to return a more detailed
 response object.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>runOpts</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">Object</a></span>
-
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                </td>
-            
-
-            <td class="description last"><p>Options to pass to r#run.</p></td>
         </tr>
 
     
@@ -15164,8 +12404,6 @@ response object.</p></td>
           <th>Source</th>
         
         
-          <th>Overrides</th>
-        
         
         
         
@@ -15179,14 +12417,10 @@ response object.</p></td>
         
         
           <td>
-            <a href="src_index.js.html">src/index.js</a>,
-             <a href="src_index.js.html#sunlight-1-line-956">line 956</a>
+            <a href="node_modules_js-data-adapter_src_index.js.html">node_modules/js-data-adapter/src/index.js</a>,
+             <a href="node_modules_js-data-adapter_src_index.js.html#sunlight-1-line-1253">line 1253</a>
           </td>
         
-        
-          <td>
-            <a href="Adapter.html#update">Adapter#update</a>
-          </td>
         
         
         
@@ -15231,7 +12465,8 @@ response object.</p></td>
 
   
   <div class="description">
-    <p>Apply the given update to all records that match the selection query.</p>
+    <p>Apply the given update to all records that match the selection query.
+Called by <code>Mapper#updateAll</code>.</p>
   </div>
   
 
@@ -15663,45 +12898,6 @@ response object.</p></td>
 
         <tr>
             
-                <td class="name"><code>operators</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">Object</a></span>
-
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                </td>
-            
-
-            <td class="description last"><p>Override the default predicate functions
-for specified operators.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
                 <td class="name"><code>raw</code></td>
             
 
@@ -15737,82 +12933,6 @@ for specified operators.</p></td>
 
             <td class="description last"><p>Whether to return a more detailed
 response object.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>runOpts</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">Object</a></span>
-
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                </td>
-            
-
-            <td class="description last"><p>Options to pass to r#run.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>updateOpts</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">Object</a></span>
-
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                </td>
-            
-
-            <td class="description last"><p>Options to pass to r#update.</p></td>
         </tr>
 
     
@@ -15884,8 +13004,6 @@ response object.</p></td>
           <th>Source</th>
         
         
-          <th>Overrides</th>
-        
         
         
         
@@ -15899,14 +13017,10 @@ response object.</p></td>
         
         
           <td>
-            <a href="src_index.js.html">src/index.js</a>,
-             <a href="src_index.js.html#sunlight-1-line-979">line 979</a>
+            <a href="node_modules_js-data-adapter_src_index.js.html">node_modules/js-data-adapter/src/index.js</a>,
+             <a href="node_modules_js-data-adapter_src_index.js.html#sunlight-1-line-1297">line 1297</a>
           </td>
         
-        
-          <td>
-            <a href="Adapter.html#updateAll">Adapter#updateAll</a>
-          </td>
         
         
         
@@ -15951,7 +13065,7 @@ response object.</p></td>
 
   
   <div class="description">
-    <p>Update the given records in a single batch.</p>
+    <p>Update the given records in a single batch. Called by <code>Mapper#updateMany</code>.</p>
   </div>
   
 
@@ -16111,44 +13225,6 @@ response object.</p></td>
 
         <tr>
             
-                <td class="name"><code>insertOpts</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">Object</a></span>
-
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                </td>
-            
-
-            <td class="description last"><p>Options to pass to r#insert.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
                 <td class="name"><code>raw</code></td>
             
 
@@ -16184,44 +13260,6 @@ response object.</p></td>
 
             <td class="description last"><p>Whether to return a more detailed
 response object.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>runOpts</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">Object</a></span>
-
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                </td>
-            
-
-            <td class="description last"><p>Options to pass to r#run.</p></td>
         </tr>
 
     
@@ -16293,8 +13331,6 @@ response object.</p></td>
           <th>Source</th>
         
         
-          <th>Overrides</th>
-        
         
         
         
@@ -16308,14 +13344,10 @@ response object.</p></td>
         
         
           <td>
-            <a href="src_index.js.html">src/index.js</a>,
-             <a href="src_index.js.html#sunlight-1-line-1011">line 1011</a>
+            <a href="node_modules_js-data-adapter_src_index.js.html">node_modules/js-data-adapter/src/index.js</a>,
+             <a href="node_modules_js-data-adapter_src_index.js.html#sunlight-1-line-1349">line 1349</a>
           </td>
         
-        
-          <td>
-            <a href="Adapter.html#updateMany">Adapter#updateMany</a>
-          </td>
         
         
         
@@ -16388,13 +13420,13 @@ response object.</p></td>
 
 
 	<span class="copyright">
-	js-data-rethinkdb Copyright © 2014-2016 js-data-rethinkdb project authors
+	js-data-rethinkdb Copyright © 2014-2017 js-data-rethinkdb project authors
 	</span>
 
 <span class="jsdoc-message">
-	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.2</a>
+	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.4</a>
 	
-		on 2016-10-17T09:20:30-07:00
+		on 2017-08-18T10:11:56-07:00
 	
 	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
 </span>

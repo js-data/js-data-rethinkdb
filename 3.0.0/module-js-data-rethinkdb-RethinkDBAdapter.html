@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<title>js-data-rethinkdb Class: Adapter</title>
+	<title>js-data-rethinkdb Class: RethinkDBAdapter</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -121,13 +121,15 @@
 		<div id="main">
 			
 
-	<h1 class="page-title">Class: Adapter</h1>
+	<h1 class="page-title">Class: RethinkDBAdapter</h1>
 <section>
 
 <header>
     
         <h2>
-        Adapter
+            <span class="ancestors"><a href="module-js-data-rethinkdb.html">js-data-rethinkdb</a>~</span>
+        
+        RethinkDBAdapter
         </h2>
         
     
@@ -140,7 +142,7 @@
         
 <hr>
 <dt>
-  <h4 class="name" id="Adapter"><span class="type-signature">&lt;abstract> </span>new Adapter(<span class="optional">opts</span>)</h4>
+  <h4 class="name" id="RethinkDBAdapter"><span class="type-signature"></span>new RethinkDBAdapter(<span class="optional">opts</span>)</h4>
 
   
 </dt>
@@ -148,7 +150,7 @@
 
   
   <div class="description">
-    <p>Abstract class meant to be extended by adapters.</p>
+    <p>RethinkDBAdapter class.</p>
   </div>
   
 
@@ -214,7 +216,7 @@
 
             
 
-            <td class="description last"><p>Configuration opts.</p>
+            <td class="description last"><p>Configuration options.</p>
                 <h6 class="method-params-label method-subparams-label">Properties</h6>
                 
 
@@ -277,7 +279,165 @@
                 </td>
             
 
-            <td class="description last"><p>Whether to log debugging information.</p></td>
+            <td class="description last"><p>See <a href="Adapter.html#debug">Adapter#debug</a>.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>deleteOpts</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">Object</a></span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    {}
+                
+                </td>
+            
+
+            <td class="description last"><p>See <a href="RethinkDBAdapter.html#deleteOpts">RethinkDBAdapter#deleteOpts</a>.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>insertOpts</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">Object</a></span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    {}
+                
+                </td>
+            
+
+            <td class="description last"><p>See <a href="RethinkDBAdapter.html#insertOpts">RethinkDBAdapter#insertOpts</a>.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>operators</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">Object</a></span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    <a href="module-js-data-rethinkdb.html#.OPERATORS">module:js-data-rethinkdb.OPERATORS</a>
+                
+                </td>
+            
+
+            <td class="description last"><p>See <a href="RethinkDBAdapter.html#operators">RethinkDBAdapter#operators</a>.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>r</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">Object</a></span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>See <a href="RethinkDBAdapter.html#r">RethinkDBAdapter#r</a>.</p></td>
         </tr>
 
     
@@ -317,8 +477,127 @@
                 </td>
             
 
-            <td class="description last"><p>Whether to return a more detailed response
-object.</p></td>
+            <td class="description last"><p>See <a href="Adapter.html#raw">Adapter#raw</a>.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>rOpts</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">Object</a></span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    {}
+                
+                </td>
+            
+
+            <td class="description last"><p>See <a href="RethinkDBAdapter.html#rOpts">RethinkDBAdapter#rOpts</a>.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>runOpts</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">Object</a></span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    {}
+                
+                </td>
+            
+
+            <td class="description last"><p>See <a href="RethinkDBAdapter.html#runOpts">RethinkDBAdapter#runOpts</a>.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>updateOpts</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">Object</a></span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    {}
+                
+                </td>
+            
+
+            <td class="description last"><p>See <a href="RethinkDBAdapter.html#updateOpts">RethinkDBAdapter#updateOpts</a>.</p></td>
         </tr>
 
     
@@ -374,8 +653,8 @@ object.</p></td>
         
         
           <td>
-            <a href="node_modules_js-data-adapter_src_index.js.html">node_modules/js-data-adapter/src/index.js</a>,
-             <a href="node_modules_js-data-adapter_src_index.js.html#sunlight-1-line-93">line 93</a>
+            <a href="src_index.js.html">src/index.js</a>,
+             <a href="src_index.js.html#sunlight-1-line-91">line 91</a>
           </td>
         
         
@@ -408,6 +687,49 @@ object.</p></td>
 
 
   
+    <div class="code-panel panel panel-warning">
+      <div class="panel-heading">
+        <strong>Example</strong>
+      </div>
+      <div class="panel-body">
+        
+    <pre id="pre-"><code class="javascript">// Use Container instead of DataStore on the server
+import { Container } from &#x27;js-data&#x27;;
+import { RethinkDBAdapter } from &#x27;js-data-rethinkdb&#x27;;
+
+// Create a store to hold your Mappers
+const store = new Container();
+
+// Create an instance of RethinkDBAdapter with default settings
+const adapter = new RethinkDBAdapter();
+
+// Mappers in &quot;store&quot; will use the RethinkDB adapter by default
+store.registerAdapter(&#x27;rethinkdb&#x27;, adapter, { default: true });
+
+// Create a Mapper that maps to a &quot;user&quot; table
+store.defineMapper(&#x27;user&#x27;);</code></pre>
+    <div class="tonic" id="tonic-" style="display: none;">
+      // Use Container instead of DataStore on the server
+import { Container } from &#x27;js-data&#x27;;
+import { RethinkDBAdapter } from &#x27;js-data-rethinkdb&#x27;;
+
+// Create a store to hold your Mappers
+const store = new Container();
+
+// Create an instance of RethinkDBAdapter with default settings
+const adapter = new RethinkDBAdapter();
+
+// Mappers in &quot;store&quot; will use the RethinkDB adapter by default
+store.registerAdapter(&#x27;rethinkdb&#x27;, adapter, { default: true });
+
+// Create a Mapper that maps to a &quot;user&quot; table
+store.defineMapper(&#x27;user&#x27;);
+    </div>
+
+
+      </div>
+    </div>
+  
 </dd>
 
     
@@ -419,7 +741,7 @@ object.</p></td>
         
 
 
-    This class extends the Component class.
+    This class extends the <a href="Adapter.html">Adapter</a> class.
 
 
     
@@ -506,6 +828,15 @@ object.</p></td>
 <dl class="details">
     
 
+  
+  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+  <dd class="inherited-from">
+    <ul class="dummy">
+      <li>
+        <a href="Adapter.html#debug">Adapter#debug</a>
+      </li>
+    </ul>
+  </dd>
   
 
     
@@ -599,6 +930,15 @@ object.</p></td>
     
 
   
+  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+  <dd class="inherited-from">
+    <ul class="dummy">
+      <li>
+        <a href="Adapter.html#raw">Adapter#raw</a>
+      </li>
+    </ul>
+  </dd>
+  
 
     
 
@@ -626,405 +966,6 @@ object.</p></td>
         <h3 class="subsection-title">Methods</h3>
 
         <dl>
-            
-<hr>
-<dt>
-  <h4 class="name" id=".extend"><span class="type-signature">&lt;static> </span>extend(<span class="optional">props</span>, <span class="optional">classProps</span>)</h4>
-
-  
-</dt>
-<dd>
-
-  
-  <div class="description">
-    <p>Create a subclass of this Adapter:</p>
-  </div>
-  
-
-  
-
-  
-
-  
-  
-    <div class="panel panel-success">
-      <!-- Default panel contents -->
-      <div class="panel-heading"><strong>Method parameters:</strong></div>
-      
-
-<table class="params table table-striped table-bordered">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-        <th>Argument</th>
-        
-
-        
-        <th>Default</th>
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>props</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">Object</a></span>
-
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    {}
-                
-                </td>
-            
-
-            <td class="description last"><p>Properties to add to the prototype of the
-subclass.</p>
-                <h6 class="method-params-label method-subparams-label">Properties</h6>
-                
-
-<table class="params table table-striped table-bordered">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-        <th>Argument</th>
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>constructor</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">Object</a></span>
-
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last"><p>Provide a custom constructor function
-to be used as the subclass itself.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-            </td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>classProps</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">Object</a></span>
-
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-                <td class="default">
-                
-                    {}
-                
-                </td>
-            
-
-            <td class="description last"><p>Static properties to add to the subclass.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    </div>
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-  <div class="panel panel-info">
-    <!-- Default panel contents -->
-    <div class="panel-heading"><strong>Return value:</strong></div>
-    <table class="table table-striped table-bordered">
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-        
-          <tr>
-            
-              <td>
-<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/new" target="_blank">Constructor</a></span>
-
-
-</td>
-            
-            
-              <td><p>Subclass of this Adapter class.</p></td>
-            
-          </tr>
-        
-      </tbody>
-    </table>
-  </div>
-  
-
-  
-<div class="panel panel-default">
-  <div class="panel-heading"><strong>Details</strong></div>
-  <table class="table table-striped table-bordered">
-    <thead>
-      <tr>
-        
-        
-        
-        
-        
-          <th>Source</th>
-        
-        
-        
-        
-        
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        
-        
-        
-        
-        
-          <td>
-            <a href="node_modules_js-data-adapter_src_index.js.html">node_modules/js-data-adapter/src/index.js</a>,
-             <a href="node_modules_js-data-adapter_src_index.js.html#sunlight-1-line-1396">line 1396</a>
-          </td>
-        
-        
-        
-        
-        
-      </tr>
-    </tbody>
-  </table>
-</div>
-<dl class="details">
-    
-
-  
-
-    
-
-    
-
-    
-
-  
-
-  
-
-  
-
-  
-</dl>
-
-
-  
-    <div class="code-panel panel panel-warning">
-      <div class="panel-heading">
-        <strong>Example</strong>
-      </div>
-      <div class="panel-body">
-        
-        <p class="code-caption" id="btn-Adapter.extend">
-          <button class="btn btn-primary" onclick="loadTonic('Adapter.extend')">Try it out</button>
-        </p>
-    
-    <pre id="pre-Adapter.extend"><code class="javascript">// Normally you would do: import {Adapter} from &#x27;js-data&#x27;
-const JSData = require(&#x27;js-data@3.0.0-beta.10&#x27;)
-const {Adapter} = JSData
-console.log(&#x27;Using JSData v&#x27; + JSData.version.full)
-
-// Extend the class using ES2015 class syntax.
-class CustomAdapterClass extends Adapter {
-  foo () { return &#x27;bar&#x27; }
-  static beep () { return &#x27;boop&#x27; }
-}
-const customAdapter = new CustomAdapterClass()
-console.log(customAdapter.foo())
-console.log(CustomAdapterClass.beep())
-
-// Extend the class using alternate method.
-const OtherAdapterClass = Adapter.extend({
-  foo () { return &#x27;bar&#x27; }
-}, {
-  beep () { return &#x27;boop&#x27; }
-})
-const otherAdapter = new OtherAdapterClass()
-console.log(otherAdapter.foo())
-console.log(OtherAdapterClass.beep())
-
-// Extend the class, providing a custom constructor.
-function AnotherAdapterClass () {
-  Adapter.call(this)
-  this.created_at = new Date().getTime()
-}
-Adapter.extend({
-  constructor: AnotherAdapterClass,
-  foo () { return &#x27;bar&#x27; }
-}, {
-  beep () { return &#x27;boop&#x27; }
-})
-const anotherAdapter = new AnotherAdapterClass()
-console.log(anotherAdapter.created_at)
-console.log(anotherAdapter.foo())
-console.log(AnotherAdapterClass.beep())</code></pre>
-    <div class="tonic" id="tonic-Adapter.extend" style="display: none;">
-      // Normally you would do: import {Adapter} from &#x27;js-data&#x27;
-const JSData = require(&#x27;js-data@3.0.0-beta.10&#x27;)
-const {Adapter} = JSData
-console.log(&#x27;Using JSData v&#x27; + JSData.version.full)
-
-// Extend the class using ES2015 class syntax.
-class CustomAdapterClass extends Adapter {
-  foo () { return &#x27;bar&#x27; }
-  static beep () { return &#x27;boop&#x27; }
-}
-const customAdapter = new CustomAdapterClass()
-console.log(customAdapter.foo())
-console.log(CustomAdapterClass.beep())
-
-// Extend the class using alternate method.
-const OtherAdapterClass = Adapter.extend({
-  foo () { return &#x27;bar&#x27; }
-}, {
-  beep () { return &#x27;boop&#x27; }
-})
-const otherAdapter = new OtherAdapterClass()
-console.log(otherAdapter.foo())
-console.log(OtherAdapterClass.beep())
-
-// Extend the class, providing a custom constructor.
-function AnotherAdapterClass () {
-  Adapter.call(this)
-  this.created_at = new Date().getTime()
-}
-Adapter.extend({
-  constructor: AnotherAdapterClass,
-  foo () { return &#x27;bar&#x27; }
-}, {
-  beep () { return &#x27;boop&#x27; }
-})
-const anotherAdapter = new AnotherAdapterClass()
-console.log(anotherAdapter.created_at)
-console.log(anotherAdapter.foo())
-console.log(AnotherAdapterClass.beep())
-    </div>
-
-
-      </div>
-    </div>
-  
-</dd>
-
-        
             
 <hr>
 <dt>
@@ -1288,6 +1229,15 @@ console.log(AnotherAdapterClass.beep())
     
 
   
+  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+  <dd class="inherited-from">
+    <ul class="dummy">
+      <li>
+        <a href="Adapter.html#afterCount">Adapter#afterCount</a>
+      </li>
+    </ul>
+  </dd>
+  
 
     
 
@@ -1490,6 +1440,8 @@ console.log(AnotherAdapterClass.beep())
           <th>Source</th>
         
         
+          <th>Overrides</th>
+        
         
         
         
@@ -1507,6 +1459,10 @@ console.log(AnotherAdapterClass.beep())
              <a href="node_modules_js-data-adapter_src_index.js.html#sunlight-1-line-138">line 138</a>
           </td>
         
+        
+          <td>
+            <a href="Adapter.html#afterCreate">Adapter#afterCreate</a>
+          </td>
         
         
         
@@ -1572,289 +1528,14 @@ console.log(AnotherAdapterClass.beep())
     
 
   
-
-    
-
-    
-
-    
-
-  
-
-  
-
-  
-
-  
-</dl>
-
-
-  
-</dd>
-
-        
-            
-<hr>
-<dt>
-  <h4 class="name" id="afterCreate"><span class="type-signature"></span>afterCreate(mapper, props, opts, response)</h4>
-
-  
-</dt>
-<dd>
-
-  
-  <div class="description">
-    <p>Lifecycle method method called by <a href="#createMany__anchor">createMany</a>.</p>
-<p>Override this method to add custom behavior for this lifecycle hook.</p>
-<p>Returning a Promise causes <a href="#createMany__anchor">createMany</a> to wait for the Promise to resolve before continuing.</p>
-<p>If <code>opts.raw</code> is <code>true</code> then <code>response</code> will be a detailed response object, otherwise <code>response</code> will be the created records.</p>
-<p><code>response</code> may be modified. You can also re-assign <code>response</code> to another value by returning a different value or a Promise that resolves to a different value.</p>
-<p>A thrown error or rejected Promise will bubble up and reject the Promise returned by <a href="#createMany__anchor">createMany</a>.</p>
-  </div>
-  
-
-  
-
-  
-
-  
-  
-    <div class="panel panel-success">
-      <!-- Default panel contents -->
-      <div class="panel-heading"><strong>Method parameters:</strong></div>
-      
-
-<table class="params table table-striped table-bordered">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>mapper</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">Object</a></span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The <code>mapper</code> argument passed to <a href="#createMany__anchor">createMany</a>.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>props</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" target="_blank">Array</a>.&lt;<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">Object</a>&gt;</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The <code>props</code> argument passed to <a href="#createMany__anchor">createMany</a>.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>opts</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">Object</a></span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The <code>opts</code> argument passed to <a href="#createMany__anchor">createMany</a>.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>response</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array" target="_blank">Array</a>.&lt;<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">Object</a>&gt;</span>
-|
-
-<span class="param-type"><a href="Response.html">Response</a></span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>Created records or <a href="Response.html">Response</a>, depending on the value of <code>opts.raw</code>.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    </div>
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-<div class="panel panel-default">
-  <div class="panel-heading"><strong>Details</strong></div>
-  <table class="table table-striped table-bordered">
-    <thead>
-      <tr>
-        
-        
-        
-        
-        
-          <th>Source</th>
-        
-        
-        
-        
-        
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        
-        
-        
-        
-        
-          <td>
-            <a href="node_modules_js-data-adapter_src_index.js.html">node_modules/js-data-adapter/src/index.js</a>,
-             <a href="node_modules_js-data-adapter_src_index.js.html#sunlight-1-line-161">line 161</a>
-          </td>
-        
-        
-        
-        
-        
-      </tr>
-    </tbody>
-  </table>
-</div>
-<dl class="details">
-    
-
-    <h5 class="subsection-title">Properties:</h5>
-
-    <dl>
-
-<table class="props table table-striped table-bordered">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>opts.op</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" target="_blank">String</a></span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p><code>afterCreateMany</code></p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-</dl>
-
-    
-
+  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+  <dd class="inherited-from">
+    <ul class="dummy">
+      <li>
+        <a href="Adapter.html#afterCreate">Adapter#afterCreate</a>
+      </li>
+    </ul>
+  </dd>
   
 
     
@@ -2143,6 +1824,15 @@ console.log(AnotherAdapterClass.beep())
     
 
   
+  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+  <dd class="inherited-from">
+    <ul class="dummy">
+      <li>
+        <a href="Adapter.html#afterDestroy">Adapter#afterDestroy</a>
+      </li>
+    </ul>
+  </dd>
+  
 
     
 
@@ -2426,6 +2116,15 @@ console.log(AnotherAdapterClass.beep())
 
     
 
+  
+  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+  <dd class="inherited-from">
+    <ul class="dummy">
+      <li>
+        <a href="Adapter.html#afterDestroyAll">Adapter#afterDestroyAll</a>
+      </li>
+    </ul>
+  </dd>
   
 
     
@@ -2714,6 +2413,15 @@ console.log(AnotherAdapterClass.beep())
     
 
   
+  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+  <dd class="inherited-from">
+    <ul class="dummy">
+      <li>
+        <a href="Adapter.html#afterFind">Adapter#afterFind</a>
+      </li>
+    </ul>
+  </dd>
+  
 
     
 
@@ -2997,6 +2705,15 @@ console.log(AnotherAdapterClass.beep())
 
     
 
+  
+  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+  <dd class="inherited-from">
+    <ul class="dummy">
+      <li>
+        <a href="Adapter.html#afterFindAll">Adapter#afterFindAll</a>
+      </li>
+    </ul>
+  </dd>
   
 
     
@@ -3305,6 +3022,15 @@ console.log(AnotherAdapterClass.beep())
 
     
 
+  
+  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+  <dd class="inherited-from">
+    <ul class="dummy">
+      <li>
+        <a href="Adapter.html#afterSum">Adapter#afterSum</a>
+      </li>
+    </ul>
+  </dd>
   
 
     
@@ -3617,6 +3343,15 @@ console.log(AnotherAdapterClass.beep())
     
 
   
+  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+  <dd class="inherited-from">
+    <ul class="dummy">
+      <li>
+        <a href="Adapter.html#afterUpdate">Adapter#afterUpdate</a>
+      </li>
+    </ul>
+  </dd>
+  
 
     
 
@@ -3925,6 +3660,15 @@ console.log(AnotherAdapterClass.beep())
     
 
   
+  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+  <dd class="inherited-from">
+    <ul class="dummy">
+      <li>
+        <a href="Adapter.html#afterUpdateAll">Adapter#afterUpdateAll</a>
+      </li>
+    </ul>
+  </dd>
+  
 
     
 
@@ -4209,6 +3953,15 @@ console.log(AnotherAdapterClass.beep())
     
 
   
+  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+  <dd class="inherited-from">
+    <ul class="dummy">
+      <li>
+        <a href="Adapter.html#afterUpdateMany">Adapter#afterUpdateMany</a>
+      </li>
+    </ul>
+  </dd>
+  
 
     
 
@@ -4463,6 +4216,15 @@ console.log(AnotherAdapterClass.beep())
 
     
 
+  
+  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+  <dd class="inherited-from">
+    <ul class="dummy">
+      <li>
+        <a href="Adapter.html#beforeCount">Adapter#beforeCount</a>
+      </li>
+    </ul>
+  </dd>
   
 
     
@@ -4720,6 +4482,15 @@ console.log(AnotherAdapterClass.beep())
     
 
   
+  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+  <dd class="inherited-from">
+    <ul class="dummy">
+      <li>
+        <a href="Adapter.html#beforeCreate">Adapter#beforeCreate</a>
+      </li>
+    </ul>
+  </dd>
+  
 
     
 
@@ -4975,6 +4746,15 @@ console.log(AnotherAdapterClass.beep())
 
     
 
+  
+  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+  <dd class="inherited-from">
+    <ul class="dummy">
+      <li>
+        <a href="Adapter.html#beforeCreateMany">Adapter#beforeCreateMany</a>
+      </li>
+    </ul>
+  </dd>
   
 
     
@@ -5234,6 +5014,15 @@ console.log(AnotherAdapterClass.beep())
     
 
   
+  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+  <dd class="inherited-from">
+    <ul class="dummy">
+      <li>
+        <a href="Adapter.html#beforeDestroy">Adapter#beforeDestroy</a>
+      </li>
+    </ul>
+  </dd>
+  
 
     
 
@@ -5488,6 +5277,15 @@ console.log(AnotherAdapterClass.beep())
 
     
 
+  
+  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+  <dd class="inherited-from">
+    <ul class="dummy">
+      <li>
+        <a href="Adapter.html#beforeDestroyAll">Adapter#beforeDestroyAll</a>
+      </li>
+    </ul>
+  </dd>
   
 
     
@@ -5747,6 +5545,15 @@ console.log(AnotherAdapterClass.beep())
     
 
   
+  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+  <dd class="inherited-from">
+    <ul class="dummy">
+      <li>
+        <a href="Adapter.html#beforeFind">Adapter#beforeFind</a>
+      </li>
+    </ul>
+  </dd>
+  
 
     
 
@@ -6002,6 +5809,15 @@ console.log(AnotherAdapterClass.beep())
     
 
   
+  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+  <dd class="inherited-from">
+    <ul class="dummy">
+      <li>
+        <a href="Adapter.html#beforeFindAll">Adapter#beforeFindAll</a>
+      </li>
+    </ul>
+  </dd>
+  
 
     
 
@@ -6256,6 +6072,15 @@ console.log(AnotherAdapterClass.beep())
 
     
 
+  
+  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+  <dd class="inherited-from">
+    <ul class="dummy">
+      <li>
+        <a href="Adapter.html#beforeSum">Adapter#beforeSum</a>
+      </li>
+    </ul>
+  </dd>
   
 
     
@@ -6540,6 +6365,15 @@ console.log(AnotherAdapterClass.beep())
     
 
   
+  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+  <dd class="inherited-from">
+    <ul class="dummy">
+      <li>
+        <a href="Adapter.html#beforeUpdate">Adapter#beforeUpdate</a>
+      </li>
+    </ul>
+  </dd>
+  
 
     
 
@@ -6820,6 +6654,15 @@ console.log(AnotherAdapterClass.beep())
     
 
   
+  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+  <dd class="inherited-from">
+    <ul class="dummy">
+      <li>
+        <a href="Adapter.html#beforeUpdateAll">Adapter#beforeUpdateAll</a>
+      </li>
+    </ul>
+  </dd>
+  
 
     
 
@@ -7075,6 +6918,15 @@ console.log(AnotherAdapterClass.beep())
 
     
 
+  
+  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+  <dd class="inherited-from">
+    <ul class="dummy">
+      <li>
+        <a href="Adapter.html#beforeUpdateMany">Adapter#beforeUpdateMany</a>
+      </li>
+    </ul>
+  </dd>
   
 
     
@@ -7644,6 +7496,15 @@ response object.</p></td>
     
 
   
+  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+  <dd class="inherited-from">
+    <ul class="dummy">
+      <li>
+        <a href="Adapter.html#count">Adapter#count</a>
+      </li>
+    </ul>
+  </dd>
+  
 
     
 
@@ -7971,6 +7832,15 @@ response object.</p></td>
     
 
   
+  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+  <dd class="inherited-from">
+    <ul class="dummy">
+      <li>
+        <a href="Adapter.html#create">Adapter#create</a>
+      </li>
+    </ul>
+  </dd>
+  
 
     
 
@@ -8297,6 +8167,15 @@ response object.</p></td>
 <dl class="details">
     
 
+  
+  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+  <dd class="inherited-from">
+    <ul class="dummy">
+      <li>
+        <a href="Adapter.html#createMany">Adapter#createMany</a>
+      </li>
+    </ul>
+  </dd>
   
 
     
@@ -8628,6 +8507,15 @@ response object.</p></td>
 <dl class="details">
     
 
+  
+  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+  <dd class="inherited-from">
+    <ul class="dummy">
+      <li>
+        <a href="Adapter.html#destroy">Adapter#destroy</a>
+      </li>
+    </ul>
+  </dd>
   
 
     
@@ -9197,6 +9085,15 @@ response object.</p></td>
     
 
   
+  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+  <dd class="inherited-from">
+    <ul class="dummy">
+      <li>
+        <a href="Adapter.html#destroyAll">Adapter#destroyAll</a>
+      </li>
+    </ul>
+  </dd>
+  
 
     
 
@@ -9566,6 +9463,15 @@ response object.</p></td>
 <dl class="details">
     
 
+  
+  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+  <dd class="inherited-from">
+    <ul class="dummy">
+      <li>
+        <a href="Adapter.html#find">Adapter#find</a>
+      </li>
+    </ul>
+  </dd>
   
 
     
@@ -10174,6 +10080,15 @@ response object.</p></td>
     
 
   
+  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+  <dd class="inherited-from">
+    <ul class="dummy">
+      <li>
+        <a href="Adapter.html#findAll">Adapter#findAll</a>
+      </li>
+    </ul>
+  </dd>
+  
 
     
 
@@ -10399,6 +10314,15 @@ this adapter's settings. Override with care.</p>
     
 
   
+  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+  <dd class="inherited-from">
+    <ul class="dummy">
+      <li>
+        <a href="Adapter.html#getOpt">Adapter#getOpt</a>
+      </li>
+    </ul>
+  </dd>
+  
 
     
 
@@ -10526,6 +10450,15 @@ this adapter's settings. Override with care.</p>
 <dl class="details">
     
 
+  
+  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+  <dd class="inherited-from">
+    <ul class="dummy">
+      <li>
+        <a href="Adapter.html#loadBelongsTo">Adapter#loadBelongsTo</a>
+      </li>
+    </ul>
+  </dd>
   
 
     
@@ -10655,6 +10588,15 @@ this adapter's settings. Override with care.</p>
     
 
   
+  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+  <dd class="inherited-from">
+    <ul class="dummy">
+      <li>
+        <a href="Adapter.html#loadHasMany">Adapter#loadHasMany</a>
+      </li>
+    </ul>
+  </dd>
+  
 
     
 
@@ -10783,6 +10725,15 @@ this adapter's settings. Override with care.</p>
     
 
   
+  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+  <dd class="inherited-from">
+    <ul class="dummy">
+      <li>
+        <a href="Adapter.html#loadHasOne">Adapter#loadHasOne</a>
+      </li>
+    </ul>
+  </dd>
+  
 
     
 
@@ -10910,6 +10861,15 @@ this adapter's settings. Override with care.</p>
 <dl class="details">
     
 
+  
+  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+  <dd class="inherited-from">
+    <ul class="dummy">
+      <li>
+        <a href="Adapter.html#makeBelongsToForeignKey">Adapter#makeBelongsToForeignKey</a>
+      </li>
+    </ul>
+  </dd>
   
 
     
@@ -11041,6 +11001,15 @@ the id of the parent doesn't exactly match up to the key on the child.</p>
     
 
   
+  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+  <dd class="inherited-from">
+    <ul class="dummy">
+      <li>
+        <a href="Adapter.html#makeHasManyForeignKey">Adapter#makeHasManyForeignKey</a>
+      </li>
+    </ul>
+  </dd>
+  
 
     
 
@@ -11169,6 +11138,15 @@ the id of the parent doesn't exactly match up to the key on the child.</p>
     
 
   
+  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+  <dd class="inherited-from">
+    <ul class="dummy">
+      <li>
+        <a href="Adapter.html#makeHasManyForeignKeys">Adapter#makeHasManyForeignKeys</a>
+      </li>
+    </ul>
+  </dd>
+  
 
     
 
@@ -11296,6 +11274,15 @@ the id of the parent doesn't exactly match up to the key on the child.</p>
 <dl class="details">
     
 
+  
+  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+  <dd class="inherited-from">
+    <ul class="dummy">
+      <li>
+        <a href="Adapter.html#makeHasManyLocalKeys">Adapter#makeHasManyLocalKeys</a>
+      </li>
+    </ul>
+  </dd>
   
 
     
@@ -11469,6 +11456,15 @@ return {Object} If <code>opts.raw == true</code> then return <code>response</cod
 <dl class="details">
     
 
+  
+  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+  <dd class="inherited-from">
+    <ul class="dummy">
+      <li>
+        <a href="Adapter.html#respond">Adapter#respond</a>
+      </li>
+    </ul>
+  </dd>
   
 
     
@@ -12070,6 +12066,15 @@ response object.</p></td>
     
 
   
+  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+  <dd class="inherited-from">
+    <ul class="dummy">
+      <li>
+        <a href="Adapter.html#sum">Adapter#sum</a>
+      </li>
+    </ul>
+  </dd>
+  
 
     
 
@@ -12432,6 +12437,15 @@ response object.</p></td>
 <dl class="details">
     
 
+  
+  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+  <dd class="inherited-from">
+    <ul class="dummy">
+      <li>
+        <a href="Adapter.html#update">Adapter#update</a>
+      </li>
+    </ul>
+  </dd>
   
 
     
@@ -13033,6 +13047,15 @@ response object.</p></td>
     
 
   
+  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+  <dd class="inherited-from">
+    <ul class="dummy">
+      <li>
+        <a href="Adapter.html#updateAll">Adapter#updateAll</a>
+      </li>
+    </ul>
+  </dd>
+  
 
     
 
@@ -13359,6 +13382,15 @@ response object.</p></td>
 <dl class="details">
     
 
+  
+  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+  <dd class="inherited-from">
+    <ul class="dummy">
+      <li>
+        <a href="Adapter.html#updateMany">Adapter#updateMany</a>
+      </li>
+    </ul>
+  </dd>
   
 
     
