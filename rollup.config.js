@@ -1,17 +1,25 @@
-var babel = require('rollup-plugin-babel')
+import babel from 'rollup-plugin-babel'
 
-module.exports = {
+export default {
   external: [
     'rethinkdbdash',
     'js-data',
     'js-data-adapter',
-    'mout/string/underscore'
+    'lodash.snakecase'
   ],
   plugins: [
     babel({
       babelrc: false,
+      plugins: [
+        'external-helpers'
+      ],
       presets: [
-        'es2015-rollup'
+        [
+          'es2015',
+          {
+            modules: false
+          }
+        ]
       ],
       exclude: 'node_modules/**'
     })

@@ -1,24 +1,32 @@
+# Adjust the behavior of the virtual machine (VM)
+machine:
+  node:
+    version: 6.11.2
+
+# Use for broader build-related configuration
 general:
   branches:
     ignore:
       - gh-pages
-machine:
-  node:
-    version: 5.7.0
+
 dependencies:
   pre:
     - npm i -g npm
     - npm i -g codecov nyc
-    - npm i js-data@^3.0.0-rc.4 rethinkdbdash
     - source /etc/lsb-release && echo "deb http://download.rethinkdb.com/apt $DISTRIB_CODENAME main" | sudo tee /etc/apt/sources.list.d/rethinkdb.list
     - wget -qO- http://download.rethinkdb.com/apt/pubkey.gpg | sudo apt-key add -
     - sudo apt-get update -qq
     - sudo apt-get install rethinkdb -y --force-yes
+    - sudo cp /etc/rethinkdb/default.conf.sample /etc/rethinkdb/instances.d/instance1.conf
+    - echo "cache-size=128" | sudo tee --append /etc/rethinkdb/instances.d/instance1.conf
+    - echo "no-http-admin" | sudo tee --append /etc/rethinkdb/instances.d/instance1.conf
+    - sudo /etc/init.d/rethinkdb restart
+    - sleep 5
   post:
     - sudo rethinkdb --io-threads 2048 --daemon
     - ulimit -S -n 2048
     - sleep 10
 test:
   post:
-    - nyc report --reporter=lcov | codecov
+    - nyc report --reporter=lcov > coverage.lcov && codecov
     - sudo killall rethinkdb
