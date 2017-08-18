@@ -7,211 +7,7 @@ function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'defau
 var jsData = require('js-data');
 var jsDataAdapter = require('js-data-adapter');
 var rethinkdbdash = _interopDefault(require('rethinkdbdash'));
-var underscore = _interopDefault(require('mout/string/underscore'));
-
-var asyncGenerator = function () {
-  function AwaitValue(value) {
-    this.value = value;
-  }
-
-  function AsyncGenerator(gen) {
-    var front, back;
-
-    function send(key, arg) {
-      return new Promise(function (resolve, reject) {
-        var request = {
-          key: key,
-          arg: arg,
-          resolve: resolve,
-          reject: reject,
-          next: null
-        };
-
-        if (back) {
-          back = back.next = request;
-        } else {
-          front = back = request;
-          resume(key, arg);
-        }
-      });
-    }
-
-    function resume(key, arg) {
-      try {
-        var result = gen[key](arg);
-        var value = result.value;
-
-        if (value instanceof AwaitValue) {
-          Promise.resolve(value.value).then(function (arg) {
-            resume("next", arg);
-          }, function (arg) {
-            resume("throw", arg);
-          });
-        } else {
-          settle(result.done ? "return" : "normal", result.value);
-        }
-      } catch (err) {
-        settle("throw", err);
-      }
-    }
-
-    function settle(type, value) {
-      switch (type) {
-        case "return":
-          front.resolve({
-            value: value,
-            done: true
-          });
-          break;
-
-        case "throw":
-          front.reject(value);
-          break;
-
-        default:
-          front.resolve({
-            value: value,
-            done: false
-          });
-          break;
-      }
-
-      front = front.next;
-
-      if (front) {
-        resume(front.key, front.arg);
-      } else {
-        back = null;
-      }
-    }
-
-    this._invoke = send;
-
-    if (typeof gen.return !== "function") {
-      this.return = undefined;
-    }
-  }
-
-  if (typeof Symbol === "function" && Symbol.asyncIterator) {
-    AsyncGenerator.prototype[Symbol.asyncIterator] = function () {
-      return this;
-    };
-  }
-
-  AsyncGenerator.prototype.next = function (arg) {
-    return this._invoke("next", arg);
-  };
-
-  AsyncGenerator.prototype.throw = function (arg) {
-    return this._invoke("throw", arg);
-  };
-
-  AsyncGenerator.prototype.return = function (arg) {
-    return this._invoke("return", arg);
-  };
-
-  return {
-    wrap: function (fn) {
-      return function () {
-        return new AsyncGenerator(fn.apply(this, arguments));
-      };
-    },
-    await: function (value) {
-      return new AwaitValue(value);
-    }
-  };
-}();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-var get = function get(object, property, receiver) {
-  if (object === null) object = Function.prototype;
-  var desc = Object.getOwnPropertyDescriptor(object, property);
-
-  if (desc === undefined) {
-    var parent = Object.getPrototypeOf(object);
-
-    if (parent === null) {
-      return undefined;
-    } else {
-      return get(parent, property, receiver);
-    }
-  } else if ("value" in desc) {
-    return desc.value;
-  } else {
-    var getter = desc.get;
-
-    if (getter === undefined) {
-      return undefined;
-    }
-
-    return getter.call(receiver);
-  }
-};
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-var set = function set(object, property, value, receiver) {
-  var desc = Object.getOwnPropertyDescriptor(object, property);
-
-  if (desc === undefined) {
-    var parent = Object.getPrototypeOf(object);
-
-    if (parent !== null) {
-      set(parent, property, value, receiver);
-    }
-  } else if ("value" in desc && desc.writable) {
-    desc.value = value;
-  } else {
-    var setter = desc.set;
-
-    if (setter !== undefined) {
-      setter.call(receiver, value);
-    }
-  }
-
-  return value;
-};
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+var snakeCase = _interopDefault(require('lodash.snakecase'));
 
 var toConsumableArray = function (arr) {
   if (Array.isArray(arr)) {
@@ -310,20 +106,20 @@ Object.freeze(OPERATORS);
  *
  * @example
  * // Use Container instead of DataStore on the server
- * import {Container} from 'js-data'
- * import {RethinkDBAdapter} from 'js-data-rethinkdb'
+ * import { Container } from 'js-data';
+ * import { RethinkDBAdapter } from 'js-data-rethinkdb';
  *
  * // Create a store to hold your Mappers
- * const store = new Container()
+ * const store = new Container();
  *
  * // Create an instance of RethinkDBAdapter with default settings
- * const adapter = new RethinkDBAdapter()
+ * const adapter = new RethinkDBAdapter();
  *
  * // Mappers in "store" will use the RethinkDB adapter by default
- * store.registerAdapter('rethinkdb', adapter, { default: true })
+ * store.registerAdapter('rethinkdb', adapter, { default: true });
  *
  * // Create a Mapper that maps to a "user" table
- * store.defineMapper('user')
+ * store.defineMapper('user');
  *
  * @class RethinkDBAdapter
  * @extends Adapter
@@ -349,28 +145,28 @@ function RethinkDBAdapter(opts) {
      * you need to write custom queries.
      *
      * @example <caption>Use default instance.</caption>
-     * import {RethinkDBAdapter} from 'js-data-rethinkdb'
-     * const adapter = new RethinkDBAdapter()
-     * adapter.r.dbDrop('foo').then(...)
+     * import { RethinkDBAdapter } from 'js-data-rethinkdb';
+     * const adapter = new RethinkDBAdapter();
+     * adapter.r.dbDrop('foo').then(...);
      *
      * @example <caption>Configure default instance.</caption>
-     * import {RethinkDBAdapter} from 'js-data-rethinkdb'
+     * import { RethinkDBAdapter } from 'js-data-rethinkdb';
      * const adapter = new RethinkDBAdapter({
      *   rOpts: {
      *     user: 'myUser',
      *     password: 'myPassword'
      *   }
-     * })
-     * adapter.r.dbDrop('foo').then(...)
+     * });
+     * adapter.r.dbDrop('foo').then(...);
      *
      * @example <caption>Provide a custom instance.</caption>
-     * import rethinkdbdash from 'rethinkdbdash'
-     * import {RethinkDBAdapter} from 'js-data-rethinkdb'
-     * const r = rethinkdbdash()
+     * import rethinkdbdash from 'rethinkdbdash';
+     * import { RethinkDBAdapter } from 'js-data-rethinkdb';
+     * const r = rethinkdbdash();
      * const adapter = new RethinkDBAdapter({
      *   r: r
-     * })
-     * adapter.r.dbDrop('foo').then(...)
+     * });
+     * adapter.r.dbDrop('foo').then(...);
      *
      * @name RethinkDBAdapter#r
      * @type {object}
@@ -450,27 +246,27 @@ function RethinkDBAdapter(opts) {
    * [readme]: https://github.com/neumino/rethinkdbdash#importing-the-driver
    *
    * @example <caption>Connect to localhost:8080, and let the driver find other instances.</caption>
-   * import {RethinkDBAdapter} from 'js-data-rethinkdb'
+   * import { RethinkDBAdapter } from 'js-data-rethinkdb';
    * const adapter = new RethinkDBAdapter({
    *   rOpts: {
    *     discovery: true
    *   }
-   * })
+   * });
    *
    * @example <caption>Connect to and only to localhost:8080.</caption>
-   * import {RethinkDBAdapter} from 'js-data-rethinkdb'
-   * const adapter = new RethinkDBAdapter()
+   * import { RethinkDBAdapter } from 'js-data-rethinkdb';
+   * const adapter = new RethinkDBAdapter();
    *
    * @example <caption>Do not create a connection pool.</caption>
-   * import {RethinkDBAdapter} from 'js-data-rethinkdb'
+   * import { RethinkDBAdapter } from 'js-data-rethinkdb';
    * const adapter = new RethinkDBAdapter({
    *   rOpts: {
    *     pool: false
    *   }
-   * })
+   * });
    *
    * @example <caption>Connect to a cluster seeding from `192.168.0.100`, `192.168.0.101`, `192.168.0.102`.</caption>
-   * import {RethinkDBAdapter} from 'js-data-rethinkdb'
+   * import { RethinkDBAdapter } from 'js-data-rethinkdb';
    * const adapter = new RethinkDBAdapter({
    *   rOpts: {
    *     servers: [
@@ -479,7 +275,7 @@ function RethinkDBAdapter(opts) {
    *       { host: '192.168.0.102', port: 28015 }
    *     ]
    *   }
-   * })
+   * });
    *
    * @name RethinkDBAdapter#rOpts
    * @see https://github.com/neumino/rethinkdbdash#importing-the-driver
@@ -573,6 +369,9 @@ jsDataAdapter.Adapter.extend({
     opts || (opts = {});
 
     return this._pluck(mapper, this.selectTable(mapper, opts).get(id), opts).run(this.getOpt('runOpts', opts)).then(function (record) {
+      if (!record) {
+        record = undefined;
+      }
       return [record, {}];
     });
   },
@@ -847,7 +646,7 @@ jsDataAdapter.Adapter.extend({
     return this.r.db(jsData.utils.isUndefined(opts.db) ? this.rOpts.db : opts.db);
   },
   selectTable: function selectTable(mapper, opts) {
-    return this.selectDb(opts).table(mapper.table || underscore(mapper.name));
+    return this.selectDb(opts).table(mapper.table || snakeCase(mapper.name));
   },
   waitForDb: function waitForDb(opts) {
     opts || (opts = {});
@@ -861,7 +660,7 @@ jsDataAdapter.Adapter.extend({
     var _this10 = this;
 
     opts || (opts = {});
-    var table = jsData.utils.isString(mapper) ? mapper : mapper.table || underscore(mapper.name);
+    var table = jsData.utils.isString(mapper) ? mapper : mapper.table || snakeCase(mapper.name);
     var db = jsData.utils.isUndefined(opts.db) ? this.rOpts.db : opts.db;
     return this.waitForDb(opts).then(function () {
       _this10.tables[db] = _this10.tables[db] || {};
@@ -1067,9 +866,9 @@ jsDataAdapter.Adapter.extend({
       }
       if (def.foreignKey && def.type !== 'belongsTo') {
         if (def.type === 'belongsTo') {
-          tasks.push(_this17.waitForIndex(mapper.table || underscore(mapper.name), def.foreignKey, opts));
+          tasks.push(_this17.waitForIndex(mapper.table || snakeCase(mapper.name), def.foreignKey, opts));
         } else {
-          tasks.push(_this17.waitForIndex(relationDef.table || underscore(relationDef.name), def.foreignKey, opts));
+          tasks.push(_this17.waitForIndex(relationDef.table || snakeCase(relationDef.name), def.foreignKey, opts));
         }
       }
     });
@@ -1120,9 +919,9 @@ jsDataAdapter.Adapter.extend({
       }
       if (def.foreignKey && def.type !== 'belongsTo') {
         if (def.type === 'belongsTo') {
-          tasks.push(_this18.waitForIndex(mapper.table || underscore(mapper.name), def.foreignKey, opts));
+          tasks.push(_this18.waitForIndex(mapper.table || snakeCase(mapper.name), def.foreignKey, opts));
         } else {
-          tasks.push(_this18.waitForIndex(relationDef.table || underscore(relationDef.name), def.foreignKey, opts));
+          tasks.push(_this18.waitForIndex(relationDef.table || snakeCase(relationDef.name), def.foreignKey, opts));
         }
       }
     });
@@ -1280,12 +1079,12 @@ jsDataAdapter.Adapter.extend({
  * Details of the current version of the `js-data-rethinkdb` module.
  *
  * @example <caption>ES2015 modules import</caption>
- * import {version} from 'js-data-rethinkdb'
- * console.log(version.full)
+ * import { version } from 'js-data-rethinkdb';
+ * console.log(version.full);
  *
  * @example <caption>CommonJS import</caption>
- * var version = require('js-data-rethinkdb').version
- * console.log(version.full)
+ * const version = require('js-data-rethinkdb').version;
+ * console.log(version.full);
  *
  * @name module:js-data-rethinkdb.version
  * @type {object}
@@ -1299,7 +1098,7 @@ jsDataAdapter.Adapter.extend({
  * otherwise `false` if the current version is not beta.
  */
 var version = {
-  full: '3.0.0-rc.3',
+  full: '3.0.0',
   major: 3,
   minor: 0,
   patch: 0
@@ -1309,12 +1108,12 @@ var version = {
  * {@link RethinkDBAdapter} class.
  *
  * @example <caption>ES2015 modules import</caption>
- * import {RethinkDBAdapter} from 'js-data-rethinkdb'
- * const adapter = new RethinkDBAdapter()
+ * import { RethinkDBAdapter } from 'js-data-rethinkdb';
+ * const adapter = new RethinkDBAdapter();
  *
  * @example <caption>CommonJS import</caption>
- * var RethinkDBAdapter = require('js-data-rethinkdb').RethinkDBAdapter
- * var adapter = new RethinkDBAdapter()
+ * const RethinkDBAdapter = require('js-data-rethinkdb').RethinkDBAdapter;
+ * const adapter = new RethinkDBAdapter();
  *
  * @name module:js-data-rethinkdb.RethinkDBAdapter
  * @see RethinkDBAdapter
@@ -1325,15 +1124,15 @@ var version = {
  * Registered as `js-data-rethinkdb` in NPM.
  *
  * @example <caption>Install from NPM</caption>
- * npm i --save js-data-rethinkdb@beta js-data@beta rethinkdbdash
+ * npm i --save js-data-rethinkdb js-data
  *
  * @example <caption>ES2015 modules import</caption>
- * import {RethinkDBAdapter} from 'js-data-rethinkdb'
- * const adapter = new RethinkDBAdapter()
+ * import { RethinkDBAdapter } from 'js-data-rethinkdb';
+ * const adapter = new RethinkDBAdapter();
  *
  * @example <caption>CommonJS import</caption>
- * var RethinkDBAdapter = require('js-data-rethinkdb').RethinkDBAdapter
- * var adapter = new RethinkDBAdapter()
+ * const RethinkDBAdapter = require('js-data-rethinkdb').RethinkDBAdapter;
+ * const adapter = new RethinkDBAdapter();
  *
  * @module js-data-rethinkdb
  */
@@ -1341,45 +1140,45 @@ var version = {
 /**
  * Create a subclass of this RethinkDBAdapter:
  * @example <caption>RethinkDBAdapter.extend</caption>
- * // Normally you would do: import {RethinkDBAdapter} from 'js-data-rethinkdb'
- * const JSDataRethinkDB = require('js-data-rethinkdb@3.0.0-beta.8')
- * const {RethinkDBAdapter} = JSDataRethinkDB
- * console.log('Using JSDataRethinkDB v' + JSDataRethinkDB.version.full)
+ * // Normally you would do: import { RethinkDBAdapter } from 'js-data-rethinkdb';
+ * const JSDataRethinkDB = require('js-data-rethinkdb');
+ * const { RethinkDBAdapter } = JSDataRethinkDB;
+ * console.log('Using JSDataRethinkDB v' + JSDataRethinkDB.version.full);
  *
  * // Extend the class using ES2015 class syntax.
  * class CustomRethinkDBAdapterClass extends RethinkDBAdapter {
- *   foo () { return 'bar' }
- *   static beep () { return 'boop' }
+ *   foo () { return 'bar'; }
+ *   static beep () { return 'boop'; }
  * }
- * const customRethinkDBAdapter = new CustomRethinkDBAdapterClass()
- * console.log(customRethinkDBAdapter.foo())
- * console.log(CustomRethinkDBAdapterClass.beep())
+ * const customRethinkDBAdapter = new CustomRethinkDBAdapterClass();
+ * console.log(customRethinkDBAdapter.foo());
+ * console.log(CustomRethinkDBAdapterClass.beep());
  *
  * // Extend the class using alternate method.
  * const OtherRethinkDBAdapterClass = RethinkDBAdapter.extend({
- *   foo () { return 'bar' }
+ *   foo () { return 'bar'; }
  * }, {
- *   beep () { return 'boop' }
- * })
- * const otherRethinkDBAdapter = new OtherRethinkDBAdapterClass()
- * console.log(otherRethinkDBAdapter.foo())
- * console.log(OtherRethinkDBAdapterClass.beep())
+ *   beep () { return 'boop'; }
+ * });
+ * const otherRethinkDBAdapter = new OtherRethinkDBAdapterClass();
+ * console.log(otherRethinkDBAdapter.foo());
+ * console.log(OtherRethinkDBAdapterClass.beep());
  *
  * // Extend the class, providing a custom constructor.
  * function AnotherRethinkDBAdapterClass () {
- *   RethinkDBAdapter.call(this)
- *   this.created_at = new Date().getTime()
+ *   RethinkDBAdapter.call(this);
+ *   this.created_at = new Date().getTime();
  * }
  * RethinkDBAdapter.extend({
  *   constructor: AnotherRethinkDBAdapterClass,
- *   foo () { return 'bar' }
+ *   foo () { return 'bar'; }
  * }, {
- *   beep () { return 'boop' }
+ *   beep () { return 'boop'; }
  * })
- * const anotherRethinkDBAdapter = new AnotherRethinkDBAdapterClass()
- * console.log(anotherRethinkDBAdapter.created_at)
- * console.log(anotherRethinkDBAdapter.foo())
- * console.log(AnotherRethinkDBAdapterClass.beep())
+ * const anotherRethinkDBAdapter = new AnotherRethinkDBAdapterClass();
+ * console.log(anotherRethinkDBAdapter.created_at);
+ * console.log(anotherRethinkDBAdapter.foo());
+ * console.log(AnotherRethinkDBAdapterClass.beep());
  *
  * @method RethinkDBAdapter.extend
  * @param {object} [props={}] Properties to add to the prototype of the
